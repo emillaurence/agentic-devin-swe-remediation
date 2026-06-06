@@ -25,7 +25,8 @@ The system is built as a Python FastAPI application with the following component
 - `POST /webhook/github` - Accept GitHub issue webhook payloads (only triggers on `action == "labeled"`)
 - `POST /simulate` - Simulate remediation events without live webhooks
 - `GET /sessions` - View all tracked Devin sessions
-- `GET /metrics` - View operational metrics
+- `POST /sessions/sync` - Manually trigger a sync pass over all running Devin sessions
+- `GET /metrics` - View operational metrics (automatically syncs sessions before returning)
 - `GET /health` - Health check endpoint
 
 ## Label-Driven Operating Model
@@ -46,6 +47,46 @@ The system is generic and label-driven. It uses GitHub labels to control behavio
 - `status:devin-running` - Automatically added when a Devin session starts
 - `status:devin-completed` - Added when remediation completes successfully
 - `status:devin-failed` - Added when remediation fails
+
+## Session Completion Tracking
+
+The system uses a **polling-based mechanism** to track session completion, not webhook callbacks from Devin.
+
+### How It Works
+
+1. When a Devin session is created, it's stored locally with status `running`
+2. The system periodically polls the Devin API to check session status
+3. When a session reaches a terminal state (completed, failed, suspended, error):
+   - The local session record is updated
+   - GitHub labels are updated (removing `status:devin-running`, adding the appropriate status label)
+   - A comment is added to the GitHub issue with details:
+     - For completed sessions: session link, PR link, validation summary
+     - For failed sessions: failure reason
+
+### Manual Sync
+
+To manually trigger a sync pass over all running sessions:
+
+```bash
+curl -X POST http://localhost:8000/sessions/sync
+```
+
+This endpoint:
+- Queries the Devin API for all running sessions
+- Updates local session records based on actual Devin status
+- Updates GitHub labels and comments for completed/failed sessions
+
+### Automatic Sync
+
+The `/metrics` endpoint automatically triggers a sync before returning metrics, ensuring the metrics reflect the latest session statuses.
+
+### Why Polling?
+
+This approach keeps the system simple:
+- No need for webhook infrastructure from Devin
+- No database or message queue required
+- Local JSON store is sufficient for tracking
+- Manual sync gives control over when to check status
 
 The system is not hardcoded only for Superset or only for `risk:quality`. Superset is the first target repo, but the design is reusable for other repositories and other remediation labels.
 

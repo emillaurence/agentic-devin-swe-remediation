@@ -1,6 +1,7 @@
 import os
 import uuid
 import logging
+import asyncio
 from datetime import datetime
 from typing import List, Optional
 from fastapi import FastAPI, HTTPException, BackgroundTasks, Request
@@ -192,6 +193,144 @@ This issue has been labeled `{STATUS_RUNNING_LABEL}`. Progress will be updated a
             )
 
 
+async def sync_sessions():
+    """Sync all running Devin sessions with their actual status from Devin API.
+    
+    This function:
+    - Gets all running sessions from the store
+    - Queries Devin API for each session's current status
+    - Updates local session records and GitHub labels based on status
+    - Comments on GitHub issues with completion/failure details
+    """
+    if not devin_client:
+        logger.warning("Devin client not initialized - cannot sync sessions")
+        return
+    
+    logger.info("Starting session sync")
+    
+    # Get all running sessions
+    all_sessions = store.get_all_sessions()
+    running_sessions = [s for s in all_sessions if s.status == SessionStatus.RUNNING]
+    
+    logger.info(f"Found {len(running_sessions)} running sessions to sync")
+    
+    for session in running_sessions:
+        try:
+            logger.info(f"Checking status for session {session.session_id}")
+            
+            # Get session status from Devin
+            session_status = await devin_client.get_session_status(session.session_id)
+            
+            # Determine the actual status from Devin response
+            # Devin API returns status field with values like: running, completed, failed, suspended, error
+            devin_state = session_status.get("status", "").lower()
+            
+            logger.info(f"Session {session.session_id} Devin status: {devin_state}")
+            
+            # Check if session is terminal (completed, failed, suspended, error)
+            terminal_states = ["completed", "failed", "suspended", "error"]
+            
+            # Also check for pull_requests as a completion signal (Devin API may not update status correctly)
+            has_pull_requests = session_status.get("pull_requests") and len(session_status.get("pull_requests", [])) > 0
+            
+            # Consider session completed if it has pull requests, even if status is still "new" or "running"
+            if has_pull_requests and devin_state in ["new", "running"]:
+                logger.info(f"Session {session.session_id} has pull requests but status is '{devin_state}' - treating as completed")
+                devin_state = "completed"
+            
+            if devin_state in terminal_states:
+                # Determine final status
+                if devin_state == "completed":
+                    final_status = SessionStatus.COMPLETED
+                    status_label = STATUS_COMPLETED_LABEL
+                    emoji = "✅"
+                else:
+                    final_status = SessionStatus.FAILED
+                    status_label = STATUS_FAILED_LABEL
+                    emoji = "❌"
+                
+                # Extract additional info from Devin response
+                pull_request_url = session_status.get("pull_request_url") or session.pull_request_url
+                
+                # If no pull_request_url but has pull_requests array, extract from there
+                if not pull_request_url and has_pull_requests:
+                    pull_requests = session_status.get("pull_requests", [])
+                    if pull_requests:
+                        pull_request_url = pull_requests[0].get("url") if isinstance(pull_requests[0], dict) else str(pull_requests[0])
+                
+                validation_summary = session_status.get("validation_summary")
+                failure_reason = session_status.get("error_message") or session_status.get("failure_reason")
+                
+                # Build comment body
+                if final_status == SessionStatus.COMPLETED:
+                    comment_body = f"""{emoji} **Devin Remediation Completed**
+
+**Session ID:** `{session.session_id}`
+**Status:** Completed successfully
+
+"""
+                    if pull_request_url:
+                        comment_body += f"**Pull Request:** {pull_request_url}\n\n"
+                    
+                    if validation_summary:
+                        comment_body += f"**Validation Summary:**\n{validation_summary}\n\n"
+                    
+                    comment_body += "This issue has been labeled `status:devin-completed`."
+                else:
+                    comment_body = f"""{emoji} **Devin Remediation Failed**
+
+**Session ID:** `{session.session_id}`
+**Status:** {devin_state.capitalize()}
+"""
+                    if failure_reason:
+                        comment_body += f"\n**Reason:** {failure_reason}\n\n"
+                    
+                    comment_body += "This issue has been labeled `status:devin-failed`."
+                
+                # Update session in store
+                update_data = {
+                    "status": final_status,
+                    "completed_at": datetime.utcnow()
+                }
+                
+                if pull_request_url:
+                    update_data["pull_request_url"] = pull_request_url
+                
+                if final_status == SessionStatus.FAILED and failure_reason:
+                    update_data["error_message"] = failure_reason
+                
+                store.update_session(session.session_id, update_data)
+                
+                # Update GitHub labels and add comment
+                if github_client and session.issue:
+                    try:
+                        # Remove running label
+                        await github_client.remove_label(session.issue.owner, session.issue.repo, session.issue.number, STATUS_RUNNING_LABEL)
+                        
+                        # Remove other status labels to avoid conflicts
+                        await github_client.remove_label(session.issue.owner, session.issue.repo, session.issue.number, STATUS_COMPLETED_LABEL)
+                        await github_client.remove_label(session.issue.owner, session.issue.repo, session.issue.number, STATUS_FAILED_LABEL)
+                        
+                        # Add new status label
+                        await github_client.add_label(session.issue.owner, session.issue.repo, session.issue.number, status_label)
+                        
+                        # Add comment
+                        await github_client.add_comment(session.issue.owner, session.issue.repo, session.issue.number, comment_body)
+                        
+                        logger.info(f"Updated GitHub issue {session.issue.number} for session {session.session_id}")
+                    except Exception as e:
+                        logger.error(f"Error updating GitHub for session {session.session_id}: {str(e)}")
+                
+                logger.info(f"Session {session.session_id} marked as {final_status.value}")
+            else:
+                logger.info(f"Session {session.session_id} still running (status: {devin_state})")
+                
+        except Exception as e:
+            logger.error(f"Error syncing session {session.session_id}: {str(e)}", exc_info=True)
+    
+    logger.info("Session sync completed")
+
+
 @app.post("/webhook/github")
 async def github_webhook(payload: WebhookPayload, background_tasks: BackgroundTasks):
     """
@@ -325,7 +464,13 @@ async def get_metrics():
     - Count by risk label
     - Count by repository
     - Average duration
+    
+    Note: Metrics reflect the latest synced statuses from the local store.
+    To ensure metrics are up-to-date, call POST /sessions/sync before querying metrics.
     """
+    # Sync sessions first to ensure metrics reflect latest status
+    await sync_sessions()
+    
     metrics = store.get_metrics()
     return {
         "total_issues_processed": metrics.total_issues_processed,
@@ -422,6 +567,52 @@ async def complete_session(session_id: str, pull_request_url: Optional[str] = No
         "session_id": session_id,
         "new_status": "completed"
     }
+
+
+@app.post("/sessions/sync")
+async def sync_sessions_endpoint():
+    """
+    Manually trigger a sync pass over all running Devin sessions.
+    
+    This endpoint:
+    - Queries the Devin API for all running sessions
+    - Updates local session records based on actual Devin status
+    - Updates GitHub labels and comments for completed/failed sessions
+    
+    This is a polling-based mechanism, not a webhook callback from Devin.
+    """
+    await sync_sessions()
+    
+    # Return summary of sync
+    all_sessions = store.get_all_sessions()
+    running_count = len([s for s in all_sessions if s.status == SessionStatus.RUNNING])
+    completed_count = len([s for s in all_sessions if s.status == SessionStatus.COMPLETED])
+    failed_count = len([s for s in all_sessions if s.status == SessionStatus.FAILED])
+    
+    return {
+        "status": "synced",
+        "sessions_checked": running_count + completed_count + failed_count,
+        "sessions_running": running_count,
+        "sessions_completed": completed_count,
+        "sessions_failed": failed_count
+    }
+
+
+async def periodic_sync():
+    """Periodically sync running Devin sessions every 60 seconds."""
+    while True:
+        try:
+            await sync_sessions()
+        except Exception as e:
+            logger.error(f"Error in periodic sync: {str(e)}", exc_info=True)
+        await asyncio.sleep(10)
+
+
+@app.on_event("startup")
+async def startup_event():
+    """Start the periodic sync task on startup."""
+    logger.info("Starting periodic sync task")
+    asyncio.create_task(periodic_sync())
 
 
 if __name__ == "__main__":
