@@ -1,0 +1,20 @@
+version: '3.8'
+
+services:
+  app:
+    build: .
+    ports:
+      - "8000:8000"
+    environment:
+      - DEVIN_API_KEY=${DEVIN_API_KEY}
+      - GITHUB_TOKEN=${GITHUB_TOKEN}
+      - DEFAULT_GITHUB_OWNER=${DEFAULT_GITHUB_OWNER:-emillaurence}
+      - DEFAULT_GITHUB_REPO=${DEFAULT_GITHUB_REPO:-superset}
+      - TRIGGER_LABEL=${TRIGGER_LABEL:-devin-remediate}
+      - STATUS_RUNNING_LABEL=${STATUS_RUNNING_LABEL:-status:devin-running}
+      - STATUS_COMPLETED_LABEL=${STATUS_COMPLETED_LABEL:-status:devin-completed}
+      - STATUS_FAILED_LABEL=${STATUS_FAILED_LABEL:-status:devin-failed}
+      - STORE_PATH=${STORE_PATH:-./data/sessions.json}
+    volumes:
+      - ./data:/app/data
+    restart: unless-stopped
