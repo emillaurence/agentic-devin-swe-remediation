@@ -43,6 +43,7 @@ class WebhookPayload(BaseModel):
     issue: Dict[str, Any]
     repository: Dict[str, Any]
     sender: Dict[str, Any]
+    label: Optional[Dict[str, Any]] = None
 
 
 class SimulateRequest(BaseModel):

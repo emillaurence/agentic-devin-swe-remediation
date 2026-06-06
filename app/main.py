@@ -6,6 +6,10 @@ from typing import List, Optional
 from fastapi import FastAPI, HTTPException, BackgroundTasks, Request
 from fastapi.responses import JSONResponse
 import uvicorn
+from dotenv import load_dotenv
+
+# Load environment variables from .env file
+load_dotenv()
 
 from app.models import (
     WebhookPayload,
@@ -28,6 +32,7 @@ logger = logging.getLogger(__name__)
 
 # Load environment variables
 DEVIN_API_KEY = os.getenv("DEVIN_API_KEY")
+DEVIN_ORG_ID = os.getenv("DEVIN_ORG_ID")
 GITHUB_TOKEN = os.getenv("GITHUB_TOKEN")
 DEFAULT_GITHUB_OWNER = os.getenv("DEFAULT_GITHUB_OWNER", "emillaurence")
 DEFAULT_GITHUB_REPO = os.getenv("DEFAULT_GITHUB_REPO", "superset")
@@ -40,12 +45,14 @@ STORE_PATH = os.getenv("STORE_PATH", "./data/sessions.json")
 # Validate required environment variables
 if not DEVIN_API_KEY:
     logger.warning("DEVIN_API_KEY not set - Devin integration will not work")
+if not DEVIN_ORG_ID:
+    logger.warning("DEVIN_ORG_ID not set - Devin integration will not work")
 if not GITHUB_TOKEN:
     logger.warning("GITHUB_TOKEN not set - GitHub API integration will not work")
 
 # Initialize components
 store = SessionStore(STORE_PATH)
-devin_client = DevinClient(DEVIN_API_KEY) if DEVIN_API_KEY else None
+devin_client = DevinClient(DEVIN_API_KEY, DEVIN_ORG_ID) if DEVIN_API_KEY and DEVIN_ORG_ID else None
 github_client = GitHubClient(GITHUB_TOKEN) if GITHUB_TOKEN else None
 
 # Create FastAPI app
@@ -64,8 +71,8 @@ def extract_risk_labels(labels: List[str]) -> List[str]:
 
 def parse_webhook_issue(payload: WebhookPayload) -> GitHubIssue:
     """Parse GitHub issue from webhook payload."""
-    issue_data = payload["issue"]
-    repository_data = payload["repository"]
+    issue_data = payload.issue
+    repository_data = payload.repository
     
     owner = repository_data["owner"]["login"]
     repo = repository_data["name"]
@@ -153,6 +160,10 @@ Devin will:
 This issue has been labeled `{STATUS_RUNNING_LABEL}`. Progress will be updated as the session completes.
 """
             await github_client.add_comment(issue.owner, issue.repo, issue.number, comment_body)
+            # Remove all old status labels before adding running label
+            await github_client.remove_label(issue.owner, issue.repo, issue.number, STATUS_RUNNING_LABEL)
+            await github_client.remove_label(issue.owner, issue.repo, issue.number, STATUS_FAILED_LABEL)
+            await github_client.remove_label(issue.owner, issue.repo, issue.number, STATUS_COMPLETED_LABEL)
             await github_client.add_label(issue.owner, issue.repo, issue.number, STATUS_RUNNING_LABEL)
         
         logger.info(f"Successfully started Devin session {session_id} for issue {issue.number}")
@@ -196,12 +207,24 @@ async def github_webhook(payload: WebhookPayload, background_tasks: BackgroundTa
     - Adds the status:devin-running label
     """
     
-    logger.info(f"Received GitHub webhook: action={payload.get('action')}")
+    logger.info(f"Received GitHub webhook: action={payload.action}")
     
     # Only process issue events
-    if "issue" not in payload:
+    if not payload.issue:
         logger.info("Not an issue event, skipping")
         return {"status": "skipped", "reason": "not an issue event"}
+    
+    # Only process when the action is "labeled"
+    if payload.action != "labeled":
+        logger.info(f"Action is '{payload.action}', not 'labeled', skipping")
+        return {"status": "skipped", "reason": "action is not 'labeled'"}
+    
+    # Only process when the label being added is the trigger label
+    # This prevents loops when we add our own status labels
+    label_added = payload.label.get("name") if payload.label else None
+    if label_added != TRIGGER_LABEL:
+        logger.info(f"Label '{label_added}' was added, not trigger label '{TRIGGER_LABEL}', skipping")
+        return {"status": "skipped", "reason": f"label '{label_added}' is not trigger label"}
     
     # Parse issue from webhook
     issue = parse_webhook_issue(payload)
@@ -322,6 +345,82 @@ async def health_check():
         "status": "healthy",
         "devin_configured": devin_client is not None,
         "github_configured": github_client is not None
+    }
+
+
+@app.get("/health/devin")
+async def devin_health_check():
+    """
+    Check Devin API authentication status.
+    
+    This endpoint verifies Devin authentication without creating a session.
+    Returns service user name and org ID, but never returns the API key.
+    """
+    if not devin_client:
+        return {
+            "status": "not_configured",
+            "message": "Devin client not initialized. Please check DEVIN_API_KEY and DEVIN_ORG_ID."
+        }
+    
+    try:
+        auth_info = await devin_client.check_authentication()
+        return {
+            "status": "authenticated",
+            "principal_type": auth_info.get("principal_type"),
+            "service_user_name": auth_info.get("service_user_name"),
+            "org_id": auth_info.get("org_id")
+        }
+    except ValueError as e:
+        return {
+            "status": "authentication_failed",
+            "message": str(e)
+        }
+    except Exception as e:
+        logger.error(f"Error checking Devin health: {str(e)}")
+        return {
+            "status": "error",
+            "message": f"Error checking Devin authentication: {str(e)}"
+        }
+
+
+@app.post("/sessions/{session_id}/complete")
+async def complete_session(session_id: str, pull_request_url: Optional[str] = None):
+    """
+    Manually mark a Devin session as completed.
+    
+    This endpoint allows manually updating session status when Devin has completed
+    work but the system hasn't detected it via polling yet.
+    """
+    session = store.get_session(session_id)
+    if not session:
+        raise HTTPException(status_code=404, detail="Session not found")
+    
+    # Update session status
+    update_data = {
+        "status": SessionStatus.COMPLETED,
+        "completed_at": datetime.utcnow()
+    }
+    
+    if pull_request_url:
+        update_data["pull_request_url"] = pull_request_url
+    
+    store.update_session(session_id, update_data)
+    
+    # Update GitHub issue label if configured
+    if github_client and session.issue:
+        try:
+            # Remove old status labels
+            await github_client.remove_label(session.issue.owner, session.issue.repo, session.issue.number, STATUS_RUNNING_LABEL)
+            await github_client.remove_label(session.issue.owner, session.issue.repo, session.issue.number, STATUS_FAILED_LABEL)
+            # Add completed label
+            await github_client.add_label(session.issue.owner, session.issue.repo, session.issue.number, STATUS_COMPLETED_LABEL)
+        except Exception as e:
+            logger.error(f"Error updating GitHub labels: {str(e)}")
+    
+    return {
+        "status": "updated",
+        "session_id": session_id,
+        "new_status": "completed"
     }
 
 

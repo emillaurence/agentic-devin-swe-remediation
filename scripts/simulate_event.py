@@ -10,6 +10,10 @@ import sys
 import argparse
 import httpx
 from datetime import datetime
+from dotenv import load_dotenv
+
+# Load environment variables from .env file
+load_dotenv()
 
 
 def main():

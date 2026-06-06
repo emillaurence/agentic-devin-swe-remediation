@@ -8,11 +8,18 @@ logger = logging.getLogger(__name__)
 
 
 class DevinClient:
-    def __init__(self, api_key: str, base_url: str = "https://api.devin.ai"):
-        self.api_key = api_key
+    def __init__(self, api_key: Optional[str] = None, org_id: Optional[str] = None, base_url: str = "https://api.devin.ai"):
+        self.api_key = api_key or os.getenv("DEVIN_API_KEY")
+        self.org_id = org_id or os.getenv("DEVIN_ORG_ID")
         self.base_url = base_url.rstrip('/')
+        
+        if not self.api_key:
+            raise ValueError("DEVIN_API_KEY is required")
+        if not self.org_id:
+            raise ValueError("DEVIN_ORG_ID is required")
+        
         self.headers = {
-            "Authorization": f"Bearer {api_key}",
+            "Authorization": f"Bearer {self.api_key}",
             "Content-Type": "application/json"
         }
 
@@ -84,10 +91,47 @@ Begin your work now.
 """
         return prompt
 
+    async def check_authentication(self) -> Dict[str, Any]:
+        """Check Devin API authentication by calling GET /v3/self.
+        
+        Returns:
+            Dict containing authentication status and user info (service user name, org ID)
+        
+        Raises:
+            ValueError: If authentication fails (401) or other errors occur
+        """
+        auth_url = f"{self.base_url}/v3/self"
+        
+        logger.info("Checking Devin API authentication")
+        
+        try:
+            async with httpx.AsyncClient(timeout=30.0) as client:
+                response = await client.get(
+                    auth_url,
+                    headers=self.headers
+                )
+                
+                # Handle 401 Unauthorized specifically
+                if response.status_code == 401:
+                    error_msg = "Devin API authentication failed (401 Unauthorized). Please check DEVIN_API_KEY."
+                    logger.error(error_msg)
+                    raise ValueError(error_msg)
+                
+                response.raise_for_status()
+                result = response.json()
+                logger.info(f"Devin authentication successful: {result.get('principal_type')}")
+                return result
+        except httpx.HTTPStatusError as e:
+            logger.error(f"HTTP error checking Devin authentication: {e.response.status_code} - {e.response.text}")
+            raise
+        except Exception as e:
+            logger.error(f"Error checking Devin authentication: {str(e)}")
+            raise
+
     async def create_session(self, prompt: str, metadata: Dict[str, Any]) -> Dict[str, Any]:
         """Create a new Devin session with the given prompt."""
         
-        session_url = f"{self.base_url}/sessions"
+        session_url = f"{self.base_url}/v3/organizations/{self.org_id}/sessions"
         
         payload = {
             "prompt": prompt,
@@ -103,6 +147,13 @@ Begin your work now.
                     headers=self.headers,
                     json=payload
                 )
+                
+                # Handle 401 Unauthorized specifically
+                if response.status_code == 401:
+                    error_msg = "Devin API authentication failed (401 Unauthorized). Please check DEVIN_API_KEY."
+                    logger.error(error_msg)
+                    raise ValueError(error_msg)
+                
                 response.raise_for_status()
                 result = response.json()
                 logger.info(f"Devin session created: {result.get('session_id')}")

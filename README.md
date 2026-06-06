@@ -22,7 +22,7 @@ The system is built as a Python FastAPI application with the following component
 
 ### API Endpoints
 
-- `POST /webhook/github` - Accept GitHub issue webhook payloads
+- `POST /webhook/github` - Accept GitHub issue webhook payloads (only triggers on `action == "labeled"`)
 - `POST /simulate` - Simulate remediation events without live webhooks
 - `GET /sessions` - View all tracked Devin sessions
 - `GET /metrics` - View operational metrics
@@ -68,6 +68,7 @@ cp .env.example .env
 Required environment variables:
 
 - `DEVIN_API_KEY` - Your Devin API key
+- `DEVIN_ORG_ID` - Your Devin organization ID
 - `GITHUB_TOKEN` - GitHub personal access token with repo permissions
 
 Optional environment variables (with defaults):
@@ -92,6 +93,7 @@ pip install -r requirements.txt
 
 ```bash
 export DEVIN_API_KEY=your_devin_api_key
+export DEVIN_ORG_ID=your_devin_org_id
 export GITHUB_TOKEN=your_github_token
 ```
 
@@ -103,6 +105,22 @@ python -m app.main
 
 The API will be available at `http://localhost:8000`
 
+### Testing Devin Authentication
+
+To verify your Devin API credentials are configured correctly without creating a session:
+
+```bash
+curl http://localhost:8000/health/devin
+```
+
+This endpoint checks authentication only and does not create a Devin session. It returns:
+- `status`: "authenticated" if successful
+- `principal_type`: The type of principal (e.g., "service user")
+- `service_user_name`: The name of the service user
+- `org_id`: Your organization ID
+
+If authentication fails, it will return an error status with a message explaining the issue.
+
 ## Running with Docker
 
 ### Using Docker Compose (Recommended)
@@ -111,7 +129,7 @@ The API will be available at `http://localhost:8000`
 
 ```bash
 cp .env.example .env
-# Edit .env with your DEVIN_API_KEY and GITHUB_TOKEN
+# Edit .env with your DEVIN_API_KEY, DEVIN_ORG_ID, and GITHUB_TOKEN
 ```
 
 2. Build and run:
@@ -135,6 +153,7 @@ docker build -t agentic-devin-swe-remediation .
 ```bash
 docker run -p 8000:8000 \
   -e DEVIN_API_KEY=your_devin_api_key \
+  -e DEVIN_ORG_ID=your_devin_org_id \
   -e GITHUB_TOKEN=your_github_token \
   -v $(pwd)/data:/app/data \
   agentic-devin-swe-remediation
