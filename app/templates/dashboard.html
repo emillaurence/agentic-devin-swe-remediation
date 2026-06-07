@@ -1,0 +1,790 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Agentic Software Engineering Control Tower</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: #0B1020;
+            min-height: 100vh;
+            color: #F8FAFC;
+            line-height: 1.6;
+        }
+        
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 24px;
+        }
+        
+        .header {
+            margin-bottom: 32px;
+        }
+        
+        .header h1 {
+            font-size: 32px;
+            font-weight: 700;
+            color: #F8FAFC;
+            margin-bottom: 8px;
+            letter-spacing: -0.5px;
+        }
+        
+        .header p {
+            font-size: 16px;
+            color: #AAB4C5;
+        }
+        
+        .tabs {
+            display: flex;
+            gap: 4px;
+            margin-bottom: 24px;
+            border-bottom: 1px solid #27324A;
+        }
+        
+        .tab {
+            padding: 12px 24px;
+            background: transparent;
+            border: none;
+            color: #AAB4C5;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            border-bottom: 2px solid transparent;
+            transition: all 0.2s;
+        }
+        
+        .tab:hover {
+            color: #F8FAFC;
+            background: #172033;
+        }
+        
+        .tab.active {
+            color: #3969CA;
+            border-bottom-color: #3969CA;
+        }
+        
+        .tab-content {
+            display: none;
+        }
+        
+        .tab-content.active {
+            display: block;
+        }
+        
+        .value-statement {
+            background: #172033;
+            border: 1px solid #27324A;
+            border-radius: 8px;
+            padding: 20px 24px;
+            margin-bottom: 24px;
+            font-size: 15px;
+            color: #F8FAFC;
+            line-height: 1.7;
+        }
+        
+        .kpi-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 16px;
+            margin-bottom: 24px;
+        }
+        
+        .kpi-card {
+            background: #111827;
+            border: 1px solid #27324A;
+            border-radius: 8px;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            gap: 12px;
+            min-height: 150px;
+            text-align: center;
+            position: relative;
+        }
+        
+        .kpi-card-header {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            width: 100%;
+        }
+        
+        .kpi-value {
+            font-size: 44px;
+            font-weight: 700;
+            color: #3969CA;
+            line-height: 1;
+        }
+        
+        .kpi-label {
+            font-size: 13px;
+            letter-spacing: 0.06em;
+            color: #AAB4C5;
+            max-width: 220px;
+        }
+        
+        .hero-kpi {
+            background: #111827;
+            border: 1px solid #27324A;
+            border-radius: 8px;
+            padding: 32px;
+            text-align: center;
+            margin-bottom: 24px;
+        }
+        
+        .hero-kpi .value {
+            font-size: 64px;
+            font-weight: 700;
+            color: #3969CA;
+            margin-bottom: 8px;
+        }
+        
+        .hero-kpi .label {
+            font-size: 16px;
+            color: #AAB4C5;
+            letter-spacing: 0.5px;
+            line-height: 1.4;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+        }
+        
+        .outcome-name {
+            font-size: 14px;
+            font-weight: 600;
+            color: #F8FAFC;
+        }
+        
+        .operating-status-strip {
+            background: #111827;
+            border: 1px solid #27324A;
+            border-radius: 8px;
+            padding: 12px;
+            margin-bottom: 24px;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 16px;
+        }
+        
+        .status-item {
+            text-align: center;
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .status-label {
+            font-size: 10px;
+            color: #AAB4C5;
+            letter-spacing: 0.5px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 4px;
+        }
+        
+        .status-value {
+            font-size: 18px;
+            font-weight: 700;
+            color: #3969CA;
+        }
+        
+        /* Tooltip functionality */
+        .info-tooltip {
+            position: relative;
+            display: inline-flex;
+            cursor: help;
+            color: #6B7280;
+            font-size: 12px;
+        }
+        
+        .tooltip-content {
+            visibility: hidden;
+            opacity: 0;
+            position: absolute;
+            bottom: 140%;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 300px;
+            padding: 12px 14px;
+            border-radius: 10px;
+            background: #172033;
+            border: 1px solid #27324A;
+            color: #F8FAFC;
+            font-size: 13px;
+            font-weight: normal;
+            line-height: 1.45;
+            text-align: left;
+            white-space: normal;
+            box-shadow: 0 12px 28px rgba(0, 0, 0, 0.35);
+            z-index: 100;
+            pointer-events: none;
+            transition: opacity 0.2s ease, visibility 0.2s ease;
+        }
+        
+        .tooltip-content::before {
+            content: '';
+            position: absolute;
+            top: 100%;
+            left: 50%;
+            transform: translateX(-50%);
+            border: 6px solid transparent;
+            border-top-color: #27324A;
+            margin-top: -5px;
+        }
+        
+        .info-tooltip:hover .tooltip-content {
+            visibility: visible;
+            opacity: 1;
+        }
+        
+        .value-panel {
+            background: #172033;
+            border: 1px solid #27324A;
+            border-radius: 8px;
+            padding: 24px;
+            margin-bottom: 24px;
+        }
+        
+        .value-panel h2 {
+            font-size: 18px;
+            font-weight: 600;
+            color: #F8FAFC;
+            margin-bottom: 16px;
+        }
+        
+        .outcome-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 16px;
+        }
+        
+        .outcome-card {
+            background: #111827;
+            border: 1px solid #27324A;
+            border-radius: 6px;
+            padding: 16px;
+            border-left: 3px solid #3969CA;
+        }
+        
+        .outcome-card h3 {
+            font-size: 15px;
+            font-weight: 600;
+            color: #F8FAFC;
+            margin-bottom: 8px;
+        }
+        
+        .outcome-card p {
+            font-size: 14px;
+            color: #AAB4C5;
+            line-height: 1.5;
+        }
+        
+        .health-strip {
+            background: #172033;
+            border: 1px solid #27324A;
+            border-radius: 8px;
+            padding: 16px 24px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        
+        .health-strip.healthy {
+            border-left: 4px solid #21C19A;
+        }
+        
+        .health-strip.needs-attention {
+            border-left: 4px solid #F59E0B;
+        }
+        
+        .health-icon {
+            font-size: 20px;
+            font-weight: 700;
+        }
+        
+        .health-strip.healthy .health-icon {
+            color: #21C19A;
+        }
+        
+        .health-strip.needs-attention .health-icon {
+            color: #F59E0B;
+        }
+        
+        .health-text {
+            font-size: 14px;
+            color: #F8FAFC;
+        }
+        
+        .health-detail {
+            color: #AAB4C5;
+            font-weight: 400;
+        }
+        
+        .table-section {
+            background: #111827;
+            border: 1px solid #27324A;
+            border-radius: 8px;
+            overflow: hidden;
+        }
+        
+        .table-wrapper {
+            width: 100%;
+            overflow-x: auto;
+        }
+        
+        .table-wrapper table {
+            min-width: 1400px;
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 13px;
+        }
+        
+        th {
+            background: #172033;
+            padding: 12px 16px;
+            text-align: left;
+            font-weight: 600;
+            color: #F8FAFC;
+            border-bottom: 1px solid #27324A;
+            white-space: nowrap;
+        }
+        
+        td {
+            padding: 12px 16px;
+            border-bottom: 1px solid #27324A;
+            color: #AAB4C5;
+        }
+        
+        tr:last-child td {
+            border-bottom: none;
+        }
+        
+        tr:hover {
+            background: #172033;
+        }
+        
+        .empty-row {
+            text-align: center;
+            padding: 40px 16px !important;
+            color: #6B7280;
+        }
+        
+        .status-running {
+            display: inline-block;
+            padding: 4px 12px;
+            background: rgba(57, 105, 202, 0.15);
+            color: #3969CA;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 500;
+        }
+        
+        .status-needs-review {
+            display: inline-block;
+            padding: 4px 12px;
+            background: rgba(245, 158, 11, 0.15);
+            color: #F59E0B;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 500;
+        }
+        
+        .status-needs-human-review {
+            display: inline-block;
+            padding: 4px 12px;
+            background: rgba(245, 158, 11, 0.15);
+            color: #F59E0B;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 500;
+        }
+        
+        .status-completed {
+            display: inline-block;
+            padding: 4px 12px;
+            background: rgba(33, 193, 154, 0.15);
+            color: #21C19A;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 500;
+        }
+        
+        .status-failed {
+            display: inline-block;
+            padding: 4px 12px;
+            background: rgba(239, 68, 68, 0.15);
+            color: #EF4444;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 500;
+        }
+
+        .status-needs-triage {
+            display: inline-block;
+            padding: 4px 12px;
+            background: rgba(239, 68, 68, 0.15);
+            color: #EF4444;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 500;
+        }
+        
+        .status-unknown {
+            display: inline-block;
+            padding: 4px 12px;
+            background: rgba(107, 114, 128, 0.15);
+            color: #6B7280;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 500;
+        }
+        
+        .link {
+            color: #3969CA;
+            text-decoration: none;
+            font-weight: 500;
+        }
+        
+        .link:hover {
+            text-decoration: underline;
+            color: #0294DE;
+        }
+        
+        .risk-explanation {
+            background: #172033;
+            border: 1px solid #27324A;
+            border-radius: 8px;
+            padding: 16px 24px;
+            margin-bottom: 24px;
+            font-size: 14px;
+            color: #AAB4C5;
+            line-height: 1.6;
+        }
+        
+        .refresh-hint {
+            text-align: center;
+            color: #6B7280;
+            font-size: 13px;
+            margin-top: 32px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Agentic Software Engineering Control Tower</h1>
+            <p>Operating visibility from engineering issue signal to autonomous remediation and pull request review.</p>
+        </div>
+        
+        <div class="tabs">
+            <button class="tab active" data-tab="executive">Executive Overview</button>
+            <button class="tab" data-tab="queue">Remediation Queue</button>
+            <button class="tab" data-tab="risk">Risk and Value</button>
+            <button class="tab" data-tab="details">Devin Session Details</button>
+        </div>
+        
+        <div id="executive" class="tab-content active">
+            {% if sessions %}
+                <div class="value-statement">
+                    Devin converts GitHub Issues into reviewable pull requests, improving productivity, resilience, reliability, and governance while preserving human review as the control point.
+                </div>
+                
+                <div class="hero-kpi">
+                    <div class="label" style="margin-bottom: 8px; font-weight: 700; color: #F8FAFC;">
+                        Estimated Engineering Cost Saved
+                        <span class="info-tooltip">
+                            ⓘ
+                            <span class="tooltip-content">Estimated financial value of engineering time saved. Calculated from actual engineering time saved multiplied by the configured blended engineering hourly cost. This is for ROI modelling, not billing. Note: Sessions with "Needs Triage (Failed)" status are excluded from this calculation as they did not produce a productive PR.</span>
+                        </span>
+                    </div>
+                    <div class="value">{{ kpis.roi_currency }}{{ kpis.estimated_cost_avoided if kpis.estimated_cost_avoided else 0 }}</div>
+                    <div style="font-size: 13px; color: #AAB4C5; margin-top: 12px; line-height: 1.5;">
+                        Based on {{ kpis.time_saved_hours if kpis.time_saved_hours else 0 }} hrs actual engineering time saved × {{ kpis.roi_currency }}{{ kpis.blended_hourly_cost }}/hr blended engineering cost.
+                    </div>
+                </div>
+                
+                <div class="kpi-grid">
+                    <div class="kpi-card">
+                        <div class="kpi-card-header">
+                            <span class="outcome-name">Productivity</span>
+                            <span class="info-tooltip">
+                                ⓘ
+                                <span class="tooltip-content">Count of Devin remediation sessions that produced a pull request. This shows whether the workflow is generating usable engineering output.</span>
+                            </span>
+                        </div>
+                        <div class="kpi-value">{{ kpis.reviewable_prs_generated }}</div>
+                        <div class="kpi-label">Reviewable PRs Created</div>
+                    </div>
+                    <div class="kpi-card">
+                        <div class="kpi-card-header">
+                            <span class="outcome-name">Resilience</span>
+                            <span class="info-tooltip">
+                                ⓘ
+                                <span class="tooltip-content">Count of accepted GitHub Issues with risk categories such as Quality or Security. This shows whether important risk and engineering hygiene work is moving toward remediation.</span>
+                            </span>
+                        </div>
+                        <div class="kpi-value">{{ kpis.risk_issues_in_remediation }}</div>
+                        <div class="kpi-label">Risk Issues in Remediation</div>
+                    </div>
+                    <div class="kpi-card">
+                        <div class="kpi-card-header">
+                            <span class="outcome-name">Reliability</span>
+                            <span class="info-tooltip">
+                                ⓘ
+                                <span class="tooltip-content">Percentage of accepted GitHub Issues that became reviewable pull requests. This shows whether the agentic workflow reliably turns issues into engineering output.</span>
+                            </span>
+                        </div>
+                        <div class="kpi-value">{{ "%.1f"|format(kpis.issue_signal_to_pr_conversion_rate) }}%</div>
+                        <div class="kpi-label">Issue-to-PR Conversion Rate</div>
+                    </div>
+                    <div class="kpi-card">
+                        <div class="kpi-card-header">
+                            <span class="outcome-name">Governance</span>
+                            <span class="info-tooltip">
+                                ⓘ
+                                <span class="tooltip-content">Count of Devin-created pull requests waiting for human engineering review. This shows that humans remain the approval and merge gate.</span>
+                            </span>
+                        </div>
+                        <div class="kpi-value">{{ kpis.prs_awaiting_review }}</div>
+                        <div class="kpi-label">PRs Awaiting Review</div>
+                    </div>
+                </div>
+                
+                <div class="operating-status-strip">
+                    <div class="status-item">
+                        <div class="status-label">
+                            Active Remediations
+                            <span class="info-tooltip">
+                                ⓘ
+                                <span class="tooltip-content">Sessions where Devin is currently working and no pull request has been created yet.</span>
+                            </span>
+                        </div>
+                        <div class="status-value">{{ kpis.active_remediations }}</div>
+                    </div>
+                    <div class="status-item">
+                        <div class="status-label">
+                            Needs Triage (Failed)
+                            <span class="info-tooltip">
+                                ⓘ
+                                <span class="tooltip-content">Sessions where Devin could not safely progress to a reviewable pull request and needs engineer input.</span>
+                            </span>
+                        </div>
+                        <div class="status-value">{{ kpis.needs_triage }}</div>
+                    </div>
+                    <div class="status-item">
+                        <div class="status-label">
+                            Mean Time to Reviewable PR
+                            <span class="info-tooltip">
+                                ⓘ
+                                <span class="tooltip-content">Average time from Devin session creation to pull request detection, where available.</span>
+                            </span>
+                        </div>
+                        <div class="status-value">{{ kpis.mean_time_to_pr_minutes }} min{% if kpis.mean_time_to_pr_minutes %}{% else %}N/A{% endif %}</div>
+                    </div>
+                </div>
+                
+                
+                <div class="health-strip {{ 'healthy' if kpis.is_healthy else 'needs-attention' }}">
+                    <div class="health-icon">{{ '✓' if kpis.is_healthy else '⚠' }}</div>
+                    <div class="health-text">
+                        <strong>Operating Health: {{ 'Healthy' if kpis.is_healthy else 'Needs Attention' }}</strong>
+                        {% if kpis.is_healthy %}
+                            <br><span class="health-detail">GitHub Issues are being converted into reviewable PRs with no items needing triage.</span>
+                        {% else %}
+                            <br><span class="health-detail">One or more remediations need triage before they can progress.</span>
+                        {% endif %}
+                    </div>
+                </div>
+            {% else %}
+                <div class="value-statement">No remediation sessions yet. Trigger a GitHub issue with the devin-remediate label or use the simulator to create the first session.</div>
+            {% endif %}
+        </div>
+        
+        <div id="queue" class="tab-content">
+            <div class="table-section">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Issue #</th>
+                            <th>Issue Title</th>
+                            <th>Repository</th>
+                            <th>Risk Category</th>
+                            <th>Devin Status</th>
+                            <th>PR Link</th>
+                            <th>Last Updated</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% if queue_rows %}
+                            {% for row in queue_rows %}
+                                <tr>
+                                    <td><a href="{{ row.issue_url }}" class="link" target="_blank">#{{ row.issue_number }}</a></td>
+                                    <td>{{ row.issue_title[:60] }}...</td>
+                                    <td>{{ row.repository }}</td>
+                                    <td>{{ row.risk_category }}</td>
+                                    <td>
+                                        {% if row.status == 'Running' %}
+                                            <span class="status-running">{{ row.status }}</span>
+                                        {% elif row.status == 'Needs Human Review' %}
+                                            <span class="status-needs-human-review">{{ row.status }}</span>
+                                        {% elif row.status == 'Completed' %}
+                                            <span class="status-completed">{{ row.status }}</span>
+                                        {% elif row.status == 'Needs Triage' %}
+                                            <span class="status-needs-triage">Needs Triage (Failed)</span>
+                                        {% else %}
+                                            <span class="status-unknown">{{ row.status }}</span>
+                                        {% endif %}
+                                    </td>
+                                    <td>{% if row.pr_link %}<a href="{{ row.pr_link }}" class="link" target="_blank">View PR</a>{% else %}Not created yet{% endif %}</td>
+                                    <td>{{ row.updated_at }}</td>
+                                </tr>
+                            {% endfor %}
+                        {% else %}
+                            <tr><td colspan="7" class="empty-row">No remediation sessions yet. Trigger a GitHub issue with the devin-remediate label or use the simulator to create the first session.</td></tr>
+                        {% endif %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        
+        <div id="details" class="tab-content">
+            <div class="table-wrapper">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Issue #</th>
+                            <th>Title</th>
+                            <th>Repository</th>
+                            <th>All Labels</th>
+                            <th>Risk Category</th>
+                            <th>Devin Status</th>
+                            <th>Devin Session</th>
+                            <th>PR Link</th>
+                            <th>Time to PR</th>
+                            <th>Error Message</th>
+                            <th>Created At</th>
+                            <th>Updated At</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% if detail_rows %}
+                            {% for row in detail_rows %}
+                                <tr>
+                                    <td><a href="{{ row.issue_url }}" class="link" target="_blank">#{{ row.issue_number }}</a></td>
+                                    <td>{{ row.issue_title[:50] }}...</td>
+                                    <td>{{ row.repository }}</td>
+                                    <td>{{ row.all_labels|join(', ') if row.all_labels else 'None' }}</td>
+                                    <td>{{ row.risk_category }}</td>
+                                    <td>
+                                        {% if row.status == 'Running' %}
+                                            <span class="status-running">{{ row.status }}</span>
+                                        {% elif row.status == 'Needs Human Review' %}
+                                            <span class="status-needs-human-review">{{ row.status }}</span>
+                                        {% elif row.status == 'Completed' %}
+                                            <span class="status-completed">{{ row.status }}</span>
+                                        {% elif row.status == 'Needs Triage' %}
+                                            <span class="status-needs-triage">Needs Triage (Failed)</span>
+                                        {% else %}
+                                            <span class="status-unknown">{{ row.status }}</span>
+                                        {% endif %}
+                                    </td>
+                                    <td><a href="{{ row.devin_session_url }}" class="link" target="_blank">View Session</a></td>
+                                    <td>{% if row.pr_link %}<a href="{{ row.pr_link }}" class="link" target="_blank">View PR</a>{% else %}Not created yet{% endif %}</td>
+                                    <td>{{ row.time_to_pr or 'N/A' }}</td>
+                                    <td>{{ row.error_message or 'None' }}</td>
+                                    <td>{{ row.created_at }}</td>
+                                    <td>{{ row.updated_at }}</td>
+                                </tr>
+                            {% endfor %}
+                        {% else %}
+                            <tr><td colspan="12" class="empty-row">No remediation sessions yet. Trigger a GitHub issue with the devin-remediate label or use the simulator to create the first session.</td></tr>
+                        {% endif %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        
+        <div id="risk" class="tab-content">
+            <div class="risk-explanation">
+                This view shows where agentic remediation is being applied: quality improvements, security remediation, or other engineering hygiene work.
+                <br><br>
+                <small>Risk categories are derived from GitHub labels such as risk:quality and risk:security.</small>
+            </div>
+            
+            <div class="table-section">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Risk Category</th>
+                            <th>Cost Saved</th>
+                            <th>Time Saved</th>
+                            <th>Issues</th>
+                            <th>PRs Created</th>
+                            <th>Awaiting Review</th>
+                            <th>Needs Triage (Failed)</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% if risk_categories %}
+                            {% for category, data in risk_categories.items() %}
+                                {% if data.issues > 0 %}
+                                    <tr>
+                                        <td>{{ category }}</td>
+                                        <td>{{ data.roi_currency }}{{ "%.0f"|format(data.cost_saved) }}</td>
+                                        <td>{{ "%.1f"|format(data.time_saved_hours) }} hrs</td>
+                                        <td>{{ data.issues }}</td>
+                                        <td>{{ data.prs }}</td>
+                                        <td>{{ data.awaiting_review }}</td>
+                                        <td>{{ data.blocked }}</td>
+                                    </tr>
+                                {% endif %}
+                            {% endfor %}
+                        {% else %}
+                            <tr><td colspan="7" class="empty-row">No remediation sessions yet. Trigger a GitHub issue with the devin-remediate label or use the simulator to create the first session.</td></tr>
+                        {% endif %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        
+        <div class="refresh-hint">
+            Refresh the page to see the latest data
+        </div>
+    </div>
+    
+    <script>
+        document.querySelectorAll('.tab').forEach(tab => {
+            tab.addEventListener('click', () => {
+                // Remove active class from all tabs
+                document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+                // Add active class to clicked tab
+                tab.classList.add('active');
+                
+                // Hide all tab contents
+                document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
+                // Show selected tab content
+                const tabId = tab.getAttribute('data-tab');
+                document.getElementById(tabId).classList.add('active');
+            });
+        });
+    </script>
+</body>
+</html>
