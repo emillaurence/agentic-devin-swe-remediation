@@ -378,7 +378,7 @@ This issue has been labeled `status:devin-needs-human-review`."""
     logger.info("Session sync completed")
 
 
-@app.post("/webhook/github")
+@app.post("/webhook/github/issue")
 async def github_webhook(payload: WebhookPayload, background_tasks: BackgroundTasks):
     """
     Handle GitHub issue webhook events.

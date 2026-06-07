@@ -22,7 +22,7 @@ The system is built as a Python FastAPI application with the following component
 
 ### API Endpoints
 
-- `POST /webhook/github` - Accept GitHub issue webhook payloads (only triggers on `action == "labeled"`)
+- `POST /webhook/github/issue` - Accept GitHub issue webhook payloads (only triggers on `action == "labeled"`)
 - `POST /webhook/github/pull_request` - Accept GitHub pull request webhook payloads (automatically completes sessions when PR is merged)
 - `POST /simulate` - Simulate remediation events without live webhooks
 - `GET /sessions` - View all tracked Devin sessions
@@ -194,7 +194,7 @@ To test GitHub webhooks locally without deploying, use ngrok to expose your loca
 
 4. Configure your GitHub webhook to point to:
    ```
-   https://abc123.ngrok.io/webhook/github
+   https://abc123.ngrok.io/webhook/github/issue
    ```
 
 5. Select "Issues" as the event type
@@ -346,6 +346,10 @@ The system supports automated completion when a pull request is merged:
 **To enable automated completion:**
 - Configure your GitHub webhook to send `Pull request` events to `https://your-domain.com/webhook/github/pull_request`
 - The system will automatically detect merged PRs and complete the associated sessions
+
+**Webhook Configuration Summary:**
+- Issue webhook: `https://your-domain.com/webhook/github/issue` (triggers remediation)
+- PR webhook: `https://your-domain.com/webhook/github/pull_request` (auto-completes sessions)
 
 **Manual completion is still available:**
 If you prefer manual control, you can still use the completion endpoint after reviewing a PR:
