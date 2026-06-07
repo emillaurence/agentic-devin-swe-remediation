@@ -43,6 +43,7 @@ The system is generic and label-driven. It uses GitHub labels to control behavio
 - Python 3.11 or higher
 - Devin API key and organization ID
 - GitHub personal access token with repo permissions
+- ngrok account (required for Docker Compose webhook support)
 
 ### Setup
 
@@ -56,6 +57,7 @@ cp .env.example .env
 DEVIN_API_KEY=your_devin_api_key
 DEVIN_ORG_ID=your_devin_org_id
 GITHUB_TOKEN=your_github_token
+NGROK_AUTHTOKEN=your_ngrok_authtoken
 ```
 
 3. Run with Docker Compose (recommended):

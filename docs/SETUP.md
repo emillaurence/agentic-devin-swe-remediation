@@ -55,7 +55,7 @@ GITHUB_TOKEN=your_actual_github_token
 DEFAULT_GITHUB_OWNER=your_github_username
 DEFAULT_GITHUB_REPO=your_target_repository
 
-# Ngrok Configuration (optional, for local testing)
+# Ngrok Configuration (required for Docker Compose webhook support)
 NGROK_AUTHTOKEN=your_ngrok_authtoken
 ```
 
