@@ -446,19 +446,35 @@ async def github_webhook(payload: WebhookPayload, background_tasks: BackgroundTa
 
 
 @app.post("/webhook/github/pull_request")
-async def github_pull_request_webhook(payload: PullRequestWebhookPayload):
+async def github_pull_request_webhook(request: Request):
     """
     Handle GitHub pull request webhook events.
-    
+
     This endpoint:
     - Detects when a pull request is merged
     - Finds the associated Devin session by PR URL
     - Automatically marks the session as completed
     - Updates GitHub labels to status:devin-completed
     """
-    
-    logger.info(f"Received GitHub pull request webhook: action={payload.action}")
-    
+
+    # Log raw payload for debugging
+    raw_payload = await request.json()
+    logger.info(f"Received GitHub pull request webhook raw payload: {raw_payload}")
+
+    try:
+        payload = PullRequestWebhookPayload(**raw_payload)
+    except Exception as e:
+        logger.error(f"Failed to parse webhook payload: {e}")
+        logger.error(f"Raw payload: {raw_payload}")
+        raise
+
+    logger.info(f"Parsed webhook payload: action={payload.action}")
+
+    # Handle GitHub ping events
+    if payload.zen or not payload.action:
+        logger.info("Received ping event, skipping")
+        return {"status": "pong"}
+
     # Only process when the action is "closed" (which includes merged)
     if payload.action != "closed":
         logger.info(f"Action is '{payload.action}', not 'closed', skipping")

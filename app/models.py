@@ -59,10 +59,15 @@ class SimulateRequest(BaseModel):
 
 
 class PullRequestWebhookPayload(BaseModel):
-    action: str
-    pull_request: Dict[str, Any]
-    repository: Dict[str, Any]
-    sender: Dict[str, Any]
+    action: Optional[str] = None
+    pull_request: Optional[Dict[str, Any]] = None
+    repository: Optional[Dict[str, Any]] = None
+    sender: Optional[Dict[str, Any]] = None
+    number: Optional[int] = None
+    zen: Optional[str] = None  # GitHub ping event
+    # Allow additional fields from GitHub webhook
+    class Config:
+        extra = "allow"
 
 
 class Metrics(BaseModel):
