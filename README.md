@@ -23,6 +23,7 @@ The system is built as a Python FastAPI application with the following component
 ### API Endpoints
 
 - `POST /webhook/github` - Accept GitHub issue webhook payloads (only triggers on `action == "labeled"`)
+- `POST /webhook/github/pull_request` - Accept GitHub pull request webhook payloads (automatically completes sessions when PR is merged)
 - `POST /simulate` - Simulate remediation events without live webhooks
 - `GET /sessions` - View all tracked Devin sessions
 - `GET /sessions/review-queue` - View all sessions awaiting human review
@@ -328,6 +329,34 @@ Metrics include:
 - Review queue size
 
 ## Human Review Workflow
+
+### Automated PR Completion
+
+The system supports automated completion when a pull request is merged:
+
+1. When Devin completes remediation and opens a PR, the session status changes to `needs_human_review`
+2. GitHub labels are updated to `status:devin-needs-human-review`
+3. When you review and merge the PR:
+   - GitHub sends a `pull_request` webhook with `action == "closed"` and `merged == true`
+   - The system automatically finds the associated session by PR URL
+   - Session status is updated to `completed`
+   - GitHub labels are updated to `status:devin-completed`
+   - A comment is added confirming completion
+
+**To enable automated completion:**
+- Configure your GitHub webhook to send `Pull request` events to `https://your-domain.com/webhook/github/pull_request`
+- The system will automatically detect merged PRs and complete the associated sessions
+
+**Manual completion is still available:**
+If you prefer manual control, you can still use the completion endpoint after reviewing a PR:
+
+```bash
+curl -X POST http://localhost:8000/sessions/{session_id}/complete \
+  -H "Content-Type: application/json" \
+  -d '{
+    "pull_request_url": "https://github.com/owner/repo/pull/123"
+  }'
+```
 
 ### View Review Queue
 

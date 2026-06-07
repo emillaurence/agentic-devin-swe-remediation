@@ -58,6 +58,13 @@ class SimulateRequest(BaseModel):
     url: str
 
 
+class PullRequestWebhookPayload(BaseModel):
+    action: str
+    pull_request: Dict[str, Any]
+    repository: Dict[str, Any]
+    sender: Dict[str, Any]
+
+
 class Metrics(BaseModel):
     total_issues_processed: int
     sessions_running: int

@@ -15,6 +15,7 @@ load_dotenv()
 from app.models import (
     WebhookPayload,
     SimulateRequest,
+    PullRequestWebhookPayload,
     DevinSession,
     GitHubIssue,
     IssueLabel,
@@ -338,6 +339,42 @@ This issue has been labeled `status:devin-needs-human-review`."""
         except Exception as e:
             logger.error(f"Error syncing session {session.session_id}: {str(e)}", exc_info=True)
     
+    # Verify and fix GitHub labels for sessions in needs_review status
+    needs_review_sessions = [s for s in all_sessions if s.status == SessionStatus.NEEDS_HUMAN_REVIEW]
+    
+    if needs_review_sessions and github_client:
+        logger.info(f"Verifying GitHub labels for {len(needs_review_sessions)} sessions in needs_review status")
+        
+        for session in needs_review_sessions:
+            try:
+                if not session.issue:
+                    continue
+                
+                # Get current labels from GitHub
+                current_labels = await github_client.get_labels(session.issue.owner, session.issue.repo, session.issue.number)
+                current_label_names = [label.get("name") for label in current_labels]
+                
+                # Check if needs_review label is present
+                if STATUS_NEEDS_REVIEW_LABEL not in current_label_names:
+                    logger.warning(f"Session {session.session_id} is in needs_review status but missing {STATUS_NEEDS_REVIEW_LABEL} label on GitHub")
+                    
+                    # Remove running label if present
+                    if STATUS_RUNNING_LABEL in current_label_names:
+                        await github_client.remove_label(session.issue.owner, session.issue.repo, session.issue.number, STATUS_RUNNING_LABEL)
+                    
+                    # Add needs_review label
+                    await github_client.add_label(session.issue.owner, session.issue.repo, session.issue.number, STATUS_NEEDS_REVIEW_LABEL)
+                    logger.info(f"Added {STATUS_NEEDS_REVIEW_LABEL} label to issue {session.issue.number}")
+                
+                # Remove other status labels to avoid conflicts
+                for label in [STATUS_RUNNING_LABEL, STATUS_COMPLETED_LABEL, STATUS_FAILED_LABEL]:
+                    if label in current_label_names and label != STATUS_NEEDS_REVIEW_LABEL:
+                        await github_client.remove_label(session.issue.owner, session.issue.repo, session.issue.number, label)
+                        logger.info(f"Removed {label} label from issue {session.issue.number}")
+                
+            except Exception as e:
+                logger.error(f"Error verifying GitHub labels for session {session.session_id}: {str(e)}", exc_info=True)
+    
     logger.info("Session sync completed")
 
 
@@ -405,6 +442,103 @@ async def github_webhook(payload: WebhookPayload, background_tasks: BackgroundTa
         "issue_number": issue.number,
         "risk_labels": risk_labels,
         "message": "Remediation processing started"
+    }
+
+
+@app.post("/webhook/github/pull_request")
+async def github_pull_request_webhook(payload: PullRequestWebhookPayload):
+    """
+    Handle GitHub pull request webhook events.
+    
+    This endpoint:
+    - Detects when a pull request is merged
+    - Finds the associated Devin session by PR URL
+    - Automatically marks the session as completed
+    - Updates GitHub labels to status:devin-completed
+    """
+    
+    logger.info(f"Received GitHub pull request webhook: action={payload.action}")
+    
+    # Only process when the action is "closed" (which includes merged)
+    if payload.action != "closed":
+        logger.info(f"Action is '{payload.action}', not 'closed', skipping")
+        return {"status": "skipped", "reason": "action is not 'closed'"}
+    
+    # Check if the PR was merged (not just closed without merging)
+    pr_data = payload.pull_request
+    is_merged = pr_data.get("merged", False)
+    
+    if not is_merged:
+        logger.info("PR was closed but not merged, skipping")
+        return {"status": "skipped", "reason": "PR was not merged"}
+    
+    # Extract PR URL
+    pr_url = pr_data.get("html_url")
+    if not pr_url:
+        logger.error("PR URL not found in webhook payload")
+        return {"status": "error", "reason": "PR URL not found"}
+    
+    logger.info(f"PR merged: {pr_url}")
+    
+    # Find the associated session by PR URL
+    all_sessions = store.get_all_sessions()
+    matching_session = None
+    
+    for session in all_sessions:
+        if session.pull_request_url and session.pull_request_url == pr_url:
+            matching_session = session
+            break
+    
+    if not matching_session:
+        logger.warning(f"No session found with PR URL: {pr_url}")
+        return {"status": "skipped", "reason": "no session found with this PR URL"}
+    
+    # Only process sessions in needs_review status
+    if matching_session.status != SessionStatus.NEEDS_HUMAN_REVIEW:
+        logger.info(f"Session {matching_session.session_id} is not in needs_review status (current: {matching_session.status}), skipping")
+        return {"status": "skipped", "reason": "session not in needs_review status"}
+    
+    logger.info(f"Found session {matching_session.session_id} for merged PR, marking as completed")
+    
+    # Update session status to completed
+    update_data = {
+        "status": SessionStatus.COMPLETED,
+        "completed_at": datetime.utcnow()
+    }
+    
+    store.update_session(matching_session.session_id, update_data)
+    
+    # Update GitHub labels
+    if github_client and matching_session.issue:
+        try:
+            # Remove old status labels
+            await github_client.remove_label(matching_session.issue.owner, matching_session.issue.repo, matching_session.issue.number, STATUS_RUNNING_LABEL)
+            await github_client.remove_label(matching_session.issue.owner, matching_session.issue.repo, matching_session.issue.number, STATUS_NEEDS_REVIEW_LABEL)
+            await github_client.remove_label(matching_session.issue.owner, matching_session.issue.repo, matching_session.issue.number, STATUS_FAILED_LABEL)
+            
+            # Add completed label
+            await github_client.add_label(matching_session.issue.owner, matching_session.issue.repo, matching_session.issue.number, STATUS_COMPLETED_LABEL)
+            
+            # Add comment
+            comment_body = f"""✅ **Devin Remediation Completed**
+
+**Session ID:** `{matching_session.session_id}`
+**Status:** Pull request merged successfully
+
+**Pull Request:** {pr_url}
+
+This issue has been labeled `status:devin-completed`. The remediation is complete.
+"""
+            await github_client.add_comment(matching_session.issue.owner, matching_session.issue.repo, matching_session.issue.number, comment_body)
+            
+            logger.info(f"Updated GitHub issue {matching_session.issue.number} for session {matching_session.session_id}")
+        except Exception as e:
+            logger.error(f"Error updating GitHub for session {matching_session.session_id}: {str(e)}")
+    
+    return {
+        "status": "completed",
+        "session_id": matching_session.session_id,
+        "pr_url": pr_url
     }
 
 
