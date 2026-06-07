@@ -14,6 +14,9 @@ services:
       - STATUS_COMPLETED_LABEL=${STATUS_COMPLETED_LABEL:-status:devin-completed}
       - STATUS_FAILED_LABEL=${STATUS_FAILED_LABEL:-status:devin-failed}
       - STORE_PATH=${STORE_PATH:-./data/sessions.json}
+      - HUMAN_BASELINE_QUALITY_HOURS=${HUMAN_BASELINE_QUALITY_HOURS:-3}
+      - HUMAN_BASELINE_SECURITY_HOURS=${HUMAN_BASELINE_SECURITY_HOURS:-10}
+      - HUMAN_BASELINE_OTHER_HOURS=${HUMAN_BASELINE_OTHER_HOURS:-6}
     volumes:
       - ./data:/app/data
     restart: unless-stopped

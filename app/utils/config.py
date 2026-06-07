@@ -1,0 +1,65 @@
+import os
+import logging
+from app.core.devin_client import DevinClient
+from app.core.github_client import GitHubClient
+from app.core.store import SessionStore
+
+logger = logging.getLogger(__name__)
+
+
+def load_environment_variables():
+    """Load and validate environment variables."""
+    DEVIN_API_KEY = os.getenv("DEVIN_API_KEY")
+    DEVIN_ORG_ID = os.getenv("DEVIN_ORG_ID")
+    GITHUB_TOKEN = os.getenv("GITHUB_TOKEN")
+    DEFAULT_GITHUB_OWNER = os.getenv("DEFAULT_GITHUB_OWNER", "emillaurence")
+    DEFAULT_GITHUB_REPO = os.getenv("DEFAULT_GITHUB_REPO", "superset")
+    TRIGGER_LABEL = os.getenv("TRIGGER_LABEL", "devin-remediate")
+    STATUS_RUNNING_LABEL = os.getenv("STATUS_RUNNING_LABEL", "status:devin-running")
+    STATUS_NEEDS_REVIEW_LABEL = os.getenv("STATUS_NEEDS_REVIEW_LABEL", "status:devin-needs-human-review")
+    STATUS_COMPLETED_LABEL = os.getenv("STATUS_COMPLETED_LABEL", "status:devin-completed")
+    STATUS_FAILED_LABEL = os.getenv("STATUS_FAILED_LABEL", "status:devin-failed")
+    STORE_PATH = os.getenv("STORE_PATH", "./data/sessions.json")
+    
+    # Human baseline configuration (hours)
+    HUMAN_BASELINE_QUALITY_HOURS = float(os.getenv("HUMAN_BASELINE_QUALITY_HOURS", "3"))
+    HUMAN_BASELINE_SECURITY_HOURS = float(os.getenv("HUMAN_BASELINE_SECURITY_HOURS", "10"))
+    HUMAN_BASELINE_OTHER_HOURS = float(os.getenv("HUMAN_BASELINE_OTHER_HOURS", "6"))
+    
+    # Validate required environment variables
+    if not DEVIN_API_KEY:
+        logger.warning("DEVIN_API_KEY not set - Devin integration will not work")
+    if not DEVIN_ORG_ID:
+        logger.warning("DEVIN_ORG_ID not set - Devin integration will not work")
+    if not GITHUB_TOKEN:
+        logger.warning("GITHUB_TOKEN not set - GitHub API integration will not work")
+    
+    return {
+        "DEVIN_API_KEY": DEVIN_API_KEY,
+        "DEVIN_ORG_ID": DEVIN_ORG_ID,
+        "GITHUB_TOKEN": GITHUB_TOKEN,
+        "DEFAULT_GITHUB_OWNER": DEFAULT_GITHUB_OWNER,
+        "DEFAULT_GITHUB_REPO": DEFAULT_GITHUB_REPO,
+        "TRIGGER_LABEL": TRIGGER_LABEL,
+        "STATUS_RUNNING_LABEL": STATUS_RUNNING_LABEL,
+        "STATUS_NEEDS_REVIEW_LABEL": STATUS_NEEDS_REVIEW_LABEL,
+        "STATUS_COMPLETED_LABEL": STATUS_COMPLETED_LABEL,
+        "STATUS_FAILED_LABEL": STATUS_FAILED_LABEL,
+        "STORE_PATH": STORE_PATH,
+        "HUMAN_BASELINE_QUALITY_HOURS": HUMAN_BASELINE_QUALITY_HOURS,
+        "HUMAN_BASELINE_SECURITY_HOURS": HUMAN_BASELINE_SECURITY_HOURS,
+        "HUMAN_BASELINE_OTHER_HOURS": HUMAN_BASELINE_OTHER_HOURS
+    }
+
+
+def initialize_components(config: dict):
+    """Initialize application components based on configuration."""
+    store = SessionStore(config["STORE_PATH"])
+    devin_client = DevinClient(config["DEVIN_API_KEY"], config["DEVIN_ORG_ID"]) if config["DEVIN_API_KEY"] and config["DEVIN_ORG_ID"] else None
+    github_client = GitHubClient(config["GITHUB_TOKEN"]) if config["GITHUB_TOKEN"] else None
+    
+    return {
+        "store": store,
+        "devin_client": devin_client,
+        "github_client": github_client
+    }
