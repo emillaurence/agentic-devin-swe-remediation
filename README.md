@@ -228,7 +228,7 @@ The simulator is useful for local testing, but the primary demo path should use 
 
 Use this narrative:
 
-> GitHub is the control plane, FastAPI is the orchestrator, Devin is the autonomous remediation worker, and pull request review remains the human governance gate.
+> GitHub is the control plane, FastAPI is the orchestrator, Devin is an AI coding agent and software engineer, and pull request review remains the human governance gate.
 
 Traditional automation detects issues. This workflow uses Devin to turn labelled GitHub Issues into reviewable pull requests with status tracking, ROI visibility, and human review control.
 
