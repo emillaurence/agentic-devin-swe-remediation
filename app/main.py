@@ -5,7 +5,7 @@ import asyncio
 from datetime import datetime
 from typing import List, Optional
 from fastapi import FastAPI, HTTPException, BackgroundTasks, Request
-from fastapi.responses import JSONResponse
+from fastapi.responses import JSONResponse, HTMLResponse
 import uvicorn
 from dotenv import load_dotenv
 
@@ -132,6 +132,9 @@ async def process_remediation(issue: GitHubIssue, risk_labels: List[str]):
         devin_response = await devin_client.create_session(prompt, session_metadata)
         session_id = devin_response.get("session_id", str(uuid.uuid4()))
         
+        # Construct Devin session URL
+        devin_session_url = f"https://app.devin.ai/sessions/{session_id}"
+        
         # Create session record
         session = DevinSession(
             session_id=session_id,
@@ -139,7 +142,8 @@ async def process_remediation(issue: GitHubIssue, risk_labels: List[str]):
             risk_labels=risk_labels,
             status=SessionStatus.RUNNING,
             prompt=prompt,
-            devin_response=devin_response
+            devin_response=devin_response,
+            devin_session_url=devin_session_url
         )
         
         store.add_session(session)
@@ -151,6 +155,7 @@ async def process_remediation(issue: GitHubIssue, risk_labels: List[str]):
 A Devin session has been created to address this issue.
 
 **Session ID:** `{session_id}`
+**Session URL:** {devin_session_url}
 **Risk Labels:** {', '.join(risk_labels) if risk_labels else 'None'}
 
 Devin will:
@@ -262,6 +267,21 @@ async def sync_sessions():
                     if pull_requests:
                         pull_request_url = pull_requests[0].get("url") if isinstance(pull_requests[0], dict) else str(pull_requests[0])
                 
+                # Fallback: Check GitHub for PRs if Devin API didn't return PR info
+                if not pull_request_url and github_client and session.issue:
+                    try:
+                        logger.info(f"Devin API didn't return PR info, checking GitHub for PRs for issue {session.issue.number}")
+                        github_prs = await github_client.get_pull_requests_for_issue(
+                            session.issue.owner, session.issue.repo, session.issue.number
+                        )
+                        if github_prs:
+                            # Use the most recent PR
+                            latest_pr = github_prs[0]  # GitHub returns PRs in reverse chronological order
+                            pull_request_url = latest_pr.get("html_url")
+                            logger.info(f"Found PR on GitHub: {pull_request_url}")
+                    except Exception as e:
+                        logger.error(f"Error checking GitHub for PRs: {str(e)}")
+                
                 validation_summary = session_status.get("validation_summary")
                 failure_reason = session_status.get("error_message") or session_status.get("failure_reason")
                 
@@ -305,6 +325,9 @@ This issue has been labeled `status:devin-needs-human-review`."""
                 
                 if pull_request_url:
                     update_data["pull_request_url"] = pull_request_url
+                    # Set pr_detected_at if this is the first time we're detecting a PR
+                    if not session.pull_request_url:
+                        update_data["pr_detected_at"] = datetime.utcnow()
                 
                 if final_status == SessionStatus.FAILED and failure_reason:
                     update_data["error_message"] = failure_reason
@@ -736,6 +759,882 @@ async def devin_health_check():
             "status": "error",
             "message": f"Error checking Devin authentication: {str(e)}"
         }
+
+
+@app.get("/dashboard", response_class=HTMLResponse)
+async def dashboard():
+    """
+    Agentic Software Engineering Control Tower.
+    
+    Executive-friendly dashboard providing operational visibility for autonomous remediation
+    from issue signal to pull request review.
+    """
+    # Get all sessions
+    sessions = store.get_all_sessions()
+    
+    # Calculate KPIs
+    issues_processed = len(sessions)
+    reviewable_prs_generated = len([s for s in sessions if s.pull_request_url])
+    issue_signal_to_pr_conversion_rate = (reviewable_prs_generated / issues_processed * 100) if issues_processed > 0 else 0
+    
+    # Risk Issues in Remediation - accepted remediation sessions with risk labels
+    risk_issues_in_remediation = len([s for s in sessions if s.risk_labels and len(s.risk_labels) > 0])
+    
+    # PRs awaiting engineering review - sessions with PR and status needs_review OR running with PR
+    prs_awaiting_review = len([s for s in sessions if s.pull_request_url and (s.status == SessionStatus.NEEDS_HUMAN_REVIEW or s.status == SessionStatus.RUNNING)])
+    
+    # Needs Triage - failed, error, suspended, or needs intervention
+    needs_triage = len([s for s in sessions if s.status == SessionStatus.FAILED])
+    
+    # Active Remediations - running with no PR yet
+    active_remediations = len([s for s in sessions if s.status == SessionStatus.RUNNING and not s.pull_request_url])
+    
+    # Mean time from issue signal to PR
+    pr_sessions = [s for s in sessions if s.pr_detected_at]
+    if pr_sessions:
+        total_time = sum((s.pr_detected_at - s.created_at).total_seconds() for s in pr_sessions)
+        mean_time_to_pr_seconds = total_time / len(pr_sessions)
+        mean_time_to_pr_minutes = int(mean_time_to_pr_seconds / 60)
+    else:
+        mean_time_to_pr_minutes = None
+    
+    # Operating health
+    has_needs_triage = needs_triage > 0
+    # Calculate completed sessions
+    sessions_completed = len([s for s in sessions if s.status == SessionStatus.COMPLETED])
+    # Only check conversion rate if there are completed sessions
+    has_completed_sessions = sessions_completed > 0
+    if has_completed_sessions:
+        conversion_rate_threshold = 50  # 50% conversion rate is healthy
+        is_healthy = issue_signal_to_pr_conversion_rate >= conversion_rate_threshold and not has_needs_triage
+    else:
+        # If no sessions completed yet, only check for failures
+        is_healthy = not has_needs_triage
+    
+    # Format timestamps for display
+    def format_timestamp(ts):
+        if ts is None:
+            return "Unknown"
+        if isinstance(ts, str):
+            ts = datetime.fromisoformat(ts)
+        return ts.strftime("%Y-%m-%d %H:%M:%S")
+    
+    # Map risk labels to friendly names
+    def get_friendly_risk_label(risk_label):
+        if not risk_label:
+            return "Unclassified"
+        risk_mapping = {
+            "risk:quality": "Quality",
+            "risk:security": "Security"
+        }
+        return risk_mapping.get(risk_label, "Unclassified")
+    
+    # Get friendly risk category from risk labels list
+    def get_friendly_risk_category(risk_labels):
+        if not risk_labels or len(risk_labels) == 0:
+            return "Unclassified"
+        # Return the first friendly label found
+        for label in risk_labels:
+            friendly = get_friendly_risk_label(label)
+            if friendly != "Unclassified":
+                return friendly
+        return "Unclassified"
+    
+    # Determine display status for each session
+    def get_display_status(session):
+        # If PR exists but Devin session is still running or waiting, show as needs-review
+        if session.pull_request_url and session.status == SessionStatus.RUNNING:
+            return "needs-review"
+        return session.status.value
+    
+    # Prepare data for Remediation Queue tab
+    queue_rows = []
+    for session in sessions:
+        display_status = get_display_status(session)
+        queue_rows.append({
+            "issue_number": session.issue.number,
+            "issue_title": session.issue.title,
+            "issue_url": session.issue.url,
+            "repository": f"{session.issue.owner}/{session.issue.repo}",
+            "risk_labels": session.risk_labels if session.risk_labels else [],
+            "risk_category": get_friendly_risk_category(session.risk_labels),
+            "status": display_status,
+            "pr_link": session.pull_request_url,
+            "created_at": format_timestamp(session.created_at),
+            "updated_at": format_timestamp(session.completed_at or session.needs_review_at or session.pr_detected_at or session.created_at)
+        })
+    
+    queue_rows.sort(key=lambda x: x["created_at"], reverse=True)
+    
+    # Prepare data for Session Details tab
+    detail_rows = []
+    for session in sessions:
+        all_labels = [label.name for label in session.issue.labels]
+        detail_rows.append({
+            "session_id": session.session_id,
+            "issue_number": session.issue.number,
+            "issue_title": session.issue.title,
+            "issue_url": session.issue.url,
+            "repository": f"{session.issue.owner}/{session.issue.repo}",
+            "all_labels": all_labels,
+            "risk_labels": session.risk_labels if session.risk_labels else [],
+            "risk_category": get_friendly_risk_category(session.risk_labels),
+            "status": session.status.value,
+            "devin_status_detail": session.devin_response.get("status_detail") if session.devin_response else None,
+            "devin_session_url": session.devin_session_url or f"https://app.devin.ai/sessions/{session.session_id}",
+            "pr_link": session.pull_request_url,
+            "pr_detected_at": session.pr_detected_at,
+            "error_message": session.error_message,
+            "created_at": format_timestamp(session.created_at),
+            "updated_at": format_timestamp(session.completed_at or session.needs_review_at or session.pr_detected_at or session.created_at),
+            "duration": None  # Could calculate if needed
+        })
+    
+    detail_rows.sort(key=lambda x: x["created_at"], reverse=True)
+    
+    # Prepare data for Risk and Value tab
+    risk_categories = {
+        "Quality": {"issues": 0, "prs": 0, "awaiting_review": 0, "blocked": 0},
+        "Security": {"issues": 0, "prs": 0, "awaiting_review": 0, "blocked": 0},
+        "Unclassified": {"issues": 0, "prs": 0, "awaiting_review": 0, "blocked": 0}
+    }
+    
+    for session in sessions:
+        friendly_category = get_friendly_risk_category(session.risk_labels)
+        if friendly_category in risk_categories:
+            risk_categories[friendly_category]["issues"] += 1
+            if session.pull_request_url:
+                risk_categories[friendly_category]["prs"] += 1
+            display_status = get_display_status(session)
+            if display_status == "needs-review":
+                risk_categories[friendly_category]["awaiting_review"] += 1
+            if session.status == SessionStatus.FAILED:
+                risk_categories[friendly_category]["blocked"] += 1
+    
+    # Build HTML for each tab
+    conversion_rate_display = f"{issue_signal_to_pr_conversion_rate:.1f}%"
+    mean_time_display = f"{mean_time_to_pr_minutes} min" if mean_time_to_pr_minutes else "N/A"
+    
+    # Executive Overview tab HTML
+    executive_html = f"""
+        <div class="value-statement">
+            Devin converts GitHub Issues into reviewable pull requests, improving productivity, resilience, reliability, and governance while preserving human review as the control point.
+        </div>
+        
+        <div class="kpi-grid">
+            <div class="kpi-card" data-tooltip="Number of Devin remediation sessions that produced a pull request.">
+                <div class="value">{reviewable_prs_generated}</div>
+                <div class="label">Reviewable PRs Created</div>
+            </div>
+            <div class="kpi-card" data-tooltip="Accepted remediation sessions with risk labels such as risk:security or risk:quality.">
+                <div class="value">{risk_issues_in_remediation}</div>
+                <div class="label">Risk Issues in Remediation</div>
+            </div>
+            <div class="kpi-card" data-tooltip="Percentage of accepted GitHub Issues that became reviewable pull requests.">
+                <div class="value">{conversion_rate_display}</div>
+                <div class="label">Issue-to-PR Conversion Rate</div>
+            </div>
+            <div class="kpi-card" data-tooltip="Pull requests created by Devin that are waiting for human engineering review.">
+                <div class="value">{prs_awaiting_review}</div>
+                <div class="label">PRs Awaiting Review</div>
+            </div>
+        </div>
+        
+        <div class="operating-status-strip">
+            <div class="status-item" data-tooltip="Sessions where Devin is currently working and no pull request has been created yet.">
+                <div class="status-label">Active Remediations</div>
+                <div class="status-value">{active_remediations}</div>
+            </div>
+            <div class="status-item" data-tooltip="Sessions where Devin could not safely progress to a reviewable pull request and needs engineer input.">
+                <div class="status-label">Needs Triage</div>
+                <div class="status-value">{needs_triage}</div>
+            </div>
+            <div class="status-item" data-tooltip="Average time from session creation to pull request detection, where available.">
+                <div class="status-label">Mean Time to Reviewable PR</div>
+                <div class="status-value">{mean_time_display}</div>
+            </div>
+        </div>
+        
+        <div class="value-panel">
+            <h2>Business Outcomes</h2>
+            <div class="outcome-grid">
+                <div class="outcome-card">
+                    <h3>Productivity</h3>
+                    <p>Reduces manual triage and repetitive remediation work so engineers can focus on higher-value delivery.</p>
+                </div>
+                <div class="outcome-card">
+                    <h3>Resilience</h3>
+                    <p>Accelerates remediation of quality and security issues before they accumulate into operational risk.</p>
+                </div>
+                <div class="outcome-card">
+                    <h3>Reliability</h3>
+                    <p>Tracks every GitHub Issue through agent execution, pull request creation, and review handoff.</p>
+                </div>
+                <div class="outcome-card">
+                    <h3>Governance</h3>
+                    <p>Keeps humans in control by making pull request review the merge gate.</p>
+                </div>
+            </div>
+        </div>
+        
+        <div class="health-strip {'healthy' if is_healthy else 'needs-attention'}">
+            <div class="health-icon">{'✓' if is_healthy else '⚠'}</div>
+            <div class="health-text">
+                <strong>Operating Health: {'Healthy' if is_healthy else 'Needs Attention'}</strong>
+                <span class="health-detail">
+                    {' - GitHub Issues are being converted into reviewable PRs with no items needing triage.' if is_healthy else ' - One or more remediations need triage before they can progress.'}
+                </span>
+            </div>
+        </div>
+    """
+    
+    # Remediation Queue tab HTML
+    queue_table_rows = ""
+    for row in queue_rows:
+        status_badge_class = {
+            "running": "status-running",
+            "needs_human_review": "status-needs-review",
+            "needs-review": "status-needs-review",
+            "completed": "status-completed",
+            "failed": "status-failed"
+        }.get(row["status"], "status-unknown")
+        
+        status_display = {
+            "running": "Devin is actively working",
+            "needs_human_review": "PR created, human review required",
+            "needs-review": "PR created, human review required",
+            "completed": "Devin session fully completed",
+            "failed": "Needs Triage"
+        }.get(row["status"], row["status"])
+        
+        pr_link_html = f'<a href="{row["pr_link"]}" class="link" target="_blank">View PR</a>' if row["pr_link"] else "Not created yet"
+        issue_link_html = f'<a href="{row["issue_url"]}" class="link" target="_blank">#{row["issue_number"]}</a>'
+        risk_category_display = row["risk_category"]
+        
+        queue_table_rows += f"""
+            <tr>
+                <td>{issue_link_html}</td>
+                <td>{row["issue_title"][:60]}...</td>
+                <td>{row["repository"]}</td>
+                <td>{risk_category_display}</td>
+                <td><span class="{status_badge_class}">{status_display}</span></td>
+                <td>{pr_link_html}</td>
+                <td>{row["updated_at"]}</td>
+            </tr>
+        """
+    
+    queue_html = f"""
+        <div class="table-section">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Issue #</th>
+                        <th>Issue Title</th>
+                        <th>Repository</th>
+                        <th>Risk Category</th>
+                        <th>Current Status</th>
+                        <th>PR Link</th>
+                        <th>Last Updated</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {queue_table_rows if queue_table_rows else '<tr><td colspan="7" class="empty-row">No remediation sessions yet. Trigger a GitHub issue with the devin-remediate label or use the simulator to create the first session.</td></tr>'}
+                </tbody>
+            </table>
+        </div>
+    """
+    
+    # Session Details tab HTML
+    detail_table_rows = ""
+    for row in detail_rows:
+        status_badge_class = {
+            "running": "status-running",
+            "needs_human_review": "status-needs-review",
+            "completed": "status-completed",
+            "failed": "status-failed"
+        }.get(row["status"], "status-unknown")
+        
+        devin_session_link_html = f'<a href="{row["devin_session_url"]}" class="link" target="_blank">View Session</a>'
+        pr_link_html = f'<a href="{row["pr_link"]}" class="link" target="_blank">View PR</a>' if row["pr_link"] else "Not created yet"
+        issue_link_html = f'<a href="{row["issue_url"]}" class="link" target="_blank">#{row["issue_number"]}</a>'
+        all_labels_display = ", ".join(row["all_labels"]) if row["all_labels"] else "None"
+        risk_category_display = row["risk_category"]
+        risk_labels_display = ", ".join(row["risk_labels"]) if row["risk_labels"] else "None"
+        
+        # Map status to proper case
+        status_proper_case = {
+            "running": "Running",
+            "needs_human_review": "Needs Human Review",
+            "needs-review": "Needs Human Review",
+            "completed": "Completed",
+            "failed": "Failed"
+        }.get(row["status"], row["status"].replace("_", " ").title() if "_" in row["status"] else row["status"].title())
+        
+        # Calculate time to PR
+        time_to_pr_display = "N/A"
+        if row["pr_detected_at"] and row["created_at"]:
+            try:
+                pr_time = datetime.fromisoformat(row["pr_detected_at"]) if isinstance(row["pr_detected_at"], str) else row["pr_detected_at"]
+                created_time = datetime.fromisoformat(row["created_at"]) if isinstance(row["created_at"], str) else row["created_at"]
+                if pr_time and created_time:
+                    time_diff = (pr_time - created_time).total_seconds()
+                    if time_diff > 0:
+                        if time_diff < 60:
+                            time_to_pr_display = f"{int(time_diff)} sec"
+                        elif time_diff < 3600:
+                            time_to_pr_display = f"{int(time_diff / 60)} min"
+                        else:
+                            time_to_pr_display = f"{int(time_diff / 3600)} hr"
+            except Exception as e:
+                time_to_pr_display = "N/A"
+        
+        detail_table_rows += f"""
+            <tr>
+                <td>{issue_link_html}</td>
+                <td>{row["issue_title"][:50]}...</td>
+                <td>{row["repository"]}</td>
+                <td>{all_labels_display}</td>
+                <td>{risk_category_display}</td>
+                <td><span class="{status_badge_class}">{status_proper_case}</span></td>
+                <td>{row["devin_status_detail"] or "N/A"}</td>
+                <td>{devin_session_link_html}</td>
+                <td>{pr_link_html}</td>
+                <td>{time_to_pr_display}</td>
+                <td>{row["error_message"] or "None"}</td>
+                <td>{row["created_at"]}</td>
+                <td>{row["updated_at"]}</td>
+            </tr>
+        """
+    
+    details_html = f"""
+        <div class="table-wrapper">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Issue #</th>
+                        <th>Title</th>
+                        <th>Repository</th>
+                        <th>All Labels</th>
+                        <th>Risk Category</th>
+                        <th>Devin Status</th>
+                        <th>Devin Status Detail</th>
+                        <th>Devin Session</th>
+                        <th>PR Link</th>
+                        <th>Time to PR</th>
+                        <th>Error Message</th>
+                        <th>Created At</th>
+                        <th>Updated At</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {detail_table_rows if detail_table_rows else '<tr><td colspan="13" class="empty-row">No remediation sessions yet. Trigger a GitHub issue with the devin-remediate label or use the simulator to create the first session.</td></tr>'}
+                </tbody>
+            </table>
+        </div>
+    """
+    
+    # Risk and Value tab HTML
+    risk_rows = ""
+    for category, data in risk_categories.items():
+        if data["issues"] > 0:
+            risk_rows += f"""
+                <tr>
+                    <td>{category}</td>
+                    <td>{data["issues"]}</td>
+                    <td>{data["prs"]}</td>
+                    <td>{data["awaiting_review"]}</td>
+                    <td>{data["blocked"]}</td>
+                </tr>
+            """
+    
+    risk_html = f"""
+        <div class="risk-explanation">
+            This view shows where agentic remediation is being applied: quality improvements, security remediation, or other engineering hygiene work.
+            <br><br>
+            <small>Risk categories are derived from GitHub labels such as risk:quality and risk:security.</small>
+        </div>
+        
+        <div class="table-section">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Risk Category</th>
+                        <th>Issues</th>
+                        <th>PRs Created</th>
+                        <th>Awaiting Review</th>
+                        <th>Needs Triage</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {risk_rows if risk_rows else '<tr><td colspan="5" class="empty-row">No remediation sessions yet. Trigger a GitHub issue with the devin-remediate label or use the simulator to create the first session.</td></tr>'}
+                </tbody>
+            </table>
+        </div>
+    """
+    
+    # Generate complete HTML
+    html = f"""
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Agentic Software Engineering Control Tower</title>
+    <style>
+        * {{
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }}
+        
+        body {{
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: #0B1020;
+            min-height: 100vh;
+            color: #F8FAFC;
+            line-height: 1.6;
+        }}
+        
+        .container {{
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 24px;
+        }}
+        
+        .header {{
+            margin-bottom: 32px;
+        }}
+        
+        .header h1 {{
+            font-size: 32px;
+            font-weight: 700;
+            color: #F8FAFC;
+            margin-bottom: 8px;
+            letter-spacing: -0.5px;
+        }}
+        
+        .header p {{
+            font-size: 16px;
+            color: #AAB4C5;
+        }}
+        
+        .tabs {{
+            display: flex;
+            gap: 4px;
+            margin-bottom: 24px;
+            border-bottom: 1px solid #27324A;
+        }}
+        
+        .tab {{
+            padding: 12px 24px;
+            background: transparent;
+            border: none;
+            color: #AAB4C5;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            border-bottom: 2px solid transparent;
+            transition: all 0.2s;
+        }}
+        
+        .tab:hover {{
+            color: #F8FAFC;
+            background: #172033;
+        }}
+        
+        .tab.active {{
+            color: #3969CA;
+            border-bottom-color: #3969CA;
+        }}
+        
+        .tab-content {{
+            display: none;
+        }}
+        
+        .tab-content.active {{
+            display: block;
+        }}
+        
+        .value-statement {{
+            background: #172033;
+            border: 1px solid #27324A;
+            border-radius: 8px;
+            padding: 20px 24px;
+            margin-bottom: 24px;
+            font-size: 15px;
+            color: #F8FAFC;
+            line-height: 1.7;
+        }}
+        
+        .kpi-grid {{
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 16px;
+            margin-bottom: 24px;
+        }}
+        
+        .kpi-card {{
+            background: #111827;
+            border: 1px solid #27324A;
+            border-radius: 8px;
+            padding: 20px;
+            text-align: center;
+            position: relative;
+        }}
+        
+        .kpi-card .value {{
+            font-size: 36px;
+            font-weight: 700;
+            color: #3969CA;
+            margin-bottom: 8px;
+        }}
+        
+        .kpi-card .label {{
+            font-size: 13px;
+            color: #AAB4C5;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            line-height: 1.4;
+        }}
+        
+        .operating-status-strip {{
+            background: #111827;
+            border: 1px solid #27324A;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 24px;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+        }}
+        
+        .status-item {{
+            text-align: center;
+            position: relative;
+        }}
+        
+        .status-label {{
+            font-size: 12px;
+            color: #AAB4C5;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 8px;
+        }}
+        
+        .status-value {{
+            font-size: 28px;
+            font-weight: 700;
+            color: #3969CA;
+            margin-bottom: 8px;
+        }}
+        
+        /* Tooltip functionality */
+        .kpi-card[data-tooltip]:hover::after,
+        .status-item[data-tooltip]:hover::after {{
+            content: attr(data-tooltip);
+            position: absolute;
+            bottom: 100%;
+            left: 50%;
+            transform: translateX(-50%);
+            background: #172033;
+            border: 1px solid #27324A;
+            color: #F8FAFC;
+            padding: 8px 12px;
+            border-radius: 6px;
+            font-size: 12px;
+            line-height: 1.4;
+            white-space: nowrap;
+            max-width: 300px;
+            white-space: normal;
+            z-index: 1000;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+            margin-bottom: 8px;
+        }}
+        
+        .kpi-card[data-tooltip]:hover::before,
+        .status-item[data-tooltip]:hover::before {{
+            content: '';
+            position: absolute;
+            bottom: 100%;
+            left: 50%;
+            transform: translateX(-50%);
+            border: 6px solid transparent;
+            border-top-color: #27324A;
+            margin-bottom: -4px;
+            z-index: 1000;
+        }}
+        
+        .value-panel {{
+            background: #172033;
+            border: 1px solid #27324A;
+            border-radius: 8px;
+            padding: 24px;
+            margin-bottom: 24px;
+        }}
+        
+        .value-panel h2 {{
+            font-size: 18px;
+            font-weight: 600;
+            color: #F8FAFC;
+            margin-bottom: 16px;
+        }}
+        
+        .outcome-grid {{
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 16px;
+        }}
+        
+        .outcome-card {{
+            background: #111827;
+            border: 1px solid #27324A;
+            border-radius: 6px;
+            padding: 16px;
+            border-left: 3px solid #3969CA;
+        }}
+        
+        .outcome-card h3 {{
+            font-size: 15px;
+            font-weight: 600;
+            color: #F8FAFC;
+            margin-bottom: 8px;
+        }}
+        
+        .outcome-card p {{
+            font-size: 14px;
+            color: #AAB4C5;
+            line-height: 1.5;
+        }}
+        
+        .health-strip {{
+            background: #172033;
+            border: 1px solid #27324A;
+            border-radius: 8px;
+            padding: 16px 24px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }}
+        
+        .health-strip.healthy {{
+            border-left: 4px solid #21C19A;
+        }}
+        
+        .health-strip.needs-attention {{
+            border-left: 4px solid #F59E0B;
+        }}
+        
+        .health-icon {{
+            font-size: 20px;
+            font-weight: 700;
+        }}
+        
+        .health-strip.healthy .health-icon {{
+            color: #21C19A;
+        }}
+        
+        .health-strip.needs-attention .health-icon {{
+            color: #F59E0B;
+        }}
+        
+        .health-text {{
+            font-size: 14px;
+            color: #F8FAFC;
+        }}
+        
+        .health-detail {{
+            color: #AAB4C5;
+            font-weight: 400;
+        }}
+        
+        .table-section {{
+            background: #111827;
+            border: 1px solid #27324A;
+            border-radius: 8px;
+            overflow: hidden;
+        }}
+        
+        .table-wrapper {{
+            width: 100%;
+            overflow-x: auto;
+        }}
+        
+        .table-wrapper table {{
+            min-width: 1400px;
+        }}
+        
+        table {{
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 13px;
+        }}
+        
+        th {{
+            background: #172033;
+            padding: 12px 16px;
+            text-align: left;
+            font-weight: 600;
+            color: #F8FAFC;
+            border-bottom: 1px solid #27324A;
+            white-space: nowrap;
+        }}
+        
+        td {{
+            padding: 12px 16px;
+            border-bottom: 1px solid #27324A;
+            color: #AAB4C5;
+        }}
+        
+        tr:last-child td {{
+            border-bottom: none;
+        }}
+        
+        tr:hover {{
+            background: #172033;
+        }}
+        
+        .empty-row {{
+            text-align: center;
+            padding: 40px 16px !important;
+            color: #6B7280;
+        }}
+        
+        .status-running {{
+            display: inline-block;
+            padding: 4px 12px;
+            background: rgba(245, 158, 11, 0.15);
+            color: #F59E0B;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 500;
+        }}
+        
+        .status-needs-review {{
+            display: inline-block;
+            padding: 4px 12px;
+            background: rgba(57, 105, 202, 0.15);
+            color: #3969CA;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 500;
+        }}
+        
+        .status-completed {{
+            display: inline-block;
+            padding: 4px 12px;
+            background: rgba(33, 193, 154, 0.15);
+            color: #21C19A;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 500;
+        }}
+        
+        .status-failed {{
+            display: inline-block;
+            padding: 4px 12px;
+            background: rgba(239, 68, 68, 0.15);
+            color: #EF4444;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 500;
+        }}
+        
+        .status-unknown {{
+            display: inline-block;
+            padding: 4px 12px;
+            background: rgba(107, 114, 128, 0.15);
+            color: #6B7280;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 500;
+        }}
+        
+        .link {{
+            color: #3969CA;
+            text-decoration: none;
+            font-weight: 500;
+        }}
+        
+        .link:hover {{
+            text-decoration: underline;
+            color: #0294DE;
+        }}
+        
+        .risk-explanation {{
+            background: #172033;
+            border: 1px solid #27324A;
+            border-radius: 8px;
+            padding: 16px 24px;
+            margin-bottom: 24px;
+            font-size: 14px;
+            color: #AAB4C5;
+            line-height: 1.6;
+        }}
+        
+        .refresh-hint {{
+            text-align: center;
+            color: #6B7280;
+            font-size: 13px;
+            margin-top: 32px;
+        }}
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Agentic Software Engineering Control Tower</h1>
+            <p>Operating visibility from engineering issue signal to autonomous remediation and pull request review.</p>
+        </div>
+        
+        <div class="tabs">
+            <button class="tab active" data-tab="executive">Executive Overview</button>
+            <button class="tab" data-tab="queue">Remediation Queue</button>
+            <button class="tab" data-tab="details">Devin Session Details</button>
+            <button class="tab" data-tab="risk">Risk and Value</button>
+        </div>
+        
+        <div id="executive" class="tab-content active">
+            {executive_html if sessions else '<div class="value-statement">No remediation sessions yet. Trigger a GitHub issue with the devin-remediate label or use the simulator to create the first session.</div>'}
+        </div>
+        
+        <div id="queue" class="tab-content">
+            {queue_html}
+        </div>
+        
+        <div id="details" class="tab-content">
+            {details_html}
+        </div>
+        
+        <div id="risk" class="tab-content">
+            {risk_html}
+        </div>
+        
+        <div class="refresh-hint">
+            Refresh the page to see the latest data
+        </div>
+    </div>
+    
+    <script>
+        document.querySelectorAll('.tab').forEach(tab => {{
+            tab.addEventListener('click', () => {{
+                // Remove active class from all tabs
+                document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+                // Add active class to clicked tab
+                tab.classList.add('active');
+                
+                // Hide all tab contents
+                document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
+                // Show selected tab content
+                const tabId = tab.getAttribute('data-tab');
+                document.getElementById(tabId).classList.add('active');
+            }});
+        }});
+    </script>
+</body>
+</html>
+    """
+    
+    return html
 
 
 @app.post("/sessions/{session_id}/needs-review")
