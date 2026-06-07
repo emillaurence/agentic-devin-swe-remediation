@@ -15,10 +15,10 @@ Traditional automation tells teams what is broken. Devin helps complete the engi
 The system is built as a Python FastAPI application with the following components:
 
 - **FastAPI Application** (`app/main.py`): REST API endpoints for webhooks, simulation, and metrics
-- **Devin Client** (`app/devin_client.py`): Integration with the Devin API for creating autonomous sessions
-- **GitHub Client** (`app/github_client.py`): Integration with GitHub API for issue comments and label management
-- **Session Store** (`app/store.py`): Local JSON-based storage for tracking Devin sessions
-- **Data Models** (`app/models.py`): Pydantic models for issues, sessions, and metrics
+- **Devin Client** (`app/core/devin_client.py`): Integration with the Devin API for creating autonomous sessions
+- **GitHub Client** (`app/core/github_client.py`): Integration with GitHub API for issue comments and label management
+- **Session Store** (`app/core/store.py`): Local JSON-based storage for tracking Devin sessions
+- **Data Models** (`app/core/models.py`): Pydantic models for issues, sessions, and metrics
 
 ### API Endpoints
 
@@ -153,6 +153,8 @@ Optional environment variables (with defaults):
 - `STATUS_COMPLETED_LABEL=status:devin-completed` - Label for completed sessions
 - `STATUS_FAILED_LABEL=status:devin-failed` - Label for failed sessions
 - `STORE_PATH=./data/sessions.json` - Path to session storage file
+- `BLENDED_ENGINEERING_HOURLY_COST=150` - Blended hourly cost for engineering time (default: 150)
+- `ROI_CURRENCY=A$` - Currency symbol for ROI display (default: A$)
 
 ### Local Development
 
@@ -379,6 +381,38 @@ This KPI tracks remediations where Devin could not safely progress to a reviewab
 
 The underlying GitHub status label remains `status:devin-failed` for these sessions, but the dashboard uses the more descriptive "Needs Triage" terminology to clearly communicate that human attention is needed.
 
+## ROI Calculation
+
+The dashboard calculates and displays **Estimated Engineering Cost Avoided** as the main hero metric in the Executive Overview. This represents the financial value of engineering time saved through agentic remediation.
+
+### Calculation Method
+
+Estimated Engineering Cost Avoided is calculated from actual time saved already tracked by the app:
+
+```
+Estimated Engineering Cost Avoided = actual_time_saved_hours × blended_engineering_hourly_cost
+```
+
+**Example:**
+- Actual engineering time saved: 3.0 hrs
+- Blended engineering hourly cost: A$150/hr
+- Estimated Engineering Cost Avoided: A$450
+
+### Configuration
+
+The ROI calculation uses the following environment variables:
+
+- `BLENDED_ENGINEERING_HOURLY_COST` - Blended hourly cost for engineering time (default: 150)
+- `ROI_CURRENCY` - Currency symbol for ROI display (default: A$)
+
+These can be overridden in your `.env` file to match your organization's cost structure and currency.
+
+### Important Notes
+
+- The value is calculated from actual or observed engineering time saved based on the remediation workflow timing already tracked by the app
+- This is for ROI modelling purposes only, not for billing
+- The calculation uses the difference between human baseline hours and actual Devin execution time to determine actual time saved
+
 ### View All Sessions
 
 ```bash
@@ -495,7 +529,7 @@ To support additional repositories, simply:
 To add new risk labels:
 
 1. Add the label to your GitHub repository
-2. Update the `generate_prompt` method in `app/devin_client.py` to handle the new label
+2. Update the `generate_prompt` method in `app/core/devin_client.py` to handle the new label
 3. The system will automatically capture any label starting with `risk:` as a risk label
 
 ### Additional Remediation Workflows
@@ -504,7 +538,7 @@ To add new remediation workflows:
 
 1. Define new trigger labels in environment variables
 2. Update the webhook handler in `app/main.py` to check for additional trigger labels
-3. Extend the prompt generation in `app/devin_client.py` to handle new workflow types
+3. Extend the prompt generation in `app/core/devin_client.py` to handle new workflow types
 4. Add corresponding status labels if needed
 
 ### Webhook Configuration

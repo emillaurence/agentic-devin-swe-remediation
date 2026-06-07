@@ -102,15 +102,36 @@
             border: 1px solid #27324A;
             border-radius: 8px;
             padding: 20px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            gap: 12px;
+            min-height: 150px;
             text-align: center;
             position: relative;
         }
         
-        .kpi-card .value {
-            font-size: 36px;
+        .kpi-card-header {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            width: 100%;
+        }
+        
+        .kpi-value {
+            font-size: 44px;
             font-weight: 700;
             color: #3969CA;
-            margin-bottom: 8px;
+            line-height: 1;
+        }
+        
+        .kpi-label {
+            font-size: 13px;
+            letter-spacing: 0.06em;
+            color: #AAB4C5;
+            max-width: 220px;
         }
         
         .hero-kpi {
@@ -132,17 +153,18 @@
         .hero-kpi .label {
             font-size: 16px;
             color: #AAB4C5;
-            text-transform: uppercase;
             letter-spacing: 0.5px;
             line-height: 1.4;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
         }
         
-        .kpi-card .label {
-            font-size: 13px;
-            color: #AAB4C5;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-            line-height: 1.4;
+        .outcome-name {
+            font-size: 14px;
+            font-weight: 600;
+            color: #F8FAFC;
         }
         
         .operating-status-strip {
@@ -159,57 +181,75 @@
         .status-item {
             text-align: center;
             position: relative;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 8px;
         }
         
         .status-label {
             font-size: 10px;
             color: #AAB4C5;
-            text-transform: uppercase;
             letter-spacing: 0.5px;
-            margin-bottom: 6px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 4px;
         }
         
         .status-value {
             font-size: 18px;
             font-weight: 700;
             color: #3969CA;
-            margin-bottom: 6px;
         }
         
         /* Tooltip functionality */
-        .kpi-card[data-tooltip]:hover::after,
-        .status-item[data-tooltip]:hover::after {
-            content: attr(data-tooltip);
+        .info-tooltip {
+            position: relative;
+            display: inline-flex;
+            cursor: help;
+            color: #6B7280;
+            font-size: 12px;
+        }
+        
+        .tooltip-content {
+            visibility: hidden;
+            opacity: 0;
             position: absolute;
-            bottom: 100%;
+            bottom: 140%;
             left: 50%;
             transform: translateX(-50%);
+            width: 300px;
+            padding: 12px 14px;
+            border-radius: 10px;
             background: #172033;
             border: 1px solid #27324A;
             color: #F8FAFC;
-            padding: 8px 12px;
-            border-radius: 6px;
-            font-size: 12px;
-            line-height: 1.4;
-            white-space: nowrap;
-            max-width: 300px;
+            font-size: 13px;
+            font-weight: normal;
+            line-height: 1.45;
+            text-align: left;
             white-space: normal;
-            z-index: 1000;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
-            margin-bottom: 8px;
+            box-shadow: 0 12px 28px rgba(0, 0, 0, 0.35);
+            z-index: 100;
+            pointer-events: none;
+            transition: opacity 0.2s ease, visibility 0.2s ease;
         }
         
-        .kpi-card[data-tooltip]:hover::before,
-        .status-item[data-tooltip]:hover::before {
+        .tooltip-content::before {
             content: '';
             position: absolute;
-            bottom: 100%;
+            top: 100%;
             left: 50%;
             transform: translateX(-50%);
             border: 6px solid transparent;
             border-top-color: #27324A;
-            margin-bottom: -4px;
-            z-index: 1000;
+            margin-top: -5px;
+        }
+        
+        .info-tooltip:hover .tooltip-content {
+            visibility: visible;
+            opacity: 1;
         }
         
         .value-panel {
@@ -350,8 +390,8 @@
         .status-running {
             display: inline-block;
             padding: 4px 12px;
-            background: rgba(245, 158, 11, 0.15);
-            color: #F59E0B;
+            background: rgba(57, 105, 202, 0.15);
+            color: #3969CA;
             border-radius: 12px;
             font-size: 12px;
             font-weight: 500;
@@ -360,8 +400,18 @@
         .status-needs-review {
             display: inline-block;
             padding: 4px 12px;
-            background: rgba(57, 105, 202, 0.15);
-            color: #3969CA;
+            background: rgba(245, 158, 11, 0.15);
+            color: #F59E0B;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 500;
+        }
+        
+        .status-needs-human-review {
+            display: inline-block;
+            padding: 4px 12px;
+            background: rgba(245, 158, 11, 0.15);
+            color: #F59E0B;
             border-radius: 12px;
             font-size: 12px;
             font-weight: 500;
@@ -378,6 +428,16 @@
         }
         
         .status-failed {
+            display: inline-block;
+            padding: 4px 12px;
+            background: rgba(239, 68, 68, 0.15);
+            color: #EF4444;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 500;
+        }
+
+        .status-needs-triage {
             display: inline-block;
             padding: 4px 12px;
             background: rgba(239, 68, 68, 0.15);
@@ -447,74 +507,110 @@
                     Devin converts GitHub Issues into reviewable pull requests, improving productivity, resilience, reliability, and governance while preserving human review as the control point.
                 </div>
                 
-                <div class="hero-kpi" data-tooltip="Total human hours saved by Devin vs estimated human baseline time across all remediated issues.">
-                    <div class="value">{{ kpis.time_saved_hours if kpis.time_saved_hours else 0 }} hrs</div>
-                    <div class="label">Time Saved</div>
+                <div class="hero-kpi">
+                    <div class="label" style="margin-bottom: 8px; font-weight: 700; color: #F8FAFC;">
+                        Estimated Engineering Cost Saved
+                        <span class="info-tooltip">
+                            ⓘ
+                            <span class="tooltip-content">Estimated financial value of engineering time saved. Calculated from actual engineering time saved multiplied by the configured blended engineering hourly cost. This is for ROI modelling, not billing.</span>
+                        </span>
+                    </div>
+                    <div class="value">{{ kpis.roi_currency }}{{ kpis.estimated_cost_avoided if kpis.estimated_cost_avoided else 0 }}</div>
+                    <div style="font-size: 13px; color: #AAB4C5; margin-top: 12px; line-height: 1.5;">
+                        Based on {{ kpis.time_saved_hours if kpis.time_saved_hours else 0 }} hrs actual engineering time saved × {{ kpis.roi_currency }}{{ kpis.blended_hourly_cost }}/hr blended engineering cost.
+                    </div>
                 </div>
                 
                 <div class="kpi-grid">
-                    <div class="kpi-card" data-tooltip="Percentage of accepted GitHub Issues that became reviewable pull requests.">
-                        <div class="value">{{ "%.1f"|format(kpis.issue_signal_to_pr_conversion_rate) }}%</div>
-                        <div class="label">Issue-to-PR Conversion Rate</div>
+                    <div class="kpi-card">
+                        <div class="kpi-card-header">
+                            <span class="outcome-name">Productivity</span>
+                            <span class="info-tooltip">
+                                ⓘ
+                                <span class="tooltip-content">Count of Devin remediation sessions that produced a pull request. This shows whether the workflow is generating usable engineering output.</span>
+                            </span>
+                        </div>
+                        <div class="kpi-value">{{ kpis.reviewable_prs_generated }}</div>
+                        <div class="kpi-label">Reviewable PRs Created</div>
                     </div>
-                    <div class="kpi-card" data-tooltip="Accepted remediation sessions with risk labels such as risk:security or risk:quality.">
-                        <div class="value">{{ kpis.risk_issues_in_remediation }}</div>
-                        <div class="label">Risk Issues in Remediation</div>
+                    <div class="kpi-card">
+                        <div class="kpi-card-header">
+                            <span class="outcome-name">Resilience</span>
+                            <span class="info-tooltip">
+                                ⓘ
+                                <span class="tooltip-content">Count of accepted GitHub Issues with risk categories such as Quality or Security. This shows whether important risk and engineering hygiene work is moving toward remediation.</span>
+                            </span>
+                        </div>
+                        <div class="kpi-value">{{ kpis.risk_issues_in_remediation }}</div>
+                        <div class="kpi-label">Risk Issues in Remediation</div>
                     </div>
-                    <div class="kpi-card" data-tooltip="Number of Devin remediation sessions that produced a pull request.">
-                        <div class="value">{{ kpis.reviewable_prs_generated }}</div>
-                        <div class="label">Reviewable PRs Created</div>
+                    <div class="kpi-card">
+                        <div class="kpi-card-header">
+                            <span class="outcome-name">Reliability</span>
+                            <span class="info-tooltip">
+                                ⓘ
+                                <span class="tooltip-content">Percentage of accepted GitHub Issues that became reviewable pull requests. This shows whether the agentic workflow reliably turns issues into engineering output.</span>
+                            </span>
+                        </div>
+                        <div class="kpi-value">{{ "%.1f"|format(kpis.issue_signal_to_pr_conversion_rate) }}%</div>
+                        <div class="kpi-label">Issue-to-PR Conversion Rate</div>
                     </div>
-                    <div class="kpi-card" data-tooltip="Pull requests created by Devin that are waiting for human engineering review.">
-                        <div class="value">{{ kpis.prs_awaiting_review }}</div>
-                        <div class="label">PRs Awaiting Review</div>
+                    <div class="kpi-card">
+                        <div class="kpi-card-header">
+                            <span class="outcome-name">Governance</span>
+                            <span class="info-tooltip">
+                                ⓘ
+                                <span class="tooltip-content">Count of Devin-created pull requests waiting for human engineering review. This shows that humans remain the approval and merge gate.</span>
+                            </span>
+                        </div>
+                        <div class="kpi-value">{{ kpis.prs_awaiting_review }}</div>
+                        <div class="kpi-label">PRs Awaiting Review</div>
                     </div>
                 </div>
                 
                 <div class="operating-status-strip">
-                    <div class="status-item" data-tooltip="Sessions where Devin is currently working and no pull request has been created yet.">
-                        <div class="status-label">Active Remediations</div>
+                    <div class="status-item">
+                        <div class="status-label">
+                            Active Remediations
+                            <span class="info-tooltip">
+                                ⓘ
+                                <span class="tooltip-content">Sessions where Devin is currently working and no pull request has been created yet.</span>
+                            </span>
+                        </div>
                         <div class="status-value">{{ kpis.active_remediations }}</div>
                     </div>
-                    <div class="status-item" data-tooltip="Sessions where Devin could not safely progress to a reviewable pull request and needs engineer input.">
-                        <div class="status-label">Needs Triage</div>
+                    <div class="status-item">
+                        <div class="status-label">
+                            Needs Triage
+                            <span class="info-tooltip">
+                                ⓘ
+                                <span class="tooltip-content">Sessions where Devin could not safely progress to a reviewable pull request and needs engineer input.</span>
+                            </span>
+                        </div>
                         <div class="status-value">{{ kpis.needs_triage }}</div>
                     </div>
-                    <div class="status-item" data-tooltip="Average time from session creation to pull request detection, where available.">
-                        <div class="status-label">Mean Time to Reviewable PR</div>
+                    <div class="status-item">
+                        <div class="status-label">
+                            Mean Time to Reviewable PR
+                            <span class="info-tooltip">
+                                ⓘ
+                                <span class="tooltip-content">Average time from Devin session creation to pull request detection, where available.</span>
+                            </span>
+                        </div>
                         <div class="status-value">{{ kpis.mean_time_to_pr_minutes }} min{% if kpis.mean_time_to_pr_minutes %}{% else %}N/A{% endif %}</div>
                     </div>
                 </div>
                 
-                <div class="value-panel">
-                    <h2>Business Outcomes</h2>
-                    <div class="outcome-grid">
-                        <div class="outcome-card">
-                            <h3>Productivity</h3>
-                            <p>Reduces manual triage and repetitive remediation work so engineers can focus on higher-value delivery.</p>
-                        </div>
-                        <div class="outcome-card">
-                            <h3>Resilience</h3>
-                            <p>Accelerates remediation of quality and security issues before they accumulate into operational risk.</p>
-                        </div>
-                        <div class="outcome-card">
-                            <h3>Reliability</h3>
-                            <p>Tracks every GitHub Issue through agent execution, pull request creation, and review handoff.</p>
-                        </div>
-                        <div class="outcome-card">
-                            <h3>Governance</h3>
-                            <p>Keeps humans in control by making pull request review the merge gate.</p>
-                        </div>
-                    </div>
-                </div>
                 
                 <div class="health-strip {{ 'healthy' if kpis.is_healthy else 'needs-attention' }}">
                     <div class="health-icon">{{ '✓' if kpis.is_healthy else '⚠' }}</div>
                     <div class="health-text">
                         <strong>Operating Health: {{ 'Healthy' if kpis.is_healthy else 'Needs Attention' }}</strong>
-                        <span class="health-detail">
-                            {{ ' - GitHub Issues are being converted into reviewable PRs with no items needing triage.' if kpis.is_healthy else ' - One or more remediations need triage before they can progress.' }}
-                        </span>
+                        {% if kpis.is_healthy %}
+                            <br><span class="health-detail">GitHub Issues are being converted into reviewable PRs with no items needing triage.</span>
+                        {% else %}
+                            <br><span class="health-detail">One or more remediations need triage before they can progress.</span>
+                        {% endif %}
                     </div>
                 </div>
             {% else %}
@@ -531,7 +627,7 @@
                             <th>Issue Title</th>
                             <th>Repository</th>
                             <th>Risk Category</th>
-                            <th>Current Status</th>
+                            <th>Devin Status</th>
                             <th>PR Link</th>
                             <th>Last Updated</th>
                         </tr>
@@ -544,7 +640,19 @@
                                     <td>{{ row.issue_title[:60] }}...</td>
                                     <td>{{ row.repository }}</td>
                                     <td>{{ row.risk_category }}</td>
-                                    <td><span class="status-{{ row.status.replace('_', '-') }}">{{ row.status|replace('_', ' ')|title }}</span></td>
+                                    <td>
+                                        {% if row.status == 'Running' %}
+                                            <span class="status-running">{{ row.status }}</span>
+                                        {% elif row.status == 'Needs Human Review' %}
+                                            <span class="status-needs-human-review">{{ row.status }}</span>
+                                        {% elif row.status == 'Completed' %}
+                                            <span class="status-completed">{{ row.status }}</span>
+                                        {% elif row.status == 'Needs Triage' %}
+                                            <span class="status-needs-triage">{{ row.status }}</span>
+                                        {% else %}
+                                            <span class="status-unknown">{{ row.status }}</span>
+                                        {% endif %}
+                                    </td>
                                     <td>{% if row.pr_link %}<a href="{{ row.pr_link }}" class="link" target="_blank">View PR</a>{% else %}Not created yet{% endif %}</td>
                                     <td>{{ row.updated_at }}</td>
                                 </tr>
@@ -585,7 +693,19 @@
                                     <td>{{ row.repository }}</td>
                                     <td>{{ row.all_labels|join(', ') if row.all_labels else 'None' }}</td>
                                     <td>{{ row.risk_category }}</td>
-                                    <td><span class="status-{{ row.status.replace('_', '-') }}">{{ row.status|replace('_', ' ')|title }}</span></td>
+                                    <td>
+                                        {% if row.status == 'Running' %}
+                                            <span class="status-running">{{ row.status }}</span>
+                                        {% elif row.status == 'Needs Human Review' %}
+                                            <span class="status-needs-human-review">{{ row.status }}</span>
+                                        {% elif row.status == 'Completed' %}
+                                            <span class="status-completed">{{ row.status }}</span>
+                                        {% elif row.status == 'Needs Triage' %}
+                                            <span class="status-needs-triage">{{ row.status }}</span>
+                                        {% else %}
+                                            <span class="status-unknown">{{ row.status }}</span>
+                                        {% endif %}
+                                    </td>
                                     <td><a href="{{ row.devin_session_url }}" class="link" target="_blank">View Session</a></td>
                                     <td>{% if row.pr_link %}<a href="{{ row.pr_link }}" class="link" target="_blank">View PR</a>{% else %}Not created yet{% endif %}</td>
                                     <td>{{ row.time_to_pr or 'N/A' }}</td>
@@ -614,11 +734,12 @@
                     <thead>
                         <tr>
                             <th>Risk Category</th>
+                            <th>Cost Saved</th>
+                            <th>Time Saved</th>
                             <th>Issues</th>
                             <th>PRs Created</th>
                             <th>Awaiting Review</th>
                             <th>Needs Triage</th>
-                            <th>Time Saved</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -627,16 +748,17 @@
                                 {% if data.issues > 0 %}
                                     <tr>
                                         <td>{{ category }}</td>
+                                        <td>{{ data.roi_currency }}{{ "%.0f"|format(data.cost_saved) }}</td>
+                                        <td>{{ "%.1f"|format(data.time_saved_hours) }} hrs</td>
                                         <td>{{ data.issues }}</td>
                                         <td>{{ data.prs }}</td>
                                         <td>{{ data.awaiting_review }}</td>
                                         <td>{{ data.blocked }}</td>
-                                        <td>{{ "%.1f"|format(data.time_saved_hours) }} hrs</td>
                                     </tr>
                                 {% endif %}
                             {% endfor %}
                         {% else %}
-                            <tr><td colspan="6" class="empty-row">No remediation sessions yet. Trigger a GitHub issue with the devin-remediate label or use the simulator to create the first session.</td></tr>
+                            <tr><td colspan="7" class="empty-row">No remediation sessions yet. Trigger a GitHub issue with the devin-remediate label or use the simulator to create the first session.</td></tr>
                         {% endif %}
                     </tbody>
                 </table>

@@ -6,6 +6,23 @@ from app.core.store import SessionStore
 
 logger = logging.getLogger(__name__)
 
+# Risk label mapping for display
+RISK_LABEL_MAPPING = {
+    "risk:quality": "Quality",
+    "risk:security": "Security"
+}
+
+# Devin session URL format
+DEVIN_SESSION_URL_FORMAT = "https://app.devin.ai/sessions/{session_id}"
+
+# Status display names for dashboard
+STATUS_DISPLAY_NAMES = {
+    "running": "Running",
+    "needs_human_review": "Needs Human Review",
+    "completed": "Completed",
+    "failed": "Needs Triage"
+}
+
 
 def load_environment_variables():
     """Load and validate environment variables."""
@@ -26,13 +43,17 @@ def load_environment_variables():
     HUMAN_BASELINE_SECURITY_HOURS = float(os.getenv("HUMAN_BASELINE_SECURITY_HOURS", "10"))
     HUMAN_BASELINE_OTHER_HOURS = float(os.getenv("HUMAN_BASELINE_OTHER_HOURS", "6"))
     
+    # ROI configuration
+    BLENDED_ENGINEERING_HOURLY_COST = float(os.getenv("BLENDED_ENGINEERING_HOURLY_COST", "150"))
+    ROI_CURRENCY = os.getenv("ROI_CURRENCY", "A$")
+    
     # Validate required environment variables
     if not DEVIN_API_KEY:
-        logger.warning("DEVIN_API_KEY not set - Devin integration will not work")
+        logger.warning("DEVIN_API_KEY not set - Devin integration will not work. Set this environment variable to enable Devin session creation.")
     if not DEVIN_ORG_ID:
-        logger.warning("DEVIN_ORG_ID not set - Devin integration will not work")
+        logger.warning("DEVIN_ORG_ID not set - Devin integration will not work. Set this environment variable to enable Devin session creation.")
     if not GITHUB_TOKEN:
-        logger.warning("GITHUB_TOKEN not set - GitHub API integration will not work")
+        logger.warning("GITHUB_TOKEN not set - GitHub API integration will not work. Set this environment variable to enable GitHub issue comments and label management.")
     
     return {
         "DEVIN_API_KEY": DEVIN_API_KEY,
@@ -48,7 +69,9 @@ def load_environment_variables():
         "STORE_PATH": STORE_PATH,
         "HUMAN_BASELINE_QUALITY_HOURS": HUMAN_BASELINE_QUALITY_HOURS,
         "HUMAN_BASELINE_SECURITY_HOURS": HUMAN_BASELINE_SECURITY_HOURS,
-        "HUMAN_BASELINE_OTHER_HOURS": HUMAN_BASELINE_OTHER_HOURS
+        "HUMAN_BASELINE_OTHER_HOURS": HUMAN_BASELINE_OTHER_HOURS,
+        "BLENDED_ENGINEERING_HOURLY_COST": BLENDED_ENGINEERING_HOURLY_COST,
+        "ROI_CURRENCY": ROI_CURRENCY
     }
 
 

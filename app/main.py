@@ -160,8 +160,8 @@ async def github_pull_request_webhook(request: Request):
     try:
         payload = PullRequestWebhookPayload(**raw_payload)
     except Exception as e:
-        logger.error(f"Failed to parse webhook payload: {e}")
-        logger.error(f"Raw payload: {raw_payload}")
+        logger.error(f"Failed to parse GitHub pull request webhook payload: {e}")
+        logger.error(f"Webhook payload validation failed. Ensure the payload structure matches GitHub's pull request webhook format.")
         raise
 
     logger.info(f"Parsed webhook payload: action={payload.action}")
@@ -409,7 +409,7 @@ async def devin_health_check():
         logger.error(f"Error checking Devin health: {str(e)}")
         return {
             "status": "error",
-            "message": f"Error checking Devin authentication: {str(e)}"
+            "message": "Failed to check Devin authentication. Check DEVIN_API_KEY and DEVIN_ORG_ID are valid."
         }
 
 
@@ -436,7 +436,6 @@ async def dashboard(request: Request):
     for row in detail_rows:
         if row["pr_detected_at"] and row["created_at"]:
             try:
-                from datetime import datetime
                 pr_time = datetime.fromisoformat(row["pr_detected_at"]) if isinstance(row["pr_detected_at"], str) else row["pr_detected_at"]
                 created_time = datetime.fromisoformat(row["created_at"]) if isinstance(row["created_at"], str) else row["created_at"]
                 if pr_time and created_time:
@@ -468,7 +467,7 @@ async def mark_session_needs_review(session_id: str):
     """
     session = store.get_session(session_id)
     if not session:
-        raise HTTPException(status_code=404, detail="Session not found")
+        raise HTTPException(status_code=404, detail=f"Session {session_id} not found. Verify the session ID is correct.")
     
     # Update session status
     update_data = {
@@ -510,7 +509,7 @@ async def complete_session(session_id: str, pull_request_url: Optional[str] = No
     """
     session = store.get_session(session_id)
     if not session:
-        raise HTTPException(status_code=404, detail="Session not found")
+        raise HTTPException(status_code=404, detail=f"Session {session_id} not found. Verify the session ID is correct.")
     
     # Update session status
     update_data = {

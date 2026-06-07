@@ -1,5 +1,6 @@
 import uuid
 import logging
+import re
 from datetime import datetime
 from typing import List, Optional
 from app.core.models import GitHubIssue, DevinSession, SessionStatus
@@ -7,6 +8,7 @@ from app.core.store import SessionStore
 from app.core.devin_client import DevinClient
 from app.core.github_client import GitHubClient
 from app.services.label_service import LabelService
+from app.utils.config import DEVIN_SESSION_URL_FORMAT
 
 logger = logging.getLogger(__name__)
 
@@ -67,7 +69,7 @@ class SoftwareRemediationService:
             session_id = devin_response.get("session_id", str(uuid.uuid4()))
             
             # Construct Devin session URL
-            devin_session_url = f"https://app.devin.ai/sessions/{session_id}"
+            devin_session_url = DEVIN_SESSION_URL_FORMAT.format(session_id=session_id)
             
             # Create session record
             session = DevinSession(
@@ -338,7 +340,6 @@ class SoftwareRemediationService:
         all_sessions: List[DevinSession]
     ) -> Optional[DevinSession]:
         """Find a session by issue number referenced in PR title or body."""
-        import re
         issue_pattern = r'#(\d+)'
         
         # Search in title and body for issue numbers

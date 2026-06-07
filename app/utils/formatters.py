@@ -2,6 +2,7 @@ from datetime import datetime
 from typing import List, Dict, Any
 import logging
 from app.core.models import SessionStatus, DevinSession
+from app.utils.config import RISK_LABEL_MAPPING, DEVIN_SESSION_URL_FORMAT, STATUS_DISPLAY_NAMES
 
 logger = logging.getLogger(__name__)
 
@@ -19,11 +20,7 @@ def get_friendly_risk_label(risk_label: str) -> str:
     """Map a risk label to a friendly name."""
     if not risk_label:
         return "Unclassified"
-    risk_mapping = {
-        "risk:quality": "Quality",
-        "risk:security": "Security"
-    }
-    return risk_mapping.get(risk_label, "Unclassified")
+    return RISK_LABEL_MAPPING.get(risk_label, "Unclassified")
 
 
 def get_friendly_risk_category(risk_labels: List[str]) -> str:
@@ -42,8 +39,8 @@ def get_display_status(session: DevinSession) -> str:
     """Determine display status for a session."""
     # If PR exists but Devin session is still running or waiting, show as needs-review
     if session.pull_request_url and session.status == SessionStatus.RUNNING:
-        return "needs-review"
-    return session.status.value
+        return STATUS_DISPLAY_NAMES["needs_human_review"]
+    return STATUS_DISPLAY_NAMES.get(session.status.value, session.status.value)
 
 
 def format_duration(seconds: float) -> str:
@@ -58,8 +55,6 @@ def format_duration(seconds: float) -> str:
 
 def calculate_kpis(sessions: List[DevinSession], config: Dict[str, Any] = None) -> Dict[str, Any]:
     """Calculate dashboard KPIs from sessions."""
-    logger.info(f"DEBUG: calculate_kpis called with {len(sessions)} sessions, config keys: {list(config.keys()) if config else 'None'}")
-    logger.info(f"DEBUG: config baseline values: quality={config.get('HUMAN_BASELINE_QUALITY_HOURS') if config else 'None'}, security={config.get('HUMAN_BASELINE_SECURITY_HOURS') if config else 'None'}, other={config.get('HUMAN_BASELINE_OTHER_HOURS') if config else 'None'}")
     issues_processed = len(sessions)
     reviewable_prs_generated = len([s for s in sessions if s.pull_request_url])
     issue_signal_to_pr_conversion_rate = (reviewable_prs_generated / issues_processed * 100) if issues_processed > 0 else 0
@@ -67,18 +62,14 @@ def calculate_kpis(sessions: List[DevinSession], config: Dict[str, Any] = None) 
     # Calculate time saved (human baseline hours - Devin time)
     total_time_saved_hours = 0
     for session in sessions:
-        logger.info(f"DEBUG: Processing session {session.session_id}, pr_detected_at={session.pr_detected_at}, created_at={session.created_at}, risk_labels={session.risk_labels}")
         if session.pr_detected_at and session.created_at:
             try:
                 # Handle both datetime objects and string timestamps
                 pr_time = session.pr_detected_at if isinstance(session.pr_detected_at, datetime) else datetime.fromisoformat(session.pr_detected_at) if isinstance(session.pr_detected_at, str) else None
                 created_time = session.created_at if isinstance(session.created_at, datetime) else datetime.fromisoformat(session.created_at) if isinstance(session.created_at, str) else None
                 
-                logger.info(f"DEBUG: Parsed pr_time={pr_time}, created_time={created_time}")
-                
                 if pr_time and created_time:
                     devin_time_hours = (pr_time - created_time).total_seconds() / 3600
-                    logger.info(f"DEBUG: devin_time_hours={devin_time_hours}")
                     
                     # Determine baseline based on risk category
                     baseline_hours = config.get("HUMAN_BASELINE_OTHER_HOURS", 6) if config else 6
@@ -86,22 +77,16 @@ def calculate_kpis(sessions: List[DevinSession], config: Dict[str, Any] = None) 
                         for label in session.risk_labels:
                             if label == "risk:quality":
                                 baseline_hours = config.get("HUMAN_BASELINE_QUALITY_HOURS", 3) if config else 3
-                                logger.info(f"DEBUG: Using quality baseline: {baseline_hours}")
                                 break
                             elif label == "risk:security":
                                 baseline_hours = config.get("HUMAN_BASELINE_SECURITY_HOURS", 10) if config else 10
-                                logger.info(f"DEBUG: Using security baseline: {baseline_hours}")
                                 break
                     
                     time_saved = baseline_hours - devin_time_hours
-                    logger.info(f"DEBUG: time_saved={time_saved}")
                     total_time_saved_hours += time_saved
             except Exception as e:
                 logger.warning(f"Error calculating time saved for session {session.session_id}: {e}")
-                logger.info(f"DEBUG: Exception: {e}")
                 continue
-    
-    logger.info(f"DEBUG: Final total_time_saved_hours={total_time_saved_hours}")
     
     # Risk Issues in Remediation - accepted remediation sessions with risk labels
     risk_issues_in_remediation = len([s for s in sessions if s.risk_labels and len(s.risk_labels) > 0])
@@ -137,7 +122,11 @@ def calculate_kpis(sessions: List[DevinSession], config: Dict[str, Any] = None) 
         # If no sessions completed yet, only check for failures
         is_healthy = not has_needs_triage
     
-    logger.info(f"DEBUG: Returning time_saved_hours={round(total_time_saved_hours, 1)}")
+    # Calculate financial ROI from actual time saved
+    blended_hourly_cost = config.get("BLENDED_ENGINEERING_HOURLY_COST", 150) if config else 150
+    roi_currency = config.get("ROI_CURRENCY", "A$") if config else "A$"
+    estimated_cost_avoided = round(total_time_saved_hours * blended_hourly_cost, 0)
+    
     return {
         "reviewable_prs_generated": reviewable_prs_generated,
         "risk_issues_in_remediation": risk_issues_in_remediation,
@@ -148,7 +137,10 @@ def calculate_kpis(sessions: List[DevinSession], config: Dict[str, Any] = None) 
         "mean_time_to_pr_minutes": mean_time_to_pr_minutes,
         "is_healthy": is_healthy,
         "sessions_completed": sessions_completed,
-        "time_saved_hours": round(total_time_saved_hours, 1)
+        "time_saved_hours": round(total_time_saved_hours, 1),
+        "estimated_cost_avoided": estimated_cost_avoided,
+        "roi_currency": roi_currency,
+        "blended_hourly_cost": blended_hourly_cost
     }
 
 
@@ -179,6 +171,7 @@ def prepare_detail_rows(sessions: List[DevinSession]) -> List[Dict[str, Any]]:
     detail_rows = []
     for session in sessions:
         all_labels = [label.name for label in session.issue.labels]
+        display_status = get_display_status(session)
         detail_rows.append({
             "session_id": session.session_id,
             "issue_number": session.issue.number,
@@ -188,9 +181,9 @@ def prepare_detail_rows(sessions: List[DevinSession]) -> List[Dict[str, Any]]:
             "all_labels": all_labels,
             "risk_labels": session.risk_labels if session.risk_labels else [],
             "risk_category": get_friendly_risk_category(session.risk_labels),
-            "status": session.status.value,
+            "status": display_status,
             "devin_status_detail": session.devin_response.get("status_detail") if session.devin_response else None,
-            "devin_session_url": session.devin_session_url or f"https://app.devin.ai/sessions/{session.session_id}",
+            "devin_session_url": session.devin_session_url or DEVIN_SESSION_URL_FORMAT.format(session_id=session.session_id),
             "pr_link": session.pull_request_url,
             "pr_detected_at": session.pr_detected_at,
             "error_message": session.error_message,
@@ -205,10 +198,13 @@ def prepare_detail_rows(sessions: List[DevinSession]) -> List[Dict[str, Any]]:
 
 def prepare_risk_categories(sessions: List[DevinSession], config: Dict[str, Any] = None) -> Dict[str, Dict[str, Any]]:
     """Prepare data for the Risk and Value tab."""
+    blended_hourly_cost = config.get("BLENDED_ENGINEERING_HOURLY_COST", 150) if config else 150
+    roi_currency = config.get("ROI_CURRENCY", "A$") if config else "A$"
+    
     risk_categories = {
-        "Quality": {"issues": 0, "prs": 0, "awaiting_review": 0, "blocked": 0, "time_saved_hours": 0.0},
-        "Security": {"issues": 0, "prs": 0, "awaiting_review": 0, "blocked": 0, "time_saved_hours": 0.0},
-        "Unclassified": {"issues": 0, "prs": 0, "awaiting_review": 0, "blocked": 0, "time_saved_hours": 0.0}
+        "Quality": {"issues": 0, "prs": 0, "awaiting_review": 0, "blocked": 0, "time_saved_hours": 0.0, "cost_saved": 0.0, "roi_currency": roi_currency},
+        "Security": {"issues": 0, "prs": 0, "awaiting_review": 0, "blocked": 0, "time_saved_hours": 0.0, "cost_saved": 0.0, "roi_currency": roi_currency},
+        "Unclassified": {"issues": 0, "prs": 0, "awaiting_review": 0, "blocked": 0, "time_saved_hours": 0.0, "cost_saved": 0.0, "roi_currency": roi_currency}
     }
     
     for session in sessions:
@@ -245,6 +241,7 @@ def prepare_risk_categories(sessions: List[DevinSession], config: Dict[str, Any]
                         
                         time_saved = baseline_hours - devin_time_hours
                         risk_categories[friendly_category]["time_saved_hours"] += time_saved
+                        risk_categories[friendly_category]["cost_saved"] += time_saved * blended_hourly_cost
                 except Exception as e:
                     logger.warning(f"Error calculating time saved for session {session.session_id}: {e}")
                     continue
