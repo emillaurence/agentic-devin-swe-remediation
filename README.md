@@ -176,6 +176,32 @@ python -m app.main
 
 The API will be available at `http://localhost:8000`
 
+### Using ngrok for Local Webhook Testing
+
+To test GitHub webhooks locally without deploying, use ngrok to expose your local server:
+
+1. Install ngrok (if not already installed):
+   - macOS: `brew install ngrok`
+   - Or download from https://ngrok.com
+
+2. Start ngrok to tunnel port 8000:
+   ```bash
+   ngrok http 8000
+   ```
+
+3. Copy the ngrok URL (e.g., `https://abc123.ngrok.io`)
+
+4. Configure your GitHub webhook to point to:
+   ```
+   https://abc123.ngrok.io/webhook/github
+   ```
+
+5. Select "Issues" as the event type
+
+6. Optionally add a webhook secret for security (add `GITHUB_WEBHOOK_SECRET` to your `.env` file)
+
+Note: The ngrok URL changes each time you restart ngrok, so you'll need to update your GitHub webhook configuration accordingly.
+
 ### Testing Devin Authentication
 
 To verify your Devin API credentials are configured correctly without creating a session:
