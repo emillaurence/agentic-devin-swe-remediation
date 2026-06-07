@@ -46,6 +46,7 @@ class SessionStore:
             "status": session.status.value,
             "created_at": session.created_at.isoformat(),
             "completed_at": session.completed_at.isoformat() if session.completed_at else None,
+            "needs_review_at": session.needs_review_at.isoformat() if session.needs_review_at else None,
             "prompt": session.prompt,
             "devin_response": session.devin_response,
             "error_message": session.error_message,
@@ -69,6 +70,7 @@ class SessionStore:
             status=SessionStatus(data["status"]),
             created_at=datetime.fromisoformat(data["created_at"]),
             completed_at=datetime.fromisoformat(data["completed_at"]) if data.get("completed_at") else None,
+            needs_review_at=datetime.fromisoformat(data["needs_review_at"]) if data.get("needs_review_at") else None,
             prompt=data["prompt"],
             devin_response=data.get("devin_response"),
             error_message=data.get("error_message"),
@@ -123,6 +125,7 @@ class SessionStore:
         
         total_issues_processed = len(sessions)
         sessions_running = len([s for s in sessions if s.status == SessionStatus.RUNNING])
+        sessions_needs_review = len([s for s in sessions if s.status == SessionStatus.NEEDS_HUMAN_REVIEW])
         sessions_completed = len([s for s in sessions if s.status == SessionStatus.COMPLETED])
         sessions_failed = len([s for s in sessions if s.status == SessionStatus.FAILED])
         
@@ -147,6 +150,7 @@ class SessionStore:
         return Metrics(
             total_issues_processed=total_issues_processed,
             sessions_running=sessions_running,
+            sessions_needs_review=sessions_needs_review,
             sessions_completed=sessions_completed,
             sessions_failed=sessions_failed,
             count_by_risk_label=count_by_risk_label,

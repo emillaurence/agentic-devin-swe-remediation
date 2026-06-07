@@ -6,6 +6,7 @@ from enum import Enum
 
 class SessionStatus(str, Enum):
     RUNNING = "running"
+    NEEDS_HUMAN_REVIEW = "needs_human_review"
     COMPLETED = "completed"
     FAILED = "failed"
 
@@ -32,6 +33,7 @@ class DevinSession(BaseModel):
     status: SessionStatus = SessionStatus.RUNNING
     created_at: datetime = Field(default_factory=datetime.utcnow)
     completed_at: Optional[datetime] = None
+    needs_review_at: Optional[datetime] = None
     prompt: str
     devin_response: Optional[Dict[str, Any]] = None
     error_message: Optional[str] = None
@@ -59,6 +61,7 @@ class SimulateRequest(BaseModel):
 class Metrics(BaseModel):
     total_issues_processed: int
     sessions_running: int
+    sessions_needs_review: int
     sessions_completed: int
     sessions_failed: int
     count_by_risk_label: Dict[str, int]

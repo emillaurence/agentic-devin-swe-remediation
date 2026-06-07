@@ -25,6 +25,9 @@ The system is built as a Python FastAPI application with the following component
 - `POST /webhook/github` - Accept GitHub issue webhook payloads (only triggers on `action == "labeled"`)
 - `POST /simulate` - Simulate remediation events without live webhooks
 - `GET /sessions` - View all tracked Devin sessions
+- `GET /sessions/review-queue` - View all sessions awaiting human review
+- `POST /sessions/{session_id}/needs-review` - Mark a session as needing human review
+- `POST /sessions/{session_id}/complete` - Mark a session as completed (after review)
 - `POST /sessions/sync` - Manually trigger a sync pass over all running Devin sessions
 - `GET /metrics` - View operational metrics (automatically syncs sessions before returning)
 - `GET /health` - Health check endpoint
@@ -45,23 +48,49 @@ The system is generic and label-driven. It uses GitHub labels to control behavio
 ### Status Labels
 
 - `status:devin-running` - Automatically added when a Devin session starts
-- `status:devin-completed` - Added when remediation completes successfully
+- `status:devin-needs-human-review` - Added when Devin completes remediation and opens a PR, awaiting human review
+- `status:devin-completed` - Added when remediation is reviewed and approved
 - `status:devin-failed` - Added when remediation fails
 
-## Session Completion Tracking
+## Session Lifecycle
 
-The system uses a **polling-based mechanism** to track session completion, not webhook callbacks from Devin.
+The system implements a human-in-the-loop review workflow where Devin-generated changes require human review before being considered complete.
+
+### Workflow
+
+```
+Running
+   │
+   ▼
+Needs Human Review
+   │
+   ├─ Completed (after review and approval)
+   ├─ Failed (if changes are rejected)
+   └─ Running (if changes are requested)
+```
+
+### Session States
+
+1. **Running**: Devin is actively working on the remediation
+2. **Needs Human Review**: Devin has completed remediation and opened a PR, awaiting human review
+3. **Completed**: The PR has been reviewed, approved, and merged
+4. **Failed**: The remediation failed or was rejected
 
 ### How It Works
 
 1. When a Devin session is created, it's stored locally with status `running`
 2. The system periodically polls the Devin API to check session status
-3. When a session reaches a terminal state (completed, failed, suspended, error):
-   - The local session record is updated
-   - GitHub labels are updated (removing `status:devin-running`, adding the appropriate status label)
-   - A comment is added to the GitHub issue with details:
-     - For completed sessions: session link, PR link, validation summary
-     - For failed sessions: failure reason
+3. When Devin completes work and opens a PR:
+   - The local session record is updated to `needs_human_review`
+   - GitHub labels are updated (removing `status:devin-running`, adding `status:devin-needs-human-review`)
+   - A comment is added to the GitHub issue with PR link and validation summary
+4. When the PR is reviewed and approved:
+   - Call the completion endpoint to mark the session as `completed`
+   - GitHub labels are updated (removing `status:devin-needs-human-review`, adding `status:devin-completed`)
+5. If the remediation fails:
+   - The local session record is updated to `failed`
+   - GitHub labels are updated (removing `status:devin-running`, adding `status:devin-failed`)
+   - A comment is added with the failure reason
 
 ### Manual Sync
 
@@ -118,6 +147,7 @@ Optional environment variables (with defaults):
 - `DEFAULT_GITHUB_REPO=superset` - Default repository name
 - `TRIGGER_LABEL=devin-remediate` - Label that triggers remediation
 - `STATUS_RUNNING_LABEL=status:devin-running` - Label for running sessions
+- `STATUS_NEEDS_REVIEW_LABEL=status:devin-needs-human-review` - Label for sessions needing human review
 - `STATUS_COMPLETED_LABEL=status:devin-completed` - Label for completed sessions
 - `STATUS_FAILED_LABEL=status:devin-failed` - Label for failed sessions
 - `STORE_PATH=./data/sessions.json` - Path to session storage file
@@ -264,10 +294,56 @@ Or visit `http://localhost:8000/metrics` in your browser.
 
 Metrics include:
 - Total issues processed
-- Sessions running/completed/failed
+- Sessions running/needs_review/completed/failed
 - Count by risk label
 - Count by repository
 - Average session duration
+- Completion rate percentage
+- Review queue size
+
+## Human Review Workflow
+
+### View Review Queue
+
+To view all sessions awaiting human review:
+
+```bash
+curl http://localhost:8000/sessions/review-queue
+```
+
+This returns all sessions with status `needs_human_review`.
+
+### Mark Session as Completed
+
+After reviewing and approving a PR, mark the session as completed:
+
+```bash
+curl -X POST http://localhost:8000/sessions/{session_id}/complete \
+  -H "Content-Type: application/json" \
+  -d '{
+    "pull_request_url": "https://github.com/owner/repo/pull/123"
+  }'
+```
+
+This will:
+- Update session status to `completed`
+- Remove `status:devin-needs-human-review` label
+- Add `status:devin-completed` label
+- Store the pull request URL and completion timestamp
+
+### Mark Session as Needs Review (Manual)
+
+If you need to manually mark a session as needing review:
+
+```bash
+curl -X POST http://localhost:8000/sessions/{session_id}/needs-review
+```
+
+This will:
+- Update session status to `needs_human_review`
+- Remove `status:devin-running` label
+- Add `status:devin-needs-human-review` label
+- Store the needs review timestamp
 
 ## Extending the System
 

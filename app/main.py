@@ -39,6 +39,7 @@ DEFAULT_GITHUB_OWNER = os.getenv("DEFAULT_GITHUB_OWNER", "emillaurence")
 DEFAULT_GITHUB_REPO = os.getenv("DEFAULT_GITHUB_REPO", "superset")
 TRIGGER_LABEL = os.getenv("TRIGGER_LABEL", "devin-remediate")
 STATUS_RUNNING_LABEL = os.getenv("STATUS_RUNNING_LABEL", "status:devin-running")
+STATUS_NEEDS_REVIEW_LABEL = os.getenv("STATUS_NEEDS_REVIEW_LABEL", "status:devin-needs-human-review")
 STATUS_COMPLETED_LABEL = os.getenv("STATUS_COMPLETED_LABEL", "status:devin-completed")
 STATUS_FAILED_LABEL = os.getenv("STATUS_FAILED_LABEL", "status:devin-failed")
 STORE_PATH = os.getenv("STORE_PATH", "./data/sessions.json")
@@ -165,6 +166,7 @@ This issue has been labeled `{STATUS_RUNNING_LABEL}`. Progress will be updated a
             await github_client.remove_label(issue.owner, issue.repo, issue.number, STATUS_RUNNING_LABEL)
             await github_client.remove_label(issue.owner, issue.repo, issue.number, STATUS_FAILED_LABEL)
             await github_client.remove_label(issue.owner, issue.repo, issue.number, STATUS_COMPLETED_LABEL)
+            await github_client.remove_label(issue.owner, issue.repo, issue.number, STATUS_NEEDS_REVIEW_LABEL)
             await github_client.add_label(issue.owner, issue.repo, issue.number, STATUS_RUNNING_LABEL)
         
         logger.info(f"Successfully started Devin session {session_id} for issue {issue.number}")
@@ -241,9 +243,10 @@ async def sync_sessions():
             if devin_state in terminal_states:
                 # Determine final status
                 if devin_state == "completed":
-                    final_status = SessionStatus.COMPLETED
-                    status_label = STATUS_COMPLETED_LABEL
-                    emoji = "✅"
+                    # Transition to needs human review instead of directly to completed
+                    final_status = SessionStatus.NEEDS_HUMAN_REVIEW
+                    status_label = STATUS_NEEDS_REVIEW_LABEL
+                    emoji = "👀"
                 else:
                     final_status = SessionStatus.FAILED
                     status_label = STATUS_FAILED_LABEL
@@ -262,11 +265,11 @@ async def sync_sessions():
                 failure_reason = session_status.get("error_message") or session_status.get("failure_reason")
                 
                 # Build comment body
-                if final_status == SessionStatus.COMPLETED:
-                    comment_body = f"""{emoji} **Devin Remediation Completed**
+                if final_status == SessionStatus.NEEDS_HUMAN_REVIEW:
+                    comment_body = f"""{emoji} **Devin Remediation Completed - Awaiting Review**
 
 **Session ID:** `{session.session_id}`
-**Status:** Completed successfully
+**Status:** Devin has completed remediation and is awaiting human review
 
 """
                     if pull_request_url:
@@ -275,7 +278,9 @@ async def sync_sessions():
                     if validation_summary:
                         comment_body += f"**Validation Summary:**\n{validation_summary}\n\n"
                     
-                    comment_body += "This issue has been labeled `status:devin-completed`."
+                    comment_body += """Please review the pull request and validate the changes. Once approved, the session can be marked as completed.
+
+This issue has been labeled `status:devin-needs-human-review`."""
                 else:
                     comment_body = f"""{emoji} **Devin Remediation Failed**
 
@@ -289,9 +294,13 @@ async def sync_sessions():
                 
                 # Update session in store
                 update_data = {
-                    "status": final_status,
-                    "completed_at": datetime.utcnow()
+                    "status": final_status
                 }
+                
+                if final_status == SessionStatus.NEEDS_HUMAN_REVIEW:
+                    update_data["needs_review_at"] = datetime.utcnow()
+                elif final_status == SessionStatus.FAILED:
+                    update_data["completed_at"] = datetime.utcnow()
                 
                 if pull_request_url:
                     update_data["pull_request_url"] = pull_request_url
@@ -309,6 +318,7 @@ async def sync_sessions():
                         
                         # Remove other status labels to avoid conflicts
                         await github_client.remove_label(session.issue.owner, session.issue.repo, session.issue.number, STATUS_COMPLETED_LABEL)
+                        await github_client.remove_label(session.issue.owner, session.issue.repo, session.issue.number, STATUS_NEEDS_REVIEW_LABEL)
                         await github_client.remove_label(session.issue.owner, session.issue.repo, session.issue.number, STATUS_FAILED_LABEL)
                         
                         # Add new status label
@@ -453,6 +463,22 @@ async def get_sessions():
     }
 
 
+@app.get("/sessions/review-queue")
+async def get_review_queue():
+    """
+    Return all sessions that need human review.
+    
+    This endpoint returns sessions with status 'needs_human_review',
+    providing a filtered view of the review queue for engineering leaders.
+    """
+    sessions = store.get_all_sessions()
+    review_sessions = [s for s in sessions if s.status == SessionStatus.NEEDS_HUMAN_REVIEW]
+    return {
+        "count": len(review_sessions),
+        "sessions": [store._session_to_dict(session) for session in review_sessions]
+    }
+
+
 @app.get("/metrics")
 async def get_metrics():
     """
@@ -460,10 +486,12 @@ async def get_metrics():
     
     Metrics include:
     - Total issues processed
-    - Sessions running/completed/failed
+    - Sessions running/needs_review/completed/failed
     - Count by risk label
     - Count by repository
     - Average duration
+    - Completion rate
+    - Review queue size
     
     Note: Metrics reflect the latest synced statuses from the local store.
     To ensure metrics are up-to-date, call POST /sessions/sync before querying metrics.
@@ -472,14 +500,25 @@ async def get_metrics():
     await sync_sessions()
     
     metrics = store.get_metrics()
+    
+    # Calculate completion rate
+    total_finished = metrics.sessions_completed + metrics.sessions_failed
+    completion_rate = (metrics.sessions_completed / total_finished * 100) if total_finished > 0 else 0
+    
+    # Review queue size is sessions_needs_review
+    review_queue_size = metrics.sessions_needs_review
+    
     return {
         "total_issues_processed": metrics.total_issues_processed,
         "sessions_running": metrics.sessions_running,
+        "sessions_needs_human_review": metrics.sessions_needs_review,
         "sessions_completed": metrics.sessions_completed,
         "sessions_failed": metrics.sessions_failed,
         "count_by_risk_label": metrics.count_by_risk_label,
         "count_by_repository": metrics.count_by_repository,
-        "average_duration_seconds": metrics.average_duration_seconds
+        "average_duration_seconds": metrics.average_duration_seconds,
+        "completion_rate_percent": round(completion_rate, 2),
+        "review_queue_size": review_queue_size
     }
 
 
@@ -528,6 +567,43 @@ async def devin_health_check():
         }
 
 
+@app.post("/sessions/{session_id}/needs-review")
+async def mark_session_needs_review(session_id: str):
+    """
+    Mark a Devin session as needing human review.
+    
+    This endpoint is called when Devin has completed remediation and opened a PR,
+    but the changes require human review before being considered complete.
+    """
+    session = store.get_session(session_id)
+    if not session:
+        raise HTTPException(status_code=404, detail="Session not found")
+    
+    # Update session status
+    update_data = {
+        "status": SessionStatus.NEEDS_HUMAN_REVIEW,
+        "needs_review_at": datetime.utcnow()
+    }
+    
+    store.update_session(session_id, update_data)
+    
+    # Update GitHub issue label if configured
+    if github_client and session.issue:
+        try:
+            # Remove running label
+            await github_client.remove_label(session.issue.owner, session.issue.repo, session.issue.number, STATUS_RUNNING_LABEL)
+            # Add needs review label
+            await github_client.add_label(session.issue.owner, session.issue.repo, session.issue.number, STATUS_NEEDS_REVIEW_LABEL)
+        except Exception as e:
+            logger.error(f"Error updating GitHub labels: {str(e)}")
+    
+    return {
+        "status": "updated",
+        "session_id": session_id,
+        "new_status": "needs_human_review"
+    }
+
+
 @app.post("/sessions/{session_id}/complete")
 async def complete_session(session_id: str, pull_request_url: Optional[str] = None):
     """
@@ -556,6 +632,7 @@ async def complete_session(session_id: str, pull_request_url: Optional[str] = No
         try:
             # Remove old status labels
             await github_client.remove_label(session.issue.owner, session.issue.repo, session.issue.number, STATUS_RUNNING_LABEL)
+            await github_client.remove_label(session.issue.owner, session.issue.repo, session.issue.number, STATUS_NEEDS_REVIEW_LABEL)
             await github_client.remove_label(session.issue.owner, session.issue.repo, session.issue.number, STATUS_FAILED_LABEL)
             # Add completed label
             await github_client.add_label(session.issue.owner, session.issue.repo, session.issue.number, STATUS_COMPLETED_LABEL)
@@ -586,13 +663,15 @@ async def sync_sessions_endpoint():
     # Return summary of sync
     all_sessions = store.get_all_sessions()
     running_count = len([s for s in all_sessions if s.status == SessionStatus.RUNNING])
+    needs_review_count = len([s for s in all_sessions if s.status == SessionStatus.NEEDS_HUMAN_REVIEW])
     completed_count = len([s for s in all_sessions if s.status == SessionStatus.COMPLETED])
     failed_count = len([s for s in all_sessions if s.status == SessionStatus.FAILED])
     
     return {
         "status": "synced",
-        "sessions_checked": running_count + completed_count + failed_count,
+        "sessions_checked": running_count + needs_review_count + completed_count + failed_count,
         "sessions_running": running_count,
+        "sessions_needs_review": needs_review_count,
         "sessions_completed": completed_count,
         "sessions_failed": failed_count
     }
