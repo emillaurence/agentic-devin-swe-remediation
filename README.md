@@ -619,6 +619,7 @@ The dashboard is designed for engineering leadership and answers the question: "
 
 **Tab 1: Executive Overview (Default)**
 - Value statement explaining the business impact of agentic remediation
+- Hero KPI: Estimated Engineering Cost Saved - Financial value of engineering time saved through agentic remediation
 - Headline KPI Cards (aligned to four business outcomes):
   - Productivity: Reviewable PRs Created - Number of Devin remediation sessions that produced a pull request
   - Resilience: Risk Issues in Remediation - Number of accepted remediation sessions with risk labels such as risk:security or risk:quality
@@ -628,35 +629,28 @@ The dashboard is designed for engineering leadership and answers the question: "
   - Active Remediations - Sessions where Devin is currently working and no PR has been created yet
   - Needs Triage (Failed) - Sessions where Devin could not safely progress to a reviewable PR and needs engineer input
   - Mean Time to Reviewable PR - Average time from session creation to PR detection, where available
-- Business Outcomes Panel:
-  - Productivity - Reduces manual triage and repetitive remediation work so engineers can focus on higher-value delivery
-  - Resilience - Accelerates remediation of quality and security issues before they accumulate into operational risk
-  - Reliability - Tracks every GitHub Issue through agent execution, pull request creation, and review handoff
-  - Governance - Keeps humans in control by making pull request review the merge gate
 - Operating Health Strip - Shows healthy if no items need triage, needs attention otherwise
 
 **Tab 2: Remediation Queue**
 - Operational status view showing one row per issue/session
-- Columns: Issue #, Issue Title, Repository, Risk Category, Current Status, PR Link, Last Updated
+- Columns: Issue #, Issue Title, Repository, Risk Category, Devin Status, PR Link, Last Updated
 - Status mapping:
-  - status:devin-running = Devin is actively working
-  - status:needs-review = PR created, human review required
-  - status:devin-completed = Devin session fully completed
-  - status:devin-failed = Needs Triage (Failed)
-- Special handling: If a PR exists but the Devin session is still running, shows as "needs-review"
+  - Running = Devin is actively working
+  - Needs Human Review = PR created, human review required
+  - Completed = Devin session fully completed
+  - Needs Triage (Failed) = Session failed and needs engineer input
 
-**Tab 3: Session Details**
-- Detailed technical session information for senior ICs and technical reviewers
-- Columns: Issue #, Title, Repository, All Labels, Risk Labels, Devin Status, Devin Status Detail, Internal App Status, Devin Session (clickable link), PR Link (clickable link), Error Message, Validation Summary, Created At, Updated At
-- Devin Session links to https://app.devin.ai/sessions/{session_id}
-- PR links open in new tab
-- Raw session IDs available in /sessions endpoint for debugging
-
-**Tab 4: Risk and Value**
+**Tab 3: Risk and Value**
 - Breakdown of remediation work by risk category
 - Categories: risk:quality, risk:security, Unclassified
-- For each category: number of issues, number of PRs created, number awaiting review, number needing triage (failed)
+- For each category: Cost Saved, Time Saved, number of issues, number of PRs created, number awaiting review, number needing triage (failed)
 - Executive explanation of where agentic remediation is being applied
+
+**Tab 4: Session Details**
+- Detailed technical session information for senior ICs and technical reviewers
+- Columns: Issue #, Title, Repository, All Labels, Risk Category, Devin Status, Devin Session (clickable link), PR Link (clickable link), Time to PR, Error Message, Created At, Updated At
+- Devin Session links to https://app.devin.ai/sessions/{session_id}
+- PR links open in new tab
 
 **Design Features:**
 - Clean dark enterprise SaaS look aligned with Cognition/Devin
