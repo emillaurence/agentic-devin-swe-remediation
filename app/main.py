@@ -828,13 +828,13 @@ async def sync_sessions_endpoint():
 
 
 async def periodic_sync():
-    """Periodically sync running Devin sessions every 60 seconds."""
+    """Periodically sync running Devin sessions every 5 seconds."""
     while True:
         try:
             await sync_sessions()
         except Exception as e:
             logger.error(f"Error in periodic sync: {str(e)}", exc_info=True)
-        await asyncio.sleep(10)
+        await asyncio.sleep(5)
 
 
 @app.on_event("startup")
