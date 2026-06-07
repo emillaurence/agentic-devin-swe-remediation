@@ -73,21 +73,9 @@ python -m app.main
 
 The API will be available at `http://localhost:8000`
 
-### Set Up ngrok (for local webhook testing)
+### Get ngrok URL
 
-To receive GitHub webhooks locally, expose your server with ngrok:
-
-1. Add ngrok authtoken to `.env`:
-```bash
-NGROK_AUTHTOKEN=your_ngrok_authtoken
-```
-
-2. With Docker Compose, ngrok starts automatically. For manual setup:
-```bash
-ngrok http 8000
-```
-
-3. Copy the ngrok HTTPS URL (e.g., `https://abc123.ngrok.io`) for GitHub webhook configuration
+With Docker Compose, ngrok starts automatically. Copy the ngrok HTTPS URL from the Docker Compose logs (e.g., `https://abc123.ngrok.io`) for GitHub webhook configuration.
 
 ### Configure GitHub Webhooks
 
