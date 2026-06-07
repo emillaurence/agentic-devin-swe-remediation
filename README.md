@@ -101,6 +101,137 @@ Access the executive control tower dashboard at:
 - **Localhost**: `http://localhost:8000/dashboard`
 - **ngrok**: `https://your-ngrok-url.ngrok.io/dashboard`
 
+## Demo Workflow
+
+This demo shows how a labelled GitHub Issue becomes a Devin remediation session, then a reviewable pull request, with operating visibility through the dashboard.
+
+Use the Quick Start section above to run the app and configure environment variables. The demo flow below focuses on the end-to-end workflow.
+
+### 1. Open the dashboard
+
+Once the app is running, open the dashboard locally:
+
+```text
+http://localhost:8000/dashboard
+```
+
+Or through your public ngrok URL:
+
+```text
+https://your-ngrok-url.ngrok.io/dashboard
+```
+
+The dashboard is the primary operating view for the demo.
+
+### 2. Configure GitHub webhooks
+
+The primary demo path uses GitHub webhooks. Configure webhooks as described in the Quick Start section above.
+
+The issue webhook starts Devin only when:
+
+```text
+action = labeled
+label.name = devin-remediate
+```
+
+The pull request webhook tracks PR creation, review handoff, and completion or merge state.
+
+### 3. Label a GitHub Issue for remediation
+
+Create or select an issue in the Superset fork.
+
+Apply both of these labels:
+
+| Label type          | Required label                    |
+| ------------------- | --------------------------------- |
+| Trigger label       | `devin-remediate`                 |
+| Risk/category label | `risk:quality` or `risk:security` |
+
+Example:
+
+```text
+devin-remediate
+risk:quality
+```
+
+The `devin-remediate` label triggers the automation.
+
+The risk/category label gives Devin context and allows the dashboard to report business impact by category.
+
+Use:
+
+* `risk:quality` for code quality, maintainability, linting, tests, or static analysis issues
+* `risk:security` for dependency, vulnerability, or security remediation issues
+
+### 4. Watch the remediation workflow
+
+Once the `devin-remediate` label is added, the app:
+
+* receives the GitHub Issues webhook
+* extracts issue context and risk/category labels
+* generates a Devin remediation prompt
+* creates a Devin session through the Devin API
+* updates the GitHub issue with status
+* tracks the session and dashboard state
+
+Devin then acts as the autonomous software engineering worker. It inspects the issue, makes a scoped remediation, validates where practical, and opens a pull request against the Superset fork.
+
+### 5. Track PR review and completion
+
+When Devin opens a pull request, the pull request webhook updates the workflow state.
+
+Expected state mapping:
+
+| Workflow state          | Meaning                                                        |
+| ----------------------- | -------------------------------------------------------------- |
+| `Running`               | Devin is still working and no PR exists yet                    |
+| `Needs Human Review`    | Devin created a PR and human review is required                |
+| `Completed`             | The PR/session completed successfully                          |
+| `Needs Triage (Failed)` | Devin could not safely progress and engineer input is required |
+
+This keeps the workflow agentic but governed:
+
+```text
+GitHub Issue → Devin Session → Pull Request → Human Review → Merge → Completed
+```
+
+### 6. Review operating visibility
+
+Use the dashboard to show:
+
+* estimated engineering cost saved
+* reviewable PRs created
+* issue-to-PR conversion rate
+* risk issues in remediation
+* PRs awaiting review
+* active remediations and `Needs Triage (Failed)` items
+* links to GitHub issues, pull requests, and Devin sessions
+
+The dashboard answers the engineering leadership question:
+
+> Are GitHub Issues being converted into reviewable pull requests with clear status, ROI visibility, and human review control?
+
+### 7. Optional simulator fallback
+
+If a live GitHub webhook is not available, use the local simulator as a fallback.
+
+The simulator should include both the trigger label and a risk/category label, for example:
+
+```text
+devin-remediate
+risk:quality
+```
+
+The simulator is useful for local testing, but the primary demo path should use GitHub webhooks.
+
+### 8. Demo narrative
+
+Use this narrative:
+
+> GitHub is the control plane, FastAPI is the orchestrator, Devin is the autonomous remediation worker, and pull request review remains the human governance gate.
+
+Traditional automation detects issues. This workflow uses Devin to turn labelled GitHub Issues into reviewable pull requests with status tracking, ROI visibility, and human review control.
+
 ## Documentation
 
 For detailed information, see the documentation in the `docs/` folder:
