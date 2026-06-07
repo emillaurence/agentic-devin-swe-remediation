@@ -207,9 +207,9 @@ Now test the end-to-end workflow:
    - Status labels updated on GitHub
 
 3. **Monitor progress**:
-   - Check the dashboard: `http://localhost:8000/dashboard`
-   - Check session status: `http://localhost:8000/sessions`
-   - Check metrics: `http://localhost:8000/metrics`
+   - Check the dashboard: `http://localhost:8000/dashboard` (or `https://your-ngrok-url.ngrok.io/dashboard`)
+   - Check session status: `http://localhost:8000/sessions` (or `https://your-ngrok-url.ngrok.io/sessions`)
+   - Check metrics: `http://localhost:8000/metrics` (or `https://your-ngrok-url.ngrok.io/metrics`)
 
 4. **Verify GitHub updates**:
    - The issue should have `status:devin-running` label

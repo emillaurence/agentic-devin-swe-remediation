@@ -95,6 +95,12 @@ With Docker Compose, ngrok starts automatically. Copy the ngrok HTTPS URL from t
 curl http://localhost:8000/health
 ```
 
+### Dashboard
+
+Access the executive control tower dashboard at:
+- **Localhost**: `http://localhost:8000/dashboard`
+- **ngrok**: `https://your-ngrok-url.ngrok.io/dashboard`
+
 ## Documentation
 
 For detailed information, see the documentation in the `docs/` folder:

@@ -5,9 +5,8 @@ The system includes an executive-friendly control tower dashboard providing oper
 ## Access
 
 Access the dashboard at:
-```
-http://localhost:8000/dashboard
-```
+- **Localhost**: `http://localhost:8000/dashboard`
+- **ngrok**: `https://your-ngrok-url.ngrok.io/dashboard`
 
 ## Purpose
 

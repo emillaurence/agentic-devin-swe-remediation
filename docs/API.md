@@ -42,6 +42,8 @@ Test Devin API authentication without creating a session.
 
 ## Example Usage
 
+**Note:** All endpoints are available via ngrok as well. Replace `http://localhost:8000` with your ngrok URL (e.g., `https://your-ngrok-url.ngrok.io`).
+
 ### Simulate an Event
 
 ```bash
