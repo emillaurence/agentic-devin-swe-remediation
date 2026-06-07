@@ -1,4 +1,4 @@
-# Agentic Devin SWE Remediation
+# Agentic Devin Software Engineer Remediation
 
 An event-driven remediation platform that helps engineering teams move from reactive issue management to an agentic operating model.
 
