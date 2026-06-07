@@ -1,4 +1,4 @@
-# Agentic Devin Software Engineer Remediation
+# Agentic Software Engineering Remediation
 
 An event-driven remediation platform that helps engineering teams move from reactive issue management to an agentic operating model.
 
@@ -9,6 +9,14 @@ Large engineering teams already have many signals from GitHub issues, dependency
 This system closes that gap by using Devin as an autonomous software engineering worker.
 
 Traditional automation tells teams what is broken. Devin helps complete the engineering work.
+
+## Demo Assets
+
+- Target repository: https://github.com/emillaurence/superset
+- Solution repository: https://github.com/emillaurence/agentic-devin-swe-remediation
+- Dashboard: http://localhost:8000/dashboard (or https://your-ngrok-url.ngrok.io/dashboard)
+- Example issue: Add link after creating the demo issue
+- Example pull request: Add link after Devin creates the demo PR
 
 ## Architecture
 

@@ -210,7 +210,11 @@ class SoftwareRemediationService:
         if not pull_request_url and has_pull_requests:
             pull_requests = session_status.get("pull_requests", [])
             if pull_requests:
-                pull_request_url = pull_requests[0].get("url") if isinstance(pull_requests[0], dict) else str(pull_requests[0])
+                pull_request_url = (
+                    pull_requests[0].get("pr_url")
+                    or pull_requests[0].get("url")
+                    or pull_requests[0].get("html_url")
+                )
         
         # Fallback: Check GitHub for PRs if Devin API didn't return PR info
         if not pull_request_url and self.github_client and session.issue:
