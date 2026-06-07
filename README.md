@@ -89,6 +89,19 @@ ngrok http 8000
 
 3. Copy the ngrok HTTPS URL (e.g., `https://abc123.ngrok.io`) for GitHub webhook configuration
 
+### Configure GitHub Webhooks
+
+1. Go to your GitHub repository → Settings → Webhooks → Add webhook
+2. Set the payload URL to your ngrok URL:
+   ```
+   https://your-ngrok-url.ngrok.io/webhook/github/issue
+   ```
+3. Content type: `application/json`
+4. Events: Select "Issues"
+5. For automated PR completion, add a second webhook:
+   - Payload URL: `https://your-ngrok-url.ngrok.io/webhook/github/pull_request`
+   - Events: Select "Pull requests"
+
 ### Test
 ```bash
 curl http://localhost:8000/health
