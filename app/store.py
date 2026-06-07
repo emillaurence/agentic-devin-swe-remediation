@@ -47,10 +47,12 @@ class SessionStore:
             "created_at": session.created_at.isoformat(),
             "completed_at": session.completed_at.isoformat() if session.completed_at else None,
             "needs_review_at": session.needs_review_at.isoformat() if session.needs_review_at else None,
+            "pr_detected_at": session.pr_detected_at.isoformat() if session.pr_detected_at else None,
             "prompt": session.prompt,
             "devin_response": session.devin_response,
             "error_message": session.error_message,
-            "pull_request_url": session.pull_request_url
+            "pull_request_url": session.pull_request_url,
+            "devin_session_url": session.devin_session_url
         }
 
     def _dict_to_session(self, data: Dict[str, Any]) -> DevinSession:
@@ -71,10 +73,12 @@ class SessionStore:
             created_at=datetime.fromisoformat(data["created_at"]),
             completed_at=datetime.fromisoformat(data["completed_at"]) if data.get("completed_at") else None,
             needs_review_at=datetime.fromisoformat(data["needs_review_at"]) if data.get("needs_review_at") else None,
+            pr_detected_at=datetime.fromisoformat(data["pr_detected_at"]) if data.get("pr_detected_at") else None,
             prompt=data["prompt"],
             devin_response=data.get("devin_response"),
             error_message=data.get("error_message"),
-            pull_request_url=data.get("pull_request_url")
+            pull_request_url=data.get("pull_request_url"),
+            devin_session_url=data.get("devin_session_url")
         )
 
     def add_session(self, session: DevinSession) -> DevinSession:

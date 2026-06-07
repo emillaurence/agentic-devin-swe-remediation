@@ -22,6 +22,7 @@ The system is built as a Python FastAPI application with the following component
 
 ### API Endpoints
 
+- `GET /dashboard` - Operational dashboard for engineering leadership visibility
 - `POST /webhook/github/issue` - Accept GitHub issue webhook payloads (only triggers on `action == "labeled"`)
 - `POST /webhook/github/pull_request` - Accept GitHub pull request webhook payloads (automatically completes sessions when PR is merged)
 - `POST /simulate` - Simulate remediation events without live webhooks
@@ -302,6 +303,81 @@ curl -X POST http://localhost:8000/simulate \
 ```
 
 ## Viewing Sessions and Metrics
+
+### Agentic Software Engineering Control Tower
+
+The system includes an executive-friendly control tower dashboard providing operational visibility from engineering issue signal to autonomous remediation and pull request review. Access it at:
+
+```
+http://localhost:8000/dashboard
+```
+
+The dashboard is designed for engineering leadership and answers the question: "Is agentic remediation creating engineering leverage by converting issue signals into reviewable pull requests faster, with governance and traceability?"
+
+**Tab 1: Executive Overview (Default)**
+- Value statement explaining the business impact of agentic remediation
+- Headline KPI Cards (aligned to four business outcomes):
+  - Productivity: Reviewable PRs Created - Number of Devin remediation sessions that produced a pull request
+  - Resilience: Risk Issues in Remediation - Number of accepted remediation sessions with risk labels such as risk:security or risk:quality
+  - Reliability: Issue-to-PR Conversion Rate - Reviewable PRs created divided by accepted GitHub Issues processed
+  - Governance: PRs Awaiting Review - Sessions where Devin has produced a PR and human review is now required
+- Operating Status Strip:
+  - Active Remediations - Sessions where Devin is currently working and no PR has been created yet
+  - Needs Triage - Sessions where Devin could not safely progress to a reviewable PR and needs engineer input
+  - Mean Time to Reviewable PR - Average time from session creation to PR detection, where available
+- Business Outcomes Panel:
+  - Productivity - Reduces manual triage and repetitive remediation work so engineers can focus on higher-value delivery
+  - Resilience - Accelerates remediation of quality and security issues before they accumulate into operational risk
+  - Reliability - Tracks every GitHub Issue through agent execution, pull request creation, and review handoff
+  - Governance - Keeps humans in control by making pull request review the merge gate
+- Operating Health Strip - Shows healthy if no items need triage, needs attention otherwise
+
+**Tab 2: Remediation Queue**
+- Operational status view showing one row per issue/session
+- Columns: Issue #, Issue Title, Repository, Risk Category, Current Status, PR Link, Last Updated
+- Status mapping:
+  - status:devin-running = Devin is actively working
+  - status:needs-review = PR created, human review required
+  - status:devin-completed = Devin session fully completed
+  - status:devin-failed = Needs Triage
+- Special handling: If a PR exists but the Devin session is still running, shows as "needs-review"
+
+**Tab 3: Session Details**
+- Detailed technical session information for senior ICs and technical reviewers
+- Columns: Issue #, Title, Repository, All Labels, Risk Labels, Devin Status, Devin Status Detail, Internal App Status, Devin Session (clickable link), PR Link (clickable link), Error Message, Validation Summary, Created At, Updated At
+- Devin Session links to https://app.devin.ai/sessions/{session_id}
+- PR links open in new tab
+- Raw session IDs available in /sessions endpoint for debugging
+
+**Tab 4: Risk and Value**
+- Breakdown of remediation work by risk category
+- Categories: risk:quality, risk:security, Unclassified
+- For each category: number of issues, number of PRs created, number awaiting review, number needing triage
+- Executive explanation of where agentic remediation is being applied
+
+**Design Features:**
+- Clean dark enterprise SaaS look aligned with Cognition/Devin
+- Color palette: Primary blue (#3969CA), Accent blue (#0294DE), Success green (#21C19A), Deep navy background (#0B1020)
+- Responsive desktop layout
+- Clickable GitHub issue, Devin session, and PR links
+- No heavy frontend framework - self-contained HTML/CSS/vanilla JavaScript
+- Reads directly from local JSON session store
+- Refresh the page to see the latest data
+
+**Why These KPIs Matter to Engineering Leaders:**
+- **Productivity: Reviewable PRs Created** - Measures actual output and engineering leverage created by Devin, showing that the agent is producing usable engineering output
+- **Resilience: Risk Issues in Remediation** - Shows how security and quality issues are being actively moved toward remediation before they accumulate into operational risk
+- **Reliability: Issue-to-PR Conversion Rate** - Indicates how effectively the system converts accepted GitHub Issues into reviewable pull requests, demonstrating workflow reliability
+- **Governance: PRs Awaiting Review** - Highlights where human attention is needed for governance, ensuring humans remain in control as the merge gate
+
+**Needs Triage:**
+This KPI tracks remediations where Devin could not safely progress to a reviewable PR and needs engineer input. These may include:
+- Failed sessions due to errors or timeouts
+- Suspended sessions requiring human input
+- Blocked sessions that could not proceed
+- Any state where Devin cannot safely continue or produce a reviewable PR
+
+The underlying GitHub status label remains `status:devin-failed` for these sessions, but the dashboard uses the more descriptive "Needs Triage" terminology to clearly communicate that human attention is needed.
 
 ### View All Sessions
 

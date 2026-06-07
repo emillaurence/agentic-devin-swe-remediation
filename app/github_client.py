@@ -133,3 +133,40 @@ class GitHubClient:
         except Exception as e:
             logger.error(f"Error getting labels: {str(e)}")
             raise
+
+    async def get_pull_requests_for_issue(self, owner: str, repo: str, issue_number: int) -> List[Dict[str, Any]]:
+        """Get all pull requests for a GitHub issue."""
+        
+        url = f"{self.base_url}/repos/{owner}/{repo}/pulls"
+        params = {"state": "all"}  # Get both open and closed PRs
+        
+        logger.info(f"Getting pull requests for {owner}/{repo}#{issue_number}")
+        
+        try:
+            async with httpx.AsyncClient(timeout=30.0) as client:
+                response = await client.get(
+                    url,
+                    headers=self.headers,
+                    params=params
+                )
+                response.raise_for_status()
+                all_prs = response.json()
+                
+                # Filter PRs that reference this issue
+                issue_prs = []
+                for pr in all_prs:
+                    # Check if PR body or title references the issue
+                    pr_body = pr.get("body", "") or ""
+                    pr_title = pr.get("title", "") or ""
+                    issue_ref = f"#{issue_number}"
+                    if issue_ref in pr_body or issue_ref in pr_title:
+                        issue_prs.append(pr)
+                
+                logger.info(f"Found {len(issue_prs)} PRs referencing issue {issue_number}")
+                return issue_prs
+        except httpx.HTTPStatusError as e:
+            logger.error(f"HTTP error getting pull requests: {e.response.status_code} - {e.response.text}")
+            raise
+        except Exception as e:
+            logger.error(f"Error getting pull requests: {str(e)}")
+            raise

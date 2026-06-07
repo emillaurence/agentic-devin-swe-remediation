@@ -34,10 +34,12 @@ class DevinSession(BaseModel):
     created_at: datetime = Field(default_factory=datetime.utcnow)
     completed_at: Optional[datetime] = None
     needs_review_at: Optional[datetime] = None
+    pr_detected_at: Optional[datetime] = None
     prompt: str
     devin_response: Optional[Dict[str, Any]] = None
     error_message: Optional[str] = None
     pull_request_url: Optional[str] = None
+    devin_session_url: Optional[str] = None
 
 
 class WebhookPayload(BaseModel):
