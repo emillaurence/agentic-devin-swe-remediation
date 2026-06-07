@@ -496,14 +496,42 @@ async def github_pull_request_webhook(request: Request):
     
     logger.info(f"PR merged: {pr_url}")
     
-    # Find the associated session by PR URL
+    # Find the associated session by PR URL or issue number
     all_sessions = store.get_all_sessions()
     matching_session = None
     
+    # First try to match by PR URL
     for session in all_sessions:
         if session.pull_request_url and session.pull_request_url == pr_url:
             matching_session = session
             break
+    
+    # If no match by PR URL, try to extract issue number from PR body/title
+    if not matching_session and pr_data:
+        pr_title = pr_data.get("title", "")
+        pr_body = pr_data.get("body", "")
+        pr_number = pr_data.get("number")
+        
+        # Look for issue references in PR title or body (e.g., "Fixes #38", "Closes #40")
+        import re
+        issue_pattern = r'#(\d+)'
+        
+        # Search in title and body for issue numbers
+        text_to_search = f"{pr_title} {pr_body}"
+        issue_matches = re.findall(issue_pattern, text_to_search)
+        
+        logger.info(f"PR #{pr_number} title: '{pr_title}', found issue references: {issue_matches}")
+        
+        # Try to match sessions by the referenced issue numbers
+        for issue_ref in issue_matches:
+            issue_number = int(issue_ref)
+            for session in all_sessions:
+                if session.issue and session.issue.number == issue_number:
+                    matching_session = session
+                    logger.info(f"Found session {session.session_id} by matching issue number {issue_number} from PR")
+                    break
+            if matching_session:
+                break
     
     if not matching_session:
         logger.warning(f"No session found with PR URL: {pr_url}")
@@ -522,6 +550,11 @@ async def github_pull_request_webhook(request: Request):
         "completed_at": datetime.utcnow()
     }
     
+    # Store the PR URL if it wasn't already stored
+    if not matching_session.pull_request_url:
+        update_data["pull_request_url"] = pr_url
+        logger.info(f"Storing PR URL for session {matching_session.session_id}: {pr_url}")
+    
     store.update_session(matching_session.session_id, update_data)
     
     # Update GitHub labels
@@ -535,19 +568,7 @@ async def github_pull_request_webhook(request: Request):
             # Add completed label
             await github_client.add_label(matching_session.issue.owner, matching_session.issue.repo, matching_session.issue.number, STATUS_COMPLETED_LABEL)
             
-            # Add comment
-            comment_body = f"""✅ **Devin Remediation Completed**
-
-**Session ID:** `{matching_session.session_id}`
-**Status:** Pull request merged successfully
-
-**Pull Request:** {pr_url}
-
-This issue has been labeled `status:devin-completed`. The remediation is complete.
-"""
-            await github_client.add_comment(matching_session.issue.owner, matching_session.issue.repo, matching_session.issue.number, comment_body)
-            
-            logger.info(f"Updated GitHub issue {matching_session.issue.number} for session {matching_session.session_id}")
+            logger.info(f"Updated GitHub labels for issue {matching_session.issue.number} - marked as completed")
         except Exception as e:
             logger.error(f"Error updating GitHub for session {matching_session.session_id}: {str(e)}")
     
