@@ -67,8 +67,7 @@ Running
 Needs Human Review
    │
    ├─ Completed (after review and approval)
-   ├─ Failed (if changes are rejected)
-   └─ Running (if changes are requested)
+   └─ Failed (if changes are rejected)
 ```
 
 ### Session States
@@ -76,7 +75,7 @@ Needs Human Review
 1. **Running**: Devin is actively working on the remediation
 2. **Needs Human Review**: Devin has completed remediation and opened a PR, awaiting human review
 3. **Completed**: The PR has been reviewed, approved, and merged
-4. **Failed**: The remediation failed or was rejected
+4. **Failed**: The remediation failed or was rejected (can be recovered if PR is reopened)
 
 ### How It Works
 
@@ -89,7 +88,15 @@ Needs Human Review
 4. When the PR is reviewed and approved:
    - Call the completion endpoint to mark the session as `completed`
    - GitHub labels are updated (removing `status:devin-needs-human-review`, adding `status:devin-completed`)
-5. If the remediation fails:
+5. If the PR is closed without merging (changes rejected):
+   - The local session record is updated to `failed`
+   - GitHub labels are updated (removing `status:devin-needs-human-review`, adding `status:devin-failed`)
+   - A comment is added indicating the PR was rejected
+6. If the PR is reopened after being closed:
+   - The session status is reset from `failed` to `needs_human_review`
+   - GitHub labels are updated (removing `status:devin-failed`, adding `status:devin-needs-human-review`)
+   - A comment is added indicating the PR was reopened
+7. If the remediation fails during execution:
    - The local session record is updated to `failed`
    - GitHub labels are updated (removing `status:devin-running`, adding `status:devin-failed`)
    - A comment is added with the failure reason
@@ -619,7 +626,7 @@ The dashboard is designed for engineering leadership and answers the question: "
   - Governance: PRs Awaiting Review - Sessions where Devin has produced a PR and human review is now required
 - Operating Status Strip:
   - Active Remediations - Sessions where Devin is currently working and no PR has been created yet
-  - Needs Triage - Sessions where Devin could not safely progress to a reviewable PR and needs engineer input
+  - Needs Triage (Failed) - Sessions where Devin could not safely progress to a reviewable PR and needs engineer input
   - Mean Time to Reviewable PR - Average time from session creation to PR detection, where available
 - Business Outcomes Panel:
   - Productivity - Reduces manual triage and repetitive remediation work so engineers can focus on higher-value delivery
@@ -635,7 +642,7 @@ The dashboard is designed for engineering leadership and answers the question: "
   - status:devin-running = Devin is actively working
   - status:needs-review = PR created, human review required
   - status:devin-completed = Devin session fully completed
-  - status:devin-failed = Needs Triage
+  - status:devin-failed = Needs Triage (Failed)
 - Special handling: If a PR exists but the Devin session is still running, shows as "needs-review"
 
 **Tab 3: Session Details**
@@ -648,7 +655,7 @@ The dashboard is designed for engineering leadership and answers the question: "
 **Tab 4: Risk and Value**
 - Breakdown of remediation work by risk category
 - Categories: risk:quality, risk:security, Unclassified
-- For each category: number of issues, number of PRs created, number awaiting review, number needing triage
+- For each category: number of issues, number of PRs created, number awaiting review, number needing triage (failed)
 - Executive explanation of where agentic remediation is being applied
 
 **Design Features:**
@@ -666,14 +673,14 @@ The dashboard is designed for engineering leadership and answers the question: "
 - **Reliability: Issue-to-PR Conversion Rate** - Indicates how effectively the system converts accepted GitHub Issues into reviewable pull requests, demonstrating workflow reliability
 - **Governance: PRs Awaiting Review** - Highlights where human attention is needed for governance, ensuring humans remain in control as the merge gate
 
-**Needs Triage:**
+**Needs Triage (Failed):**
 This KPI tracks remediations where Devin could not safely progress to a reviewable PR and needs engineer input. These may include:
 - Failed sessions due to errors or timeouts
 - Suspended sessions requiring human input
 - Blocked sessions that could not proceed
 - Any state where Devin cannot safely continue or produce a reviewable PR
 
-The underlying GitHub status label remains `status:devin-failed` for these sessions, but the dashboard uses the more descriptive "Needs Triage" terminology to clearly communicate that human attention is needed.
+The underlying GitHub status label remains `status:devin-failed` for these sessions, but the dashboard uses the more descriptive "Needs Triage (Failed)" terminology to clearly communicate that human attention is needed.
 
 ## ROI Calculation
 
@@ -704,6 +711,7 @@ These can be overridden in your `.env` file to match your organization's cost st
 ### Important Notes
 
 - The value is calculated from actual or observed engineering time saved based on the remediation workflow timing already tracked by the app
+- Sessions with "Needs Triage (Failed)" status are excluded from this calculation as they did not produce a productive PR
 - This is for ROI modelling purposes only, not for billing
 - The calculation uses the difference between human baseline hours and actual Devin execution time to determine actual time saved
 
@@ -746,6 +754,20 @@ The system supports automated completion when a pull request is merged:
    - Session status is updated to `completed`
    - GitHub labels are updated to `status:devin-completed`
    - A comment is added confirming completion
+
+### PR Reopened Recovery
+
+If a PR is closed without merging (marked as failed), it can be recovered:
+
+1. When you reopen a closed PR:
+   - GitHub sends a `pull_request` webhook with `action == "reopened"`
+   - The system automatically finds the associated session by PR URL
+   - Session status is reset from `failed` to `needs_human_review`
+   - GitHub labels are updated (removing `status:devin-failed`, adding `status:devin-needs-human-review`)
+   - A comment is added indicating the PR was reopened
+2. When you then merge the reopened PR:
+   - The system processes the merge event and marks the session as `completed`
+   - GitHub labels are updated to `status:devin-completed`
 
 **To enable automated completion:**
 - Configure your GitHub webhook to send `Pull request` events to `https://your-domain.com/webhook/github/pull_request`

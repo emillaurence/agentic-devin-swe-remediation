@@ -60,8 +60,12 @@ def calculate_kpis(sessions: List[DevinSession], config: Dict[str, Any] = None) 
     issue_signal_to_pr_conversion_rate = (reviewable_prs_generated / issues_processed * 100) if issues_processed > 0 else 0
     
     # Calculate time saved (human baseline hours - Devin time)
+    # Exclude failed sessions from time saved calculation
     total_time_saved_hours = 0
     for session in sessions:
+        # Skip failed sessions - they don't contribute to time saved
+        if session.status == SessionStatus.FAILED:
+            continue
         if session.pr_detected_at and session.created_at:
             try:
                 # Handle both datetime objects and string timestamps
@@ -220,7 +224,8 @@ def prepare_risk_categories(sessions: List[DevinSession], config: Dict[str, Any]
                 risk_categories[friendly_category]["blocked"] += 1
             
             # Calculate time saved for this session
-            if session.pr_detected_at and session.created_at:
+            # Exclude failed sessions from time saved calculation
+            if session.status != SessionStatus.FAILED and session.pr_detected_at and session.created_at:
                 try:
                     pr_time = session.pr_detected_at if isinstance(session.pr_detected_at, datetime) else datetime.fromisoformat(session.pr_detected_at) if isinstance(session.pr_detected_at, str) else None
                     created_time = session.created_at if isinstance(session.created_at, datetime) else datetime.fromisoformat(session.created_at) if isinstance(session.created_at, str) else None

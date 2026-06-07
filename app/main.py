@@ -171,24 +171,159 @@ async def github_pull_request_webhook(request: Request):
         logger.info("Received ping event, skipping")
         return {"status": "pong"}
 
+    # Handle PR reopened action - reset session status from failed to needs_review
+    if payload.action == "reopened":
+        logger.info("PR reopened, checking if session needs status reset")
+        
+        pr_data = payload.pull_request
+        pr_url = pr_data.get("html_url")
+        
+        if not pr_url:
+            logger.error("PR URL not found in webhook payload")
+            return {"status": "error", "reason": "PR URL not found"}
+        
+        # Find the associated session by PR URL or issue number
+        all_sessions = store.get_all_sessions()
+        matching_session = None
+        
+        if remediation_service:
+            matching_session = remediation_service.find_session_by_pr_url(pr_url, all_sessions)
+            
+            if not matching_session and pr_data:
+                pr_title = pr_data.get("title", "")
+                pr_body = pr_data.get("body", "")
+                matching_session = remediation_service.find_session_by_issue_reference(pr_title, pr_body, all_sessions)
+        
+        if matching_session and matching_session.status == SessionStatus.FAILED:
+            logger.info(f"Resetting session {matching_session.session_id} from failed to needs_review after PR reopen")
+            
+            update_data = {
+                "status": SessionStatus.NEEDS_HUMAN_REVIEW,
+                "needs_review_at": datetime.utcnow(),
+                "error_message": None
+            }
+            
+            store.update_session(matching_session.session_id, update_data)
+            
+            # Update GitHub labels
+            if label_service and matching_session.issue:
+                try:
+                    await label_service.transition_to_needs_review(
+                        matching_session.issue.owner,
+                        matching_session.issue.repo,
+                        matching_session.issue.number,
+                        config["STATUS_RUNNING_LABEL"],
+                        config["STATUS_FAILED_LABEL"],
+                        config["STATUS_COMPLETED_LABEL"],
+                        config["STATUS_NEEDS_REVIEW_LABEL"]
+                    )
+                    
+                    await github_client.add_comment(
+                        matching_session.issue.owner,
+                        matching_session.issue.repo,
+                        matching_session.issue.number,
+                        f"🔄 **PR Reopened**\n\nThe pull request has been reopened. The session status has been reset from failed to needs review.\n\n**Session ID:** `{matching_session.session_id}`\n**PR URL:** {pr_url}"
+                    )
+                    
+                    logger.info(f"Reset session {matching_session.session_id} to needs_review status")
+                except Exception as e:
+                    logger.error(f"Error updating GitHub for session {matching_session.session_id}: {str(e)}")
+            
+            return {
+                "status": "reset",
+                "session_id": matching_session.session_id,
+                "pr_url": pr_url
+            }
+        
+        return {"status": "skipped", "reason": "no failed session found for this PR"}
+
     # Only process when the action is "closed" (which includes merged)
     if payload.action != "closed":
         logger.info(f"Action is '{payload.action}', not 'closed', skipping")
         return {"status": "skipped", "reason": "action is not 'closed'"}
     
-    # Check if the PR was merged (not just closed without merging)
+    # Extract PR data
     pr_data = payload.pull_request
-    is_merged = pr_data.get("merged", False)
-    
-    if not is_merged:
-        logger.info("PR was closed but not merged, skipping")
-        return {"status": "skipped", "reason": "PR was not merged"}
-    
-    # Extract PR URL
     pr_url = pr_data.get("html_url")
     if not pr_url:
         logger.error("PR URL not found in webhook payload")
         return {"status": "error", "reason": "PR URL not found"}
+    
+    # Check if the PR was merged (not just closed without merging)
+    is_merged = pr_data.get("merged", False)
+    
+    if not is_merged:
+        logger.info("PR was closed but not merged, marking session as failed")
+        
+        # Find the associated session by PR URL or issue number
+        all_sessions = store.get_all_sessions()
+        matching_session = None
+        
+        # First try to match by PR URL
+        if remediation_service:
+            matching_session = remediation_service.find_session_by_pr_url(pr_url, all_sessions)
+        
+        # If no match by PR URL, try to extract issue number from PR body/title
+        if not matching_session and pr_data and remediation_service:
+            pr_title = pr_data.get("title", "")
+            pr_body = pr_data.get("body", "")
+            matching_session = remediation_service.find_session_by_issue_reference(pr_title, pr_body, all_sessions)
+        
+        if not matching_session:
+            logger.warning(f"No session found with PR URL: {pr_url}")
+            return {"status": "skipped", "reason": "no session found with this PR URL"}
+        
+        # Only process sessions in needs_review status
+        if matching_session.status != SessionStatus.NEEDS_HUMAN_REVIEW:
+            logger.info(f"Session {matching_session.session_id} is not in needs_review status (current: {matching_session.status}), skipping")
+            return {"status": "skipped", "reason": "session not in needs_review status"}
+        
+        logger.info(f"Found session {matching_session.session_id} for closed PR, marking as failed")
+        
+        # Update session status to failed
+        update_data = {
+            "status": SessionStatus.FAILED,
+            "completed_at": datetime.utcnow(),
+            "error_message": "Pull request was closed without merging (changes rejected)"
+        }
+        
+        # Store the PR URL if it wasn't already stored
+        if not matching_session.pull_request_url:
+            update_data["pull_request_url"] = pr_url
+            logger.info(f"Storing PR URL for session {matching_session.session_id}: {pr_url}")
+        
+        store.update_session(matching_session.session_id, update_data)
+        
+        # Update GitHub labels
+        if label_service and matching_session.issue:
+            try:
+                await label_service.transition_to_failed(
+                    matching_session.issue.owner,
+                    matching_session.issue.repo,
+                    matching_session.issue.number,
+                    config["STATUS_RUNNING_LABEL"],
+                    config["STATUS_FAILED_LABEL"],
+                    config["STATUS_COMPLETED_LABEL"],
+                    config["STATUS_NEEDS_REVIEW_LABEL"]
+                )
+                
+                # Add comment about rejection
+                await github_client.add_comment(
+                    matching_session.issue.owner,
+                    matching_session.issue.repo,
+                    matching_session.issue.number,
+                    f"❌ **Devin Remediation Rejected**\n\nThe pull request was closed without merging. The session has been marked as failed.\n\n**Session ID:** `{matching_session.session_id}`\n**PR URL:** {pr_url}"
+                )
+                
+                logger.info(f"Updated GitHub labels for issue {matching_session.issue.number} - marked as failed")
+            except Exception as e:
+                logger.error(f"Error updating GitHub for session {matching_session.session_id}: {str(e)}")
+        
+        return {
+            "status": "failed",
+            "session_id": matching_session.session_id,
+            "pr_url": pr_url
+        }
     
     logger.info(f"PR merged: {pr_url}")
     
@@ -210,10 +345,10 @@ async def github_pull_request_webhook(request: Request):
         logger.warning(f"No session found with PR URL: {pr_url}")
         return {"status": "skipped", "reason": "no session found with this PR URL"}
     
-    # Only process sessions in needs_review status
-    if matching_session.status != SessionStatus.NEEDS_HUMAN_REVIEW:
-        logger.info(f"Session {matching_session.session_id} is not in needs_review status (current: {matching_session.status}), skipping")
-        return {"status": "skipped", "reason": "session not in needs_review status"}
+    # Only process sessions in needs_review or failed status
+    if matching_session.status not in [SessionStatus.NEEDS_HUMAN_REVIEW, SessionStatus.FAILED]:
+        logger.info(f"Session {matching_session.session_id} is not in needs_review or failed status (current: {matching_session.status}), skipping")
+        return {"status": "skipped", "reason": "session not in needs_review or failed status"}
     
     logger.info(f"Found session {matching_session.session_id} for merged PR, marking as completed")
     

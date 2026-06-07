@@ -497,8 +497,8 @@
         <div class="tabs">
             <button class="tab active" data-tab="executive">Executive Overview</button>
             <button class="tab" data-tab="queue">Remediation Queue</button>
-            <button class="tab" data-tab="details">Devin Session Details</button>
             <button class="tab" data-tab="risk">Risk and Value</button>
+            <button class="tab" data-tab="details">Devin Session Details</button>
         </div>
         
         <div id="executive" class="tab-content active">
@@ -512,7 +512,7 @@
                         Estimated Engineering Cost Saved
                         <span class="info-tooltip">
                             ⓘ
-                            <span class="tooltip-content">Estimated financial value of engineering time saved. Calculated from actual engineering time saved multiplied by the configured blended engineering hourly cost. This is for ROI modelling, not billing.</span>
+                            <span class="tooltip-content">Estimated financial value of engineering time saved. Calculated from actual engineering time saved multiplied by the configured blended engineering hourly cost. This is for ROI modelling, not billing. Note: Sessions with "Needs Triage (Failed)" status are excluded from this calculation as they did not produce a productive PR.</span>
                         </span>
                     </div>
                     <div class="value">{{ kpis.roi_currency }}{{ kpis.estimated_cost_avoided if kpis.estimated_cost_avoided else 0 }}</div>
@@ -581,7 +581,7 @@
                     </div>
                     <div class="status-item">
                         <div class="status-label">
-                            Needs Triage
+                            Needs Triage (Failed)
                             <span class="info-tooltip">
                                 ⓘ
                                 <span class="tooltip-content">Sessions where Devin could not safely progress to a reviewable pull request and needs engineer input.</span>
@@ -648,7 +648,7 @@
                                         {% elif row.status == 'Completed' %}
                                             <span class="status-completed">{{ row.status }}</span>
                                         {% elif row.status == 'Needs Triage' %}
-                                            <span class="status-needs-triage">{{ row.status }}</span>
+                                            <span class="status-needs-triage">Needs Triage (Failed)</span>
                                         {% else %}
                                             <span class="status-unknown">{{ row.status }}</span>
                                         {% endif %}
@@ -701,7 +701,7 @@
                                         {% elif row.status == 'Completed' %}
                                             <span class="status-completed">{{ row.status }}</span>
                                         {% elif row.status == 'Needs Triage' %}
-                                            <span class="status-needs-triage">{{ row.status }}</span>
+                                            <span class="status-needs-triage">Needs Triage (Failed)</span>
                                         {% else %}
                                             <span class="status-unknown">{{ row.status }}</span>
                                         {% endif %}
@@ -739,7 +739,7 @@
                             <th>Issues</th>
                             <th>PRs Created</th>
                             <th>Awaiting Review</th>
-                            <th>Needs Triage</th>
+                            <th>Needs Triage (Failed)</th>
                         </tr>
                     </thead>
                     <tbody>
