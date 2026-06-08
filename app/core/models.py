@@ -45,11 +45,12 @@ class DevinSession(BaseModel):
 
 
 class WebhookPayload(BaseModel):
-    action: str
-    issue: Dict[str, Any]
-    repository: Dict[str, Any]
-    sender: Dict[str, Any]
+    action: Optional[str] = None
+    issue: Optional[Dict[str, Any]] = None
+    repository: Optional[Dict[str, Any]] = None
+    sender: Optional[Dict[str, Any]] = None
     label: Optional[Dict[str, Any]] = None
+    zen: Optional[str] = None  # GitHub ping event
 
 
 class SimulateRequest(BaseModel):

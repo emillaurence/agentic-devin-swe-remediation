@@ -1,13 +1,13 @@
 [
   {
-    "session_id": "fb0faf0d6f7c4d80ac8eb1c80ac3f469",
+    "session_id": "144e9d9a22e84f79896fa1d21453c5c2",
     "issue": {
       "owner": "emillaurence",
       "repo": "superset",
-      "number": 71,
-      "title": "Chore: clarify dashboard setup guidance for local demos",
-      "body": "## Problem\n\nThe README explains how to run the app and open the dashboard, but the local demo flow could be clearer for contributors who want to validate the workflow quickly.\n\n## Why it matters\n\nClear demo guidance reduces setup friction and helps contributors understand how to verify the remediation workflow end to end.\n\n## Scope\n\nMake one small documentation improvement that clarifies how to access or validate the dashboard during local development.\n\nDo not restructure the README.\n\n## Acceptance criteria\n\n- Add or improve one concise note about accessing the dashboard locally.\n- Keep the change focused and low risk.\n- Do not make unrelated documentation changes.\n- Open a pull request.\n- Comment on this issue with the PR link and validation result.\n\n## Validation\n\nIf this is documentation-only, state that automated validation is not applicable.",
-      "url": "https://github.com/emillaurence/superset/issues/71",
+      "number": 1,
+      "title": "Chore: restore Superset README context and remove remediation app copy",
+      "body": "## Problem\n\nThe repository README currently appears to describe the agentic remediation application rather than the Superset fork.\n\nThis is confusing for contributors because the README should help them understand the target repository, local setup expectations, and how this fork relates to Apache Superset.\n\n## Why it matters\n\nA correct README improves contributor experience, reduces confusion during review, and keeps the forked Superset repository clearly separated from the remediation automation repository.\n\n## Scope\n\nReview the current README and make a focused documentation correction so the repository is clearly presented as the Superset fork used for remediation issues.\n\nKeep the change small. Do not rewrite unrelated documentation or modify application code.\n\n## Acceptance criteria\n\n- Update the README title and opening section so it clearly refers to the Superset fork.\n- Remove or replace references that describe the agentic remediation app as if it is the main project.\n- Add a short note that this fork is used as the target repository for remediation workflow testing, if appropriate.\n- Do not change Superset application code.\n- Open a pull request with a clear summary of the documentation correction.\n- Comment on this issue with the PR link and validation result.\n\n## Validation\n\nThis is documentation-only. Automated validation is not required, but the PR should state that the README was reviewed for clarity.",
+      "url": "https://github.com/emillaurence/superset/issues/1",
       "labels": [
         {
           "name": "devin-remediate",
@@ -23,16 +23,16 @@
       "risk:quality"
     ],
     "status": "needs_human_review",
-    "created_at": "2026-06-08T00:48:42.415098",
+    "created_at": "2026-06-08T01:09:16.382294",
     "completed_at": null,
-    "needs_review_at": "2026-06-08 00:55:19.679674",
-    "pr_detected_at": "2026-06-08 00:55:19.679680",
-    "prompt": "# Role and Objective\nYou are an autonomous software engineering agent tasked with remediating a GitHub issue. Your objective is to produce a small, isolated, independently reviewable remediation that addresses the issue.\n\n# Selected Playbook Context\nUse the selected organization quality remediation playbook as the general procedure.\nThe playbook provides the general workflow. The GitHub Issue below is the source of truth for this specific remediation.\n\n# Target Repository\n- Owner: emillaurence\n- Repository: superset\n- GitHub URL: https://github.com/emillaurence/superset\n\n# GitHub Issue Details\n- Issue Number: 71\n- Title: Chore: clarify dashboard setup guidance for local demos\n- Description:\n## Problem\n\nThe README explains how to run the app and open the dashboard, but the local demo flow could be clearer for contributors who want to validate the workflow quickly.\n\n## Why it matters\n\nClear demo guidance reduces setup friction and helps contributors understand how to verify the remediation workflow end to end.\n\n## Scope\n\nMake one small documentation improvement that clarifies how to access or validate the dashboard during local development.\n\nDo not restructure the README.\n\n## Acceptance criteria\n\n- Add or improve one concise note about accessing the dashboard locally.\n- Keep the change focused and low risk.\n- Do not make unrelated documentation changes.\n- Open a pull request.\n- Comment on this issue with the PR link and validation result.\n\n## Validation\n\nIf this is documentation-only, state that automated validation is not applicable.\n- Issue URL: https://github.com/emillaurence/superset/issues/71\n\n# Labels and Risk Labels\n- All Labels: devin-remediate, risk:quality\n- Risk Labels: risk:quality\n\n# Task Classification\n- Work Type: Quality remediation\n- Guidance: Focus on code quality, maintainability, tests, linting, static analysis, or small cleanup. Preserve existing behavior and avoid broad refactors.\n\n# Scope Boundaries\n- Make the smallest safe change that addresses the issue.\n- Treat this as one isolated remediation slice.\n- Do not perform broad refactors.\n- Do not fix unrelated issues.\n- Do not update unrelated dependencies.\n- Do not change public behavior unless required by the issue.\n- Prefer a focused one-file or small multi-file change.\n- Follow existing repository style, conventions, and patterns.\n- Avoid speculative improvements.\n\n# Execution Plan\n1. Read the GitHub Issue carefully.\n2. Inspect only the relevant parts of the repository.\n3. Identify the smallest safe remediation.\n4. Implement the change on a branch.\n5. Run the smallest relevant validation where practical.\n6. Open a pull request against the target repository.\n7. Comment on the GitHub Issue with the PR URL, remediation summary, and validation result.\n8. Stop after opening the PR and commenting on the issue.\n\n# Validation Guidance\n- If Python code changes, run the most targeted available test, lint, or type check where practical.\n- If frontend code changes, run the most targeted test, lint, type check, or build check where practical.\n- If dependency or security files change, run package manager, lockfile, dependency, test, or build validation where practical.\n- If documentation-only changes are made, state that automated validation is not applicable.\n- If validation cannot be run due to environment or time constraints, explain why in the PR and issue comment.\n\n# Pull Request Requirements\nThe PR description must include:\n- Linked GitHub Issue\n- Summary of the change\n- Files changed\n- Validation performed\n- Risks, residual risk, or follow-up required\n\n# GitHub Issue Comment Requirements\nAfter opening the PR, comment on the original GitHub Issue with:\n- PR URL\n- Summary of remediation\n- Validation result\n- Final status: ready for human review\n\n# Blocker Handling\nIf you cannot safely create a PR, you must comment on the GitHub Issue with:\n- Blocker encountered\n- Steps attempted\n- Information, access, or decision needed\n- Recommended next action\n\n# Stop Condition\n- Stop after opening the pull request and commenting on the GitHub Issue.\n- Do not merge the pull request.\n- Human review remains the merge gate.\n\nBegin your work now.\n",
+    "needs_review_at": "2026-06-08 01:12:25.469649",
+    "pr_detected_at": "2026-06-08 01:12:25.469651",
+    "prompt": "# Role and Objective\nYou are an autonomous software engineering agent tasked with remediating a GitHub issue. Your objective is to produce a small, isolated, independently reviewable remediation that addresses the issue.\n\n# Selected Playbook Context\nUse the selected organization quality remediation playbook as the general procedure.\nThe playbook provides the general workflow. The GitHub Issue below is the source of truth for this specific remediation.\n\n# Target Repository\n- Owner: emillaurence\n- Repository: superset\n- GitHub URL: https://github.com/emillaurence/superset\n\n# GitHub Issue Details\n- Issue Number: 1\n- Title: Chore: restore Superset README context and remove remediation app copy\n- Description:\n## Problem\n\nThe repository README currently appears to describe the agentic remediation application rather than the Superset fork.\n\nThis is confusing for contributors because the README should help them understand the target repository, local setup expectations, and how this fork relates to Apache Superset.\n\n## Why it matters\n\nA correct README improves contributor experience, reduces confusion during review, and keeps the forked Superset repository clearly separated from the remediation automation repository.\n\n## Scope\n\nReview the current README and make a focused documentation correction so the repository is clearly presented as the Superset fork used for remediation issues.\n\nKeep the change small. Do not rewrite unrelated documentation or modify application code.\n\n## Acceptance criteria\n\n- Update the README title and opening section so it clearly refers to the Superset fork.\n- Remove or replace references that describe the agentic remediation app as if it is the main project.\n- Add a short note that this fork is used as the target repository for remediation workflow testing, if appropriate.\n- Do not change Superset application code.\n- Open a pull request with a clear summary of the documentation correction.\n- Comment on this issue with the PR link and validation result.\n\n## Validation\n\nThis is documentation-only. Automated validation is not required, but the PR should state that the README was reviewed for clarity.\n- Issue URL: https://github.com/emillaurence/superset/issues/1\n\n# Labels and Risk Labels\n- All Labels: devin-remediate, risk:quality\n- Risk Labels: risk:quality\n\n# Task Classification\n- Work Type: Quality remediation\n- Guidance: Focus on code quality, maintainability, tests, linting, static analysis, or small cleanup. Preserve existing behavior and avoid broad refactors.\n\n# Scope Boundaries\n- Make the smallest safe change that addresses the issue.\n- Treat this as one isolated remediation slice.\n- Do not perform broad refactors.\n- Do not fix unrelated issues.\n- Do not update unrelated dependencies.\n- Do not change public behavior unless required by the issue.\n- Prefer a focused one-file or small multi-file change.\n- Follow existing repository style, conventions, and patterns.\n- Avoid speculative improvements.\n\n# Execution Plan\n1. Read the GitHub Issue carefully.\n2. Inspect only the relevant parts of the repository.\n3. Identify the smallest safe remediation.\n4. Implement the change on a branch.\n5. Run the smallest relevant validation where practical.\n6. Open a pull request against the target repository.\n7. Comment on the GitHub Issue with the PR URL, remediation summary, and validation result.\n8. Stop after opening the PR and commenting on the issue.\n\n# Validation Guidance\n- If Python code changes, run the most targeted available test, lint, or type check where practical.\n- If frontend code changes, run the most targeted test, lint, type check, or build check where practical.\n- If dependency or security files change, run package manager, lockfile, dependency, test, or build validation where practical.\n- If documentation-only changes are made, state that automated validation is not applicable.\n- If validation cannot be run due to environment or time constraints, explain why in the PR and issue comment.\n\n# Pull Request Requirements\nThe PR description must include:\n- Linked GitHub Issue\n- Summary of the change\n- Files changed\n- Validation performed\n- Risks, residual risk, or follow-up required\n\n# GitHub Issue Comment Requirements\nAfter opening the PR, comment on the original GitHub Issue with:\n- PR URL\n- Summary of remediation\n- Validation result\n- Final status: ready for human review\n\n# Blocker Handling\nIf you cannot safely create a PR, you must comment on the GitHub Issue with:\n- Blocker encountered\n- Steps attempted\n- Information, access, or decision needed\n- Recommended next action\n\n# Stop Condition\n- Stop after opening the pull request and commenting on the GitHub Issue.\n- Do not merge the pull request.\n- Human review remains the merge gate.\n\nBegin your work now.\n",
     "devin_response": {
-      "session_id": "fb0faf0d6f7c4d80ac8eb1c80ac3f469",
-      "url": "https://app.devin.ai/sessions/fb0faf0d6f7c4d80ac8eb1c80ac3f469",
+      "session_id": "144e9d9a22e84f79896fa1d21453c5c2",
+      "url": "https://app.devin.ai/sessions/144e9d9a22e84f79896fa1d21453c5c2",
       "status": "new",
-      "title": "Remediate superset issue #71",
+      "title": "Remediate superset issue #1",
       "tags": [
         "devin-remediate",
         "risk:quality",
@@ -41,8 +41,8 @@
       "playbook_id": "playbook-b0b350bb71da4957b416c8360bbb5baa",
       "user_id": "bot_apk",
       "org_id": "org-bdcb6702eb2143c5a65d85c939b52b4a",
-      "created_at": 1780879722,
-      "updated_at": 1780879722,
+      "created_at": 1780880956,
+      "updated_at": 1780880956,
       "is_archived": false,
       "acus_consumed": 0.0,
       "pull_requests": [],
@@ -56,71 +56,9 @@
       "status_detail": null
     },
     "error_message": null,
-    "pull_request_url": "https://github.com/emillaurence/superset/pull/73",
-    "devin_session_url": "https://app.devin.ai/sessions/fb0faf0d6f7c4d80ac8eb1c80ac3f469",
+    "pull_request_url": "https://github.com/emillaurence/superset/pull/2",
+    "devin_session_url": "https://app.devin.ai/sessions/144e9d9a22e84f79896fa1d21453c5c2",
     "playbook_id": "playbook-b0b350bb71da4957b416c8360bbb5baa",
     "playbook_type": "quality"
-  },
-  {
-    "session_id": "26ca662db4cd44ab80cf82782e9d2f85",
-    "issue": {
-      "owner": "emillaurence",
-      "repo": "superset",
-      "number": 72,
-      "title": "Security: clarify safe handling of webhook URLs in documentation",
-      "body": "## Problem\n\nThe README uses ngrok-style public webhook URLs for local demos. Contributors should understand that temporary public webhook URLs should not be treated as permanent production endpoints.\n\n## Why it matters\n\nClear security guidance helps prevent local demo URLs from being reused accidentally in production-like environments.\n\n## Scope\n\nAdd a small security note to the README or setup documentation explaining that ngrok URLs are intended for local demo/testing use only.\n\nDo not change application behavior.\n\n## Acceptance criteria\n\n- Add a concise note that ngrok webhook URLs are for local testing or demo use.\n- Mention that production deployments should use a controlled public endpoint and appropriate webhook security controls.\n- Keep the change small and focused.\n- Do not introduce unrelated code or configuration changes.\n- Open a pull request.\n- Comment on this issue with the PR link, validation result, and security impact.\n\n## Validation\n\nIf this is documentation-only, state that automated validation is not applicable.",
-      "url": "https://github.com/emillaurence/superset/issues/72",
-      "labels": [
-        {
-          "name": "devin-remediate",
-          "color": "5319E7"
-        },
-        {
-          "name": "risk:security",
-          "color": "D73A4A"
-        }
-      ]
-    },
-    "risk_labels": [
-      "risk:security"
-    ],
-    "status": "needs_human_review",
-    "created_at": "2026-06-08T00:49:39.966748",
-    "completed_at": null,
-    "needs_review_at": "2026-06-08 00:56:39.673638",
-    "pr_detected_at": "2026-06-08 00:56:39.673641",
-    "prompt": "# Role and Objective\nYou are an autonomous software engineering agent tasked with remediating a GitHub issue. Your objective is to produce a small, isolated, independently reviewable remediation that addresses the issue.\n\n# Selected Playbook Context\nUse the selected organization security remediation playbook as the general procedure.\nThe playbook provides the general workflow. The GitHub Issue below is the source of truth for this specific remediation.\n\n# Target Repository\n- Owner: emillaurence\n- Repository: superset\n- GitHub URL: https://github.com/emillaurence/superset\n\n# GitHub Issue Details\n- Issue Number: 72\n- Title: Security: clarify safe handling of webhook URLs in documentation\n- Description:\n## Problem\n\nThe README uses ngrok-style public webhook URLs for local demos. Contributors should understand that temporary public webhook URLs should not be treated as permanent production endpoints.\n\n## Why it matters\n\nClear security guidance helps prevent local demo URLs from being reused accidentally in production-like environments.\n\n## Scope\n\nAdd a small security note to the README or setup documentation explaining that ngrok URLs are intended for local demo/testing use only.\n\nDo not change application behavior.\n\n## Acceptance criteria\n\n- Add a concise note that ngrok webhook URLs are for local testing or demo use.\n- Mention that production deployments should use a controlled public endpoint and appropriate webhook security controls.\n- Keep the change small and focused.\n- Do not introduce unrelated code or configuration changes.\n- Open a pull request.\n- Comment on this issue with the PR link, validation result, and security impact.\n\n## Validation\n\nIf this is documentation-only, state that automated validation is not applicable.\n- Issue URL: https://github.com/emillaurence/superset/issues/72\n\n# Labels and Risk Labels\n- All Labels: devin-remediate, risk:security\n- Risk Labels: risk:security\n\n# Task Classification\n- Work Type: Security remediation\n- Guidance: Focus on the security concern described in the issue. Prefer the smallest safe remediation, avoid broad dependency upgrades, and clearly document security impact and residual risk.\n\n# Scope Boundaries\n- Make the smallest safe change that addresses the issue.\n- Treat this as one isolated remediation slice.\n- Do not perform broad refactors.\n- Do not fix unrelated issues.\n- Do not update unrelated dependencies.\n- Do not change public behavior unless required by the issue.\n- Prefer a focused one-file or small multi-file change.\n- Follow existing repository style, conventions, and patterns.\n- Avoid speculative improvements.\n\n# Execution Plan\n1. Read the GitHub Issue carefully.\n2. Inspect only the relevant parts of the repository.\n3. Identify the smallest safe remediation.\n4. Implement the change on a branch.\n5. Run the smallest relevant validation where practical.\n6. Open a pull request against the target repository.\n7. Comment on the GitHub Issue with the PR URL, remediation summary, and validation result.\n8. Stop after opening the PR and commenting on the issue.\n\n# Validation Guidance\n- If Python code changes, run the most targeted available test, lint, or type check where practical.\n- If frontend code changes, run the most targeted test, lint, type check, or build check where practical.\n- If dependency or security files change, run package manager, lockfile, dependency, test, or build validation where practical.\n- If documentation-only changes are made, state that automated validation is not applicable.\n- If validation cannot be run due to environment or time constraints, explain why in the PR and issue comment.\n\n# Pull Request Requirements\nThe PR description must include:\n- Linked GitHub Issue\n- Summary of the change\n- Files changed\n- Validation performed\n- Risks, residual risk, or follow-up required\n\n# GitHub Issue Comment Requirements\nAfter opening the PR, comment on the original GitHub Issue with:\n- PR URL\n- Summary of remediation\n- Validation result\n- Final status: ready for human review\n\n# Blocker Handling\nIf you cannot safely create a PR, you must comment on the GitHub Issue with:\n- Blocker encountered\n- Steps attempted\n- Information, access, or decision needed\n- Recommended next action\n\n# Stop Condition\n- Stop after opening the pull request and commenting on the GitHub Issue.\n- Do not merge the pull request.\n- Human review remains the merge gate.\n\nBegin your work now.\n",
-    "devin_response": {
-      "session_id": "26ca662db4cd44ab80cf82782e9d2f85",
-      "url": "https://app.devin.ai/sessions/26ca662db4cd44ab80cf82782e9d2f85",
-      "status": "new",
-      "title": "Remediate superset issue #72",
-      "tags": [
-        "devin-remediate",
-        "risk:security",
-        "agent:devin-rs"
-      ],
-      "playbook_id": "playbook-f3d5e50a33b14d1a94558e61ee86956d",
-      "user_id": "bot_apk",
-      "org_id": "org-bdcb6702eb2143c5a65d85c939b52b4a",
-      "created_at": 1780879780,
-      "updated_at": 1780879780,
-      "is_archived": false,
-      "acus_consumed": 0.0,
-      "pull_requests": [],
-      "parent_session_id": null,
-      "child_session_ids": null,
-      "service_user_id": "service-user-630e5ca4d5d5414cbd6a3ecace9c83e7",
-      "category": null,
-      "subcategory": null,
-      "origin": "api",
-      "structured_output": null,
-      "status_detail": null
-    },
-    "error_message": null,
-    "pull_request_url": "https://github.com/emillaurence/superset/pull/74",
-    "devin_session_url": "https://app.devin.ai/sessions/26ca662db4cd44ab80cf82782e9d2f85",
-    "playbook_id": "playbook-f3d5e50a33b14d1a94558e61ee86956d",
-    "playbook_type": "security"
   }
 ]

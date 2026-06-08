@@ -102,6 +102,11 @@ async def github_webhook(payload: WebhookPayload, background_tasks: BackgroundTa
     
     logger.info(f"Received GitHub webhook: action={payload.action}")
     
+    # Handle GitHub ping events
+    if payload.zen or not payload.action:
+        logger.info("Received ping event, skipping")
+        return {"status": "pong"}
+    
     # Use webhook service to validate
     should_process, reason = webhook_service.should_process_webhook(payload, config["TRIGGER_LABEL"])
     
