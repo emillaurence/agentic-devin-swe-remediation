@@ -2,7 +2,7 @@ import uuid
 import logging
 import re
 from datetime import datetime
-from typing import List, Optional
+from typing import List, Optional, Dict, Any
 from app.core.models import GitHubIssue, DevinSession, SessionStatus
 from app.core.store import SessionStore
 from app.core.devin_client import DevinClient
@@ -25,7 +25,8 @@ class SoftwareRemediationService:
         status_running_label: str,
         status_failed_label: str,
         status_completed_label: str,
-        status_needs_review_label: str
+        status_needs_review_label: str,
+        config: Optional[Dict[str, Any]] = None
     ):
         self.devin_client = devin_client
         self.github_client = github_client
@@ -35,6 +36,28 @@ class SoftwareRemediationService:
         self.status_failed_label = status_failed_label
         self.status_completed_label = status_completed_label
         self.status_needs_review_label = status_needs_review_label
+        self.config = config or {}
+    
+    def select_playbook(self, risk_labels: List[str]) -> tuple[Optional[str], Optional[str]]:
+        """Select playbook based on risk labels and configured playbook IDs.
+        
+        Returns:
+            tuple: (playbook_id, playbook_type) where playbook_type is one of:
+                   'security', 'quality', 'default', or None
+        """
+        security_playbook_id = self.config.get("DEVIN_SECURITY_PLAYBOOK_ID")
+        quality_playbook_id = self.config.get("DEVIN_QUALITY_PLAYBOOK_ID")
+        default_playbook_id = self.config.get("DEVIN_DEFAULT_PLAYBOOK_ID")
+        
+        # If both risk:security and risk:quality are present, prefer security
+        if "risk:security" in risk_labels and security_playbook_id:
+            return security_playbook_id, "security"
+        elif "risk:quality" in risk_labels and quality_playbook_id:
+            return quality_playbook_id, "quality"
+        elif default_playbook_id:
+            return default_playbook_id, "default"
+        
+        return None, None
     
     async def process_remediation(self, issue: GitHubIssue, risk_labels: List[str]):
         """Process a remediation request by creating a Devin session."""
@@ -42,9 +65,13 @@ class SoftwareRemediationService:
         logger.info(f"Processing remediation for {issue.owner}/{issue.repo}#{issue.number}")
         
         try:
+            # Select playbook based on risk labels
+            playbook_id, playbook_type = self.select_playbook(risk_labels)
+            logger.info(f"Selected playbook: playbook_id={playbook_id}, playbook_type={playbook_type}")
+            
             # Generate prompt for Devin
             if self.devin_client:
-                prompt = self.devin_client.generate_prompt(issue, risk_labels)
+                prompt = self.devin_client.generate_prompt(issue, risk_labels, playbook_type)
             else:
                 logger.error("Devin client not initialized - cannot create session")
                 if self.github_client:
@@ -65,7 +92,7 @@ class SoftwareRemediationService:
                 "triggered_at": datetime.utcnow().isoformat()
             }
             
-            devin_response = await self.devin_client.create_session(prompt, session_metadata)
+            devin_response = await self.devin_client.create_session(prompt, session_metadata, playbook_id, issue, risk_labels)
             session_id = devin_response.get("session_id", str(uuid.uuid4()))
             
             # Construct Devin session URL
@@ -79,7 +106,9 @@ class SoftwareRemediationService:
                 status=SessionStatus.RUNNING,
                 prompt=prompt,
                 devin_response=devin_response,
-                devin_session_url=devin_session_url
+                devin_session_url=devin_session_url,
+                playbook_id=playbook_id,
+                playbook_type=playbook_type
             )
             
             self.store.add_session(session)
@@ -210,7 +239,11 @@ class SoftwareRemediationService:
         if not pull_request_url and has_pull_requests:
             pull_requests = session_status.get("pull_requests", [])
             if pull_requests:
-                pull_request_url = pull_requests[0].get("url") if isinstance(pull_requests[0], dict) else str(pull_requests[0])
+                pull_request_url = (
+                    pull_requests[0].get("pr_url")
+                    or pull_requests[0].get("url")
+                    or pull_requests[0].get("html_url")
+                )
         
         # Fallback: Check GitHub for PRs if Devin API didn't return PR info
         if not pull_request_url and self.github_client and session.issue:

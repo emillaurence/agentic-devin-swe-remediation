@@ -148,11 +148,33 @@ def calculate_kpis(sessions: List[DevinSession], config: Dict[str, Any] = None) 
     }
 
 
-def prepare_queue_rows(sessions: List[DevinSession]) -> List[Dict[str, Any]]:
+def prepare_queue_rows(sessions: List[DevinSession], config: Dict[str, Any] = None) -> List[Dict[str, Any]]:
     """Prepare data for the Remediation Queue tab."""
     queue_rows = []
+    devin_org_slug = config.get("DEVIN_ORG_SLUG") if config else None
+    
     for session in sessions:
         display_status = get_display_status(session)
+        
+        # Extract playbook ID from prefix if present
+        playbook_id_clean = None
+        playbook_link = None
+        playbook_type_display = None
+        # Check playbook_id at top level first, then in devin_response
+        playbook_id = session.playbook_id or (session.devin_response.get("playbook_id") if session.devin_response else None)
+        if playbook_id and devin_org_slug:
+            # Remove "playbook-" prefix if present
+            if playbook_id.startswith("playbook-"):
+                playbook_id_clean = playbook_id.replace("playbook-", "", 1)
+            else:
+                playbook_id_clean = playbook_id
+            # Create playbook link
+            playbook_link = f"https://app.devin.ai/org/{devin_org_slug}/settings/playbooks/{playbook_id_clean}"
+        
+        # Format playbook type with proper case
+        if session.playbook_type:
+            playbook_type_display = session.playbook_type.capitalize()
+        
         queue_rows.append({
             "issue_number": session.issue.number,
             "issue_title": session.issue.title,
@@ -163,19 +185,45 @@ def prepare_queue_rows(sessions: List[DevinSession]) -> List[Dict[str, Any]]:
             "status": display_status,
             "pr_link": session.pull_request_url,
             "created_at": format_timestamp(session.created_at),
-            "updated_at": format_timestamp(session.completed_at or session.needs_review_at or session.pr_detected_at or session.created_at)
+            "updated_at": format_timestamp(session.completed_at or session.needs_review_at or session.pr_detected_at or session.created_at),
+            "playbook_link": playbook_link,
+            "playbook_type_display": playbook_type_display,
+            "playbook_type": session.playbook_type
         })
     
     queue_rows.sort(key=lambda x: x["created_at"], reverse=True)
     return queue_rows
 
 
-def prepare_detail_rows(sessions: List[DevinSession]) -> List[Dict[str, Any]]:
+def prepare_detail_rows(sessions: List[DevinSession], config: Dict[str, Any] = None) -> List[Dict[str, Any]]:
     """Prepare data for the Session Details tab."""
     detail_rows = []
+    devin_org_slug = config.get("DEVIN_ORG_SLUG") if config else None
+    logger.info(f"prepare_detail_rows: devin_org_slug={devin_org_slug}")
+    
     for session in sessions:
         all_labels = [label.name for label in session.issue.labels]
         display_status = get_display_status(session)
+        
+        # Format playbook type with proper case
+        playbook_type_display = None
+        if session.playbook_type:
+            playbook_type_display = session.playbook_type.capitalize()
+        
+        # Extract playbook ID from prefix if present
+        playbook_id_clean = None
+        playbook_link = None
+        # Check playbook_id at top level first, then in devin_response
+        playbook_id = session.playbook_id or (session.devin_response.get("playbook_id") if session.devin_response else None)
+        if playbook_id and devin_org_slug:
+            # Remove "playbook-" prefix if present
+            if playbook_id.startswith("playbook-"):
+                playbook_id_clean = playbook_id.replace("playbook-", "", 1)
+            else:
+                playbook_id_clean = playbook_id
+            # Create playbook link
+            playbook_link = f"https://app.devin.ai/org/{devin_org_slug}/settings/playbooks/{playbook_id_clean}"
+        
         detail_rows.append({
             "session_id": session.session_id,
             "issue_number": session.issue.number,
@@ -193,7 +241,10 @@ def prepare_detail_rows(sessions: List[DevinSession]) -> List[Dict[str, Any]]:
             "error_message": session.error_message,
             "created_at": format_timestamp(session.created_at),
             "updated_at": format_timestamp(session.completed_at or session.needs_review_at or session.pr_detected_at or session.created_at),
-            "duration": None  # Could calculate if needed
+            "duration": None,  # Could calculate if needed
+            "playbook_type": session.playbook_type,
+            "playbook_type_display": playbook_type_display,
+            "playbook_link": playbook_link
         })
     
     detail_rows.sort(key=lambda x: x["created_at"], reverse=True)

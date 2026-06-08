@@ -47,6 +47,7 @@ cp .env.example .env
 # Devin API Configuration
 DEVIN_API_KEY=your_actual_devin_api_key
 DEVIN_ORG_ID=your_actual_devin_org_id
+DEVIN_ORG_SLUG=your_actual_devin_org_slug
 
 # GitHub API Configuration
 GITHUB_TOKEN=your_actual_github_token
@@ -62,6 +63,7 @@ NGROK_AUTHTOKEN=your_ngrok_authtoken
 **Getting your credentials:**
 
 - **Devin API Key & Org ID**: Log in to https://app.devin.ai and get these from your account settings
+- **Devin Org Slug**: Found in your Devin organization URL (e.g., `https://app.devin.ai/org/your-org-slug/settings`) or in organization settings
 - **GitHub Token**: Create a personal access token at https://github.com/settings/tokens with `repo` permissions
 - **Ngrok Auth Token**: Sign up at https://ngrok.com and get your authtoken from the dashboard
 
@@ -298,6 +300,7 @@ Required environment variables:
 
 - `DEVIN_API_KEY` - Your Devin API key
 - `DEVIN_ORG_ID` - Your Devin organization ID
+- `DEVIN_ORG_SLUG` - Your Devin organization slug (for playbook links)
 - `GITHUB_TOKEN` - GitHub personal access token with repo permissions
 
 Optional environment variables (with defaults):

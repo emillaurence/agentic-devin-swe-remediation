@@ -1,13 +1,13 @@
 [
   {
-    "session_id": "61e77fa31d0f48f48797a8d56331c504",
+    "session_id": "144e9d9a22e84f79896fa1d21453c5c2",
     "issue": {
       "owner": "emillaurence",
       "repo": "superset",
-      "number": 46,
-      "title": "Chore: tidy contributor setup wording",
-      "body": "## Problem\n\nSome contributor setup wording could be clearer.\n\n## Requested Change\n\nMake one small documentation-only wording improvement in the setup or contributing docs.\n\n## Constraints\n\n- Documentation only\n- No application code changes\n- Keep it minimal",
-      "url": "https://github.com/emillaurence/superset/issues/46",
+      "number": 1,
+      "title": "Chore: restore Superset README context and remove remediation app copy",
+      "body": "## Problem\n\nThe repository README currently appears to describe the agentic remediation application rather than the Superset fork.\n\nThis is confusing for contributors because the README should help them understand the target repository, local setup expectations, and how this fork relates to Apache Superset.\n\n## Why it matters\n\nA correct README improves contributor experience, reduces confusion during review, and keeps the forked Superset repository clearly separated from the remediation automation repository.\n\n## Scope\n\nReview the current README and make a focused documentation correction so the repository is clearly presented as the Superset fork used for remediation issues.\n\nKeep the change small. Do not rewrite unrelated documentation or modify application code.\n\n## Acceptance criteria\n\n- Update the README title and opening section so it clearly refers to the Superset fork.\n- Remove or replace references that describe the agentic remediation app as if it is the main project.\n- Add a short note that this fork is used as the target repository for remediation workflow testing, if appropriate.\n- Do not change Superset application code.\n- Open a pull request with a clear summary of the documentation correction.\n- Comment on this issue with the PR link and validation result.\n\n## Validation\n\nThis is documentation-only. Automated validation is not required, but the PR should state that the README was reviewed for clarity.",
+      "url": "https://github.com/emillaurence/superset/issues/1",
       "labels": [
         {
           "name": "devin-remediate",
@@ -22,31 +22,33 @@
     "risk_labels": [
       "risk:quality"
     ],
-    "status": "completed",
-    "created_at": "2026-06-07T02:40:26.162014",
-    "completed_at": "2026-06-07T03:31:33.861441",
-    "needs_review_at": "2026-06-07T02:43:04.625159",
-    "pr_detected_at": "2026-06-07T02:43:04.625164",
-    "prompt": "You are an autonomous software engineering agent tasked with remediating a GitHub issue.\n\n# Target Repository\n- Owner: emillaurence\n- Repository: superset\n- GitHub URL: https://github.com/emillaurence/superset\n\n# Issue Details\n- Issue Number: 46\n- Title: Chore: tidy contributor setup wording\n- Description:\n## Problem\n\nSome contributor setup wording could be clearer.\n\n## Requested Change\n\nMake one small documentation-only wording improvement in the setup or contributing docs.\n\n## Constraints\n\n- Documentation only\n- No application code changes\n- Keep it minimal\n\n- Issue URL: https://github.com/emillaurence/superset/issues/46\n\n# Risk Context\n\nThis issue is marked as a QUALITY risk. Focus on:\n- Code quality improvements\n- Maintainability and readability\n- Linting and static analysis fixes\n- Code style and consistency\n\n\n# Your Task\n1. Inspect the target GitHub repository to understand the codebase structure\n2. Read and understand the GitHub issue thoroughly\n3. Perform the smallest safe remediation aligned to the issue\n4. Run relevant validation checks where practical (tests, linting, etc.)\n5. Open a pull request against the target repository with your changes\n6. Comment on the GitHub issue with:\n   - A summary of the changes made\n   - The pull request URL\n   - Validation results\n\n# Important Constraints\n- Make minimal, focused changes\n- Ensure all changes are safe and well-tested\n- Follow the repository's existing code style and patterns\n- If the issue is unclear or requires human judgment, add a comment explaining what you found\n- Do not make destructive changes without clear justification\n\nBegin your work now.\n",
+    "status": "needs_human_review",
+    "created_at": "2026-06-08T01:09:16.382294",
+    "completed_at": null,
+    "needs_review_at": "2026-06-08 01:12:25.469649",
+    "pr_detected_at": "2026-06-08 01:12:25.469651",
+    "prompt": "# Role and Objective\nYou are an autonomous software engineering agent tasked with remediating a GitHub issue. Your objective is to produce a small, isolated, independently reviewable remediation that addresses the issue.\n\n# Selected Playbook Context\nUse the selected organization quality remediation playbook as the general procedure.\nThe playbook provides the general workflow. The GitHub Issue below is the source of truth for this specific remediation.\n\n# Target Repository\n- Owner: emillaurence\n- Repository: superset\n- GitHub URL: https://github.com/emillaurence/superset\n\n# GitHub Issue Details\n- Issue Number: 1\n- Title: Chore: restore Superset README context and remove remediation app copy\n- Description:\n## Problem\n\nThe repository README currently appears to describe the agentic remediation application rather than the Superset fork.\n\nThis is confusing for contributors because the README should help them understand the target repository, local setup expectations, and how this fork relates to Apache Superset.\n\n## Why it matters\n\nA correct README improves contributor experience, reduces confusion during review, and keeps the forked Superset repository clearly separated from the remediation automation repository.\n\n## Scope\n\nReview the current README and make a focused documentation correction so the repository is clearly presented as the Superset fork used for remediation issues.\n\nKeep the change small. Do not rewrite unrelated documentation or modify application code.\n\n## Acceptance criteria\n\n- Update the README title and opening section so it clearly refers to the Superset fork.\n- Remove or replace references that describe the agentic remediation app as if it is the main project.\n- Add a short note that this fork is used as the target repository for remediation workflow testing, if appropriate.\n- Do not change Superset application code.\n- Open a pull request with a clear summary of the documentation correction.\n- Comment on this issue with the PR link and validation result.\n\n## Validation\n\nThis is documentation-only. Automated validation is not required, but the PR should state that the README was reviewed for clarity.\n- Issue URL: https://github.com/emillaurence/superset/issues/1\n\n# Labels and Risk Labels\n- All Labels: devin-remediate, risk:quality\n- Risk Labels: risk:quality\n\n# Task Classification\n- Work Type: Quality remediation\n- Guidance: Focus on code quality, maintainability, tests, linting, static analysis, or small cleanup. Preserve existing behavior and avoid broad refactors.\n\n# Scope Boundaries\n- Make the smallest safe change that addresses the issue.\n- Treat this as one isolated remediation slice.\n- Do not perform broad refactors.\n- Do not fix unrelated issues.\n- Do not update unrelated dependencies.\n- Do not change public behavior unless required by the issue.\n- Prefer a focused one-file or small multi-file change.\n- Follow existing repository style, conventions, and patterns.\n- Avoid speculative improvements.\n\n# Execution Plan\n1. Read the GitHub Issue carefully.\n2. Inspect only the relevant parts of the repository.\n3. Identify the smallest safe remediation.\n4. Implement the change on a branch.\n5. Run the smallest relevant validation where practical.\n6. Open a pull request against the target repository.\n7. Comment on the GitHub Issue with the PR URL, remediation summary, and validation result.\n8. Stop after opening the PR and commenting on the issue.\n\n# Validation Guidance\n- If Python code changes, run the most targeted available test, lint, or type check where practical.\n- If frontend code changes, run the most targeted test, lint, type check, or build check where practical.\n- If dependency or security files change, run package manager, lockfile, dependency, test, or build validation where practical.\n- If documentation-only changes are made, state that automated validation is not applicable.\n- If validation cannot be run due to environment or time constraints, explain why in the PR and issue comment.\n\n# Pull Request Requirements\nThe PR description must include:\n- Linked GitHub Issue\n- Summary of the change\n- Files changed\n- Validation performed\n- Risks, residual risk, or follow-up required\n\n# GitHub Issue Comment Requirements\nAfter opening the PR, comment on the original GitHub Issue with:\n- PR URL\n- Summary of remediation\n- Validation result\n- Final status: ready for human review\n\n# Blocker Handling\nIf you cannot safely create a PR, you must comment on the GitHub Issue with:\n- Blocker encountered\n- Steps attempted\n- Information, access, or decision needed\n- Recommended next action\n\n# Stop Condition\n- Stop after opening the pull request and commenting on the GitHub Issue.\n- Do not merge the pull request.\n- Human review remains the merge gate.\n\nBegin your work now.\n",
     "devin_response": {
-      "session_id": "61e77fa31d0f48f48797a8d56331c504",
-      "url": "https://app.devin.ai/sessions/61e77fa31d0f48f48797a8d56331c504",
+      "session_id": "144e9d9a22e84f79896fa1d21453c5c2",
+      "url": "https://app.devin.ai/sessions/144e9d9a22e84f79896fa1d21453c5c2",
       "status": "new",
-      "title": null,
+      "title": "Remediate superset issue #1",
       "tags": [
+        "devin-remediate",
+        "risk:quality",
         "agent:devin-rs"
       ],
-      "playbook_id": null,
+      "playbook_id": "playbook-b0b350bb71da4957b416c8360bbb5baa",
       "user_id": "bot_apk",
-      "org_id": "org-c58482baed7a4514b5983457820dfd9a",
-      "created_at": 1780800026,
-      "updated_at": 1780800026,
+      "org_id": "org-bdcb6702eb2143c5a65d85c939b52b4a",
+      "created_at": 1780880956,
+      "updated_at": 1780880956,
       "is_archived": false,
       "acus_consumed": 0.0,
       "pull_requests": [],
       "parent_session_id": null,
       "child_session_ids": null,
-      "service_user_id": "service-user-22117f70db8c49f7a1be18cbc4da5eb8",
+      "service_user_id": "service-user-630e5ca4d5d5414cbd6a3ecace9c83e7",
       "category": null,
       "subcategory": null,
       "origin": "api",
@@ -54,355 +56,9 @@
       "status_detail": null
     },
     "error_message": null,
-    "pull_request_url": "https://github.com/emillaurence/superset/pull/47",
-    "devin_session_url": "https://app.devin.ai/sessions/61e77fa31d0f48f48797a8d56331c504"
-  },
-  {
-    "session_id": "cb175d8fe0564ee2bd7d2e10086c1cef",
-    "issue": {
-      "owner": "emillaurence",
-      "repo": "superset",
-      "number": 48,
-      "title": "Chore: clarify test command wording",
-      "body": "## Problem\n\nThe test instructions could be clearer for contributors.\n\n## Requested Change\n\nMake one small documentation-only wording improvement related to running tests or validating changes locally.\n\n## Constraints\n\n- Documentation only\n- No application code changes\n- Keep it minimal",
-      "url": "https://github.com/emillaurence/superset/issues/48",
-      "labels": [
-        {
-          "name": "devin-remediate",
-          "color": "5319E7"
-        },
-        {
-          "name": "risk:quality",
-          "color": "FBCA04"
-        }
-      ]
-    },
-    "risk_labels": [
-      "risk:quality"
-    ],
-    "status": "completed",
-    "created_at": "2026-06-07T05:18:39.849346",
-    "completed_at": "2026-06-07T05:26:54.495190",
-    "needs_review_at": "2026-06-07 05:22:25.958692",
-    "pr_detected_at": "2026-06-07 05:22:25.958694",
-    "prompt": "You are an autonomous software engineering agent tasked with remediating a GitHub issue.\n\n# Target Repository\n- Owner: emillaurence\n- Repository: superset\n- GitHub URL: https://github.com/emillaurence/superset\n\n# Issue Details\n- Issue Number: 48\n- Title: Chore: clarify test command wording\n- Description:\n## Problem\n\nThe test instructions could be clearer for contributors.\n\n## Requested Change\n\nMake one small documentation-only wording improvement related to running tests or validating changes locally.\n\n## Constraints\n\n- Documentation only\n- No application code changes\n- Keep it minimal\n\n- Issue URL: https://github.com/emillaurence/superset/issues/48\n\n# Risk Context\n\nThis issue is marked as a QUALITY risk. Focus on:\n- Code quality improvements\n- Maintainability and readability\n- Linting and static analysis fixes\n- Code style and consistency\n\n\n# Your Task\n1. Inspect the target GitHub repository to understand the codebase structure\n2. Read and understand the GitHub issue thoroughly\n3. Perform the smallest safe remediation aligned to the issue\n4. Run relevant validation checks where practical (tests, linting, etc.)\n5. Open a pull request against the target repository with your changes\n6. Comment on the GitHub issue with:\n   - A summary of the changes made\n   - The pull request URL\n   - Validation results\n\n# Important Constraints\n- Make minimal, focused changes\n- Ensure all changes are safe and well-tested\n- Follow the repository's existing code style and patterns\n- If the issue is unclear or requires human judgment, add a comment explaining what you found\n- Do not make destructive changes without clear justification\n\nBegin your work now.\n",
-    "devin_response": {
-      "session_id": "cb175d8fe0564ee2bd7d2e10086c1cef",
-      "url": "https://app.devin.ai/sessions/cb175d8fe0564ee2bd7d2e10086c1cef",
-      "status": "new",
-      "title": null,
-      "tags": [
-        "agent:devin-rs"
-      ],
-      "playbook_id": null,
-      "user_id": "bot_apk",
-      "org_id": "org-c58482baed7a4514b5983457820dfd9a",
-      "created_at": 1780809519,
-      "updated_at": 1780809519,
-      "is_archived": false,
-      "acus_consumed": 0.0,
-      "pull_requests": [],
-      "parent_session_id": null,
-      "child_session_ids": null,
-      "service_user_id": "service-user-22117f70db8c49f7a1be18cbc4da5eb8",
-      "category": null,
-      "subcategory": null,
-      "origin": "api",
-      "structured_output": null,
-      "status_detail": null
-    },
-    "error_message": null,
-    "pull_request_url": "https://github.com/emillaurence/superset/pull/49",
-    "devin_session_url": "https://app.devin.ai/sessions/cb175d8fe0564ee2bd7d2e10086c1cef"
-  },
-  {
-    "session_id": "a5387dfab0ea4d40854a99f0720d006c",
-    "issue": {
-      "owner": "emillaurence",
-      "repo": "superset",
-      "number": 50,
-      "title": "Chore: clarify documentation link wording",
-      "body": "## Problem\n\nOne documentation link or reference could be worded more clearly.\n\n## Requested Change\n\nMake one small documentation-only wording improvement to clarify a link, reference, or navigation instruction.\n\n## Constraints\n\n- Documentation only\n- No application code changes\n- Keep it minimal",
-      "url": "https://github.com/emillaurence/superset/issues/50",
-      "labels": [
-        {
-          "name": "devin-remediate",
-          "color": "5319E7"
-        },
-        {
-          "name": "risk:quality",
-          "color": "FBCA04"
-        }
-      ]
-    },
-    "risk_labels": [
-      "risk:quality"
-    ],
-    "status": "completed",
-    "created_at": "2026-06-07T05:26:21.698577",
-    "completed_at": "2026-06-07T10:55:18.523016",
-    "needs_review_at": "2026-06-07 05:28:59.097581",
-    "pr_detected_at": "2026-06-07 05:28:59.097584",
-    "prompt": "You are an autonomous software engineering agent tasked with remediating a GitHub issue.\n\n# Target Repository\n- Owner: emillaurence\n- Repository: superset\n- GitHub URL: https://github.com/emillaurence/superset\n\n# Issue Details\n- Issue Number: 50\n- Title: Chore: clarify documentation link wording\n- Description:\n## Problem\n\nOne documentation link or reference could be worded more clearly.\n\n## Requested Change\n\nMake one small documentation-only wording improvement to clarify a link, reference, or navigation instruction.\n\n## Constraints\n\n- Documentation only\n- No application code changes\n- Keep it minimal\n\n- Issue URL: https://github.com/emillaurence/superset/issues/50\n\n# Risk Context\n\nThis issue is marked as a QUALITY risk. Focus on:\n- Code quality improvements\n- Maintainability and readability\n- Linting and static analysis fixes\n- Code style and consistency\n\n\n# Your Task\n1. Inspect the target GitHub repository to understand the codebase structure\n2. Read and understand the GitHub issue thoroughly\n3. Perform the smallest safe remediation aligned to the issue\n4. Run relevant validation checks where practical (tests, linting, etc.)\n5. Open a pull request against the target repository with your changes\n6. Comment on the GitHub issue with:\n   - A summary of the changes made\n   - The pull request URL\n   - Validation results\n\n# Important Constraints\n- Make minimal, focused changes\n- Ensure all changes are safe and well-tested\n- Follow the repository's existing code style and patterns\n- If the issue is unclear or requires human judgment, add a comment explaining what you found\n- Do not make destructive changes without clear justification\n\nBegin your work now.\n",
-    "devin_response": {
-      "session_id": "a5387dfab0ea4d40854a99f0720d006c",
-      "url": "https://app.devin.ai/sessions/a5387dfab0ea4d40854a99f0720d006c",
-      "status": "new",
-      "title": null,
-      "tags": [
-        "agent:devin-rs"
-      ],
-      "playbook_id": null,
-      "user_id": "bot_apk",
-      "org_id": "org-c58482baed7a4514b5983457820dfd9a",
-      "created_at": 1780809981,
-      "updated_at": 1780809981,
-      "is_archived": false,
-      "acus_consumed": 0.0,
-      "pull_requests": [],
-      "parent_session_id": null,
-      "child_session_ids": null,
-      "service_user_id": "service-user-22117f70db8c49f7a1be18cbc4da5eb8",
-      "category": null,
-      "subcategory": null,
-      "origin": "api",
-      "structured_output": null,
-      "status_detail": null
-    },
-    "error_message": null,
-    "pull_request_url": "https://github.com/emillaurence/superset/pull/51",
-    "devin_session_url": "https://app.devin.ai/sessions/a5387dfab0ea4d40854a99f0720d006c"
-  },
-  {
-    "session_id": "4bd6235813e8430f97060835e6e8f99b",
-    "issue": {
-      "owner": "emillaurence",
-      "repo": "superset",
-      "number": 53,
-      "title": "Chore: document secret handling guidance for local setup",
-      "body": "## Problem\n\nLocal setup documentation should make it clear that secrets and access tokens must not be committed to the repository.\n\n## Requested Change\n\nAdd one small documentation-only note reminding contributors to keep local secrets, API keys, tokens, and `.env` files out of source control.\n\n## Constraints\n\n- Documentation only\n- No application code changes\n- No dependency upgrades\n- Keep it minimal",
-      "url": "https://github.com/emillaurence/superset/issues/53",
-      "labels": [
-        {
-          "name": "devin-remediate",
-          "color": "5319E7"
-        },
-        {
-          "name": "risk:security",
-          "color": "D73A4A"
-        }
-      ]
-    },
-    "risk_labels": [
-      "risk:security"
-    ],
-    "status": "completed",
-    "created_at": "2026-06-07T10:56:24.459538",
-    "completed_at": "2026-06-07T11:00:34.951681",
-    "needs_review_at": "2026-06-07 10:59:07.218778",
-    "pr_detected_at": "2026-06-07 10:59:07.218782",
-    "prompt": "You are an autonomous software engineering agent tasked with remediating a GitHub issue.\n\n# Target Repository\n- Owner: emillaurence\n- Repository: superset\n- GitHub URL: https://github.com/emillaurence/superset\n\n# Issue Details\n- Issue Number: 53\n- Title: Chore: document secret handling guidance for local setup\n- Description:\n## Problem\n\nLocal setup documentation should make it clear that secrets and access tokens must not be committed to the repository.\n\n## Requested Change\n\nAdd one small documentation-only note reminding contributors to keep local secrets, API keys, tokens, and `.env` files out of source control.\n\n## Constraints\n\n- Documentation only\n- No application code changes\n- No dependency upgrades\n- Keep it minimal\n\n- Issue URL: https://github.com/emillaurence/superset/issues/53\n\n# Risk Context\n\nThis issue is marked as a SECURITY risk. Focus on:\n- Dependency vulnerabilities and security updates\n- Security best practices and hardening\n- Vulnerability remediation\n- Security-focused validation and testing\n\n\n# Your Task\n1. Inspect the target GitHub repository to understand the codebase structure\n2. Read and understand the GitHub issue thoroughly\n3. Perform the smallest safe remediation aligned to the issue\n4. Run relevant validation checks where practical (tests, linting, etc.)\n5. Open a pull request against the target repository with your changes\n6. Comment on the GitHub issue with:\n   - A summary of the changes made\n   - The pull request URL\n   - Validation results\n\n# Important Constraints\n- Make minimal, focused changes\n- Ensure all changes are safe and well-tested\n- Follow the repository's existing code style and patterns\n- If the issue is unclear or requires human judgment, add a comment explaining what you found\n- Do not make destructive changes without clear justification\n\nBegin your work now.\n",
-    "devin_response": {
-      "session_id": "4bd6235813e8430f97060835e6e8f99b",
-      "url": "https://app.devin.ai/sessions/4bd6235813e8430f97060835e6e8f99b",
-      "status": "new",
-      "title": null,
-      "tags": [
-        "agent:devin-rs"
-      ],
-      "playbook_id": null,
-      "user_id": "bot_apk",
-      "org_id": "org-c58482baed7a4514b5983457820dfd9a",
-      "created_at": 1780829784,
-      "updated_at": 1780829784,
-      "is_archived": false,
-      "acus_consumed": 0.0,
-      "pull_requests": [],
-      "parent_session_id": null,
-      "child_session_ids": null,
-      "service_user_id": "service-user-22117f70db8c49f7a1be18cbc4da5eb8",
-      "category": null,
-      "subcategory": null,
-      "origin": "api",
-      "structured_output": null,
-      "status_detail": null
-    },
-    "error_message": null,
-    "pull_request_url": "https://github.com/emillaurence/superset/pull/54",
-    "devin_session_url": "https://app.devin.ai/sessions/4bd6235813e8430f97060835e6e8f99b"
-  },
-  {
-    "session_id": "503c452f1305465199e4bcba290f07a5",
-    "issue": {
-      "owner": "emillaurence",
-      "repo": "superset",
-      "number": 55,
-      "title": "Chore: add note about avoiding committed secrets",
-      "body": "## Problem\n\nThe project documentation should remind contributors not to commit secrets.\n\n## Requested Change\n\nAdd one small documentation-only note about avoiding committed secrets such as API keys, tokens, passwords, and local `.env` files.\n\n## Constraints\n\n- Documentation only\n- No application code changes\n- No dependency changes\n- Keep it minimal",
-      "url": "https://github.com/emillaurence/superset/issues/55",
-      "labels": [
-        {
-          "name": "devin-remediate",
-          "color": "5319E7"
-        },
-        {
-          "name": "risk:security",
-          "color": "D73A4A"
-        }
-      ]
-    },
-    "risk_labels": [
-      "risk:security"
-    ],
-    "status": "completed",
-    "created_at": "2026-06-07T11:09:12.623295",
-    "completed_at": "2026-06-07T11:47:28.053159",
-    "needs_review_at": "2026-06-07 11:11:24.354850",
-    "pr_detected_at": "2026-06-07 11:11:24.354857",
-    "prompt": "You are an autonomous software engineering agent tasked with remediating a GitHub issue.\n\n# Target Repository\n- Owner: emillaurence\n- Repository: superset\n- GitHub URL: https://github.com/emillaurence/superset\n\n# Issue Details\n- Issue Number: 55\n- Title: Chore: add note about avoiding committed secrets\n- Description:\n## Problem\n\nThe project documentation should remind contributors not to commit secrets.\n\n## Requested Change\n\nAdd one small documentation-only note about avoiding committed secrets such as API keys, tokens, passwords, and local `.env` files.\n\n## Constraints\n\n- Documentation only\n- No application code changes\n- No dependency changes\n- Keep it minimal\n\n- Issue URL: https://github.com/emillaurence/superset/issues/55\n\n# Risk Context\n\nThis issue is marked as a SECURITY risk. Focus on:\n- Dependency vulnerabilities and security updates\n- Security best practices and hardening\n- Vulnerability remediation\n- Security-focused validation and testing\n\n\n# Your Task\n1. Inspect the target GitHub repository to understand the codebase structure\n2. Read and understand the GitHub issue thoroughly\n3. Perform the smallest safe remediation aligned to the issue\n4. Run relevant validation checks where practical (tests, linting, etc.)\n5. Open a pull request against the target repository with your changes\n6. Comment on the GitHub issue with:\n   - A summary of the changes made\n   - The pull request URL\n   - Validation results\n\n# Important Constraints\n- Make minimal, focused changes\n- Ensure all changes are safe and well-tested\n- Follow the repository's existing code style and patterns\n- If the issue is unclear or requires human judgment, add a comment explaining what you found\n- Do not make destructive changes without clear justification\n\nBegin your work now.\n",
-    "devin_response": {
-      "session_id": "503c452f1305465199e4bcba290f07a5",
-      "url": "https://app.devin.ai/sessions/503c452f1305465199e4bcba290f07a5",
-      "status": "new",
-      "title": null,
-      "tags": [
-        "agent:devin-rs"
-      ],
-      "playbook_id": null,
-      "user_id": "bot_apk",
-      "org_id": "org-c58482baed7a4514b5983457820dfd9a",
-      "created_at": 1780830552,
-      "updated_at": 1780830552,
-      "is_archived": false,
-      "acus_consumed": 0.0,
-      "pull_requests": [],
-      "parent_session_id": null,
-      "child_session_ids": null,
-      "service_user_id": "service-user-22117f70db8c49f7a1be18cbc4da5eb8",
-      "category": null,
-      "subcategory": null,
-      "origin": "api",
-      "structured_output": null,
-      "status_detail": null
-    },
-    "error_message": null,
-    "pull_request_url": "https://github.com/emillaurence/superset/pull/56",
-    "devin_session_url": "https://app.devin.ai/sessions/503c452f1305465199e4bcba290f07a5"
-  },
-  {
-    "session_id": "a66229a285e1498b8386a8ca0b0cdc6c",
-    "issue": {
-      "owner": "emillaurence",
-      "repo": "superset",
-      "number": 57,
-      "title": "Chore: add note about avoiding committed secrets",
-      "body": "## Problem\n\nThe project documentation should remind contributors not to commit secrets.\n\n## Requested Change\n\nAdd one small documentation-only note about avoiding committed secrets such as API keys, tokens, passwords, and local `.env` files.\n\n## Constraints\n\n- Documentation only\n- No application code changes\n- No dependency changes\n- Keep it minimal",
-      "url": "https://github.com/emillaurence/superset/issues/57",
-      "labels": [
-        {
-          "name": "devin-remediate",
-          "color": "5319E7"
-        },
-        {
-          "name": "risk:security",
-          "color": "D73A4A"
-        }
-      ]
-    },
-    "risk_labels": [
-      "risk:security"
-    ],
-    "status": "completed",
-    "created_at": "2026-06-07T11:39:53.408581",
-    "completed_at": "2026-06-07T11:47:28.053159",
-    "needs_review_at": "2026-06-07 11:42:58.228745",
-    "pr_detected_at": "2026-06-07 11:42:58.228747",
-    "prompt": "You are an autonomous software engineering agent tasked with remediating a GitHub issue.\n\n# Target Repository\n- Owner: emillaurence\n- Repository: superset\n- GitHub URL: https://github.com/emillaurence/superset\n\n# Issue Details\n- Issue Number: 57\n- Title: Chore: add note about avoiding committed secrets\n- Description:\n## Problem\n\nThe project documentation should remind contributors not to commit secrets.\n\n## Requested Change\n\nAdd one small documentation-only note about avoiding committed secrets such as API keys, tokens, passwords, and local `.env` files.\n\n## Constraints\n\n- Documentation only\n- No application code changes\n- No dependency changes\n- Keep it minimal\n\n- Issue URL: https://github.com/emillaurence/superset/issues/57\n\n# Risk Context\n\nThis issue is marked as a SECURITY risk. Focus on:\n- Dependency vulnerabilities and security updates\n- Security best practices and hardening\n- Vulnerability remediation\n- Security-focused validation and testing\n\n\n# Your Task\n1. Inspect the target GitHub repository to understand the codebase structure\n2. Read and understand the GitHub issue thoroughly\n3. Perform the smallest safe remediation aligned to the issue\n4. Run relevant validation checks where practical (tests, linting, etc.)\n5. Open a pull request against the target repository with your changes\n6. Comment on the GitHub issue with:\n   - A summary of the changes made\n   - The pull request URL\n   - Validation results\n\n# Important Constraints\n- Make minimal, focused changes\n- Ensure all changes are safe and well-tested\n- Follow the repository's existing code style and patterns\n- If the issue is unclear or requires human judgment, add a comment explaining what you found\n- Do not make destructive changes without clear justification\n\nBegin your work now.\n",
-    "devin_response": {
-      "session_id": "a66229a285e1498b8386a8ca0b0cdc6c",
-      "url": "https://app.devin.ai/sessions/a66229a285e1498b8386a8ca0b0cdc6c",
-      "status": "new",
-      "title": null,
-      "tags": [
-        "agent:devin-rs"
-      ],
-      "playbook_id": null,
-      "user_id": "bot_apk",
-      "org_id": "org-c58482baed7a4514b5983457820dfd9a",
-      "created_at": 1780832393,
-      "updated_at": 1780832393,
-      "is_archived": false,
-      "acus_consumed": 0.0,
-      "pull_requests": [],
-      "parent_session_id": null,
-      "child_session_ids": null,
-      "service_user_id": "service-user-22117f70db8c49f7a1be18cbc4da5eb8",
-      "category": null,
-      "subcategory": null,
-      "origin": "api",
-      "structured_output": null,
-      "status_detail": null
-    },
-    "error_message": null,
-    "pull_request_url": "https://github.com/emillaurence/superset/pull/59",
-    "devin_session_url": "https://app.devin.ai/sessions/a66229a285e1498b8386a8ca0b0cdc6c"
-  },
-  {
-    "session_id": "98bb0a639cae4ad1ac26db50e8ca7f6a",
-    "issue": {
-      "owner": "emillaurence",
-      "repo": "superset",
-      "number": 58,
-      "title": "Chore: document safe handling of local configuration files",
-      "body": "## Problem\n\nContributors should be reminded to keep local configuration files out of source control.\n\n## Requested Change\n\nAdd one small documentation-only note about not committing local config files, secrets, tokens, or environment-specific settings.\n\n## Constraints\n\n- Documentation only\n- No application code changes\n- No dependency changes\n- Keep it minimal",
-      "url": "https://github.com/emillaurence/superset/issues/58",
-      "labels": [
-        {
-          "name": "devin-remediate",
-          "color": "5319E7"
-        },
-        {
-          "name": "risk:security",
-          "color": "D73A4A"
-        }
-      ]
-    },
-    "risk_labels": [
-      "risk:security"
-    ],
-    "status": "completed",
-    "created_at": "2026-06-07T11:40:58.678378",
-    "completed_at": "2026-06-07T11:47:28.053159",
-    "needs_review_at": "2026-06-07 11:47:19.298560",
-    "pr_detected_at": "2026-06-07 11:43:05.050076",
-    "prompt": "You are an autonomous software engineering agent tasked with remediating a GitHub issue.\n\n# Target Repository\n- Owner: emillaurence\n- Repository: superset\n- GitHub URL: https://github.com/emillaurence/superset\n\n# Issue Details\n- Issue Number: 58\n- Title: Chore: document safe handling of local configuration files\n- Description:\n## Problem\n\nContributors should be reminded to keep local configuration files out of source control.\n\n## Requested Change\n\nAdd one small documentation-only note about not committing local config files, secrets, tokens, or environment-specific settings.\n\n## Constraints\n\n- Documentation only\n- No application code changes\n- No dependency changes\n- Keep it minimal\n\n- Issue URL: https://github.com/emillaurence/superset/issues/58\n\n# Risk Context\n\nThis issue is marked as a SECURITY risk. Focus on:\n- Dependency vulnerabilities and security updates\n- Security best practices and hardening\n- Vulnerability remediation\n- Security-focused validation and testing\n\n\n# Your Task\n1. Inspect the target GitHub repository to understand the codebase structure\n2. Read and understand the GitHub issue thoroughly\n3. Perform the smallest safe remediation aligned to the issue\n4. Run relevant validation checks where practical (tests, linting, etc.)\n5. Open a pull request against the target repository with your changes\n6. Comment on the GitHub issue with:\n   - A summary of the changes made\n   - The pull request URL\n   - Validation results\n\n# Important Constraints\n- Make minimal, focused changes\n- Ensure all changes are safe and well-tested\n- Follow the repository's existing code style and patterns\n- If the issue is unclear or requires human judgment, add a comment explaining what you found\n- Do not make destructive changes without clear justification\n\nBegin your work now.\n",
-    "devin_response": {
-      "session_id": "98bb0a639cae4ad1ac26db50e8ca7f6a",
-      "url": "https://app.devin.ai/sessions/98bb0a639cae4ad1ac26db50e8ca7f6a",
-      "status": "new",
-      "title": null,
-      "tags": [
-        "agent:devin-rs"
-      ],
-      "playbook_id": null,
-      "user_id": "bot_apk",
-      "org_id": "org-c58482baed7a4514b5983457820dfd9a",
-      "created_at": 1780832458,
-      "updated_at": 1780832458,
-      "is_archived": false,
-      "acus_consumed": 0.0,
-      "pull_requests": [],
-      "parent_session_id": null,
-      "child_session_ids": null,
-      "service_user_id": "service-user-22117f70db8c49f7a1be18cbc4da5eb8",
-      "category": null,
-      "subcategory": null,
-      "origin": "api",
-      "structured_output": null,
-      "status_detail": null
-    },
-    "error_message": null,
-    "pull_request_url": "https://github.com/emillaurence/superset/pull/60",
-    "devin_session_url": "https://app.devin.ai/sessions/98bb0a639cae4ad1ac26db50e8ca7f6a"
+    "pull_request_url": "https://github.com/emillaurence/superset/pull/2",
+    "devin_session_url": "https://app.devin.ai/sessions/144e9d9a22e84f79896fa1d21453c5c2",
+    "playbook_id": "playbook-b0b350bb71da4957b416c8360bbb5baa",
+    "playbook_type": "quality"
   }
 ]
