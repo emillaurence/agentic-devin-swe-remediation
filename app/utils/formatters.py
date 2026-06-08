@@ -268,8 +268,7 @@ def prepare_risk_categories(sessions: List[DevinSession], config: Dict[str, Any]
             risk_categories[friendly_category]["issues"] += 1
             if session.pull_request_url:
                 risk_categories[friendly_category]["prs"] += 1
-            display_status = get_display_status(session)
-            if display_status == "needs-review":
+            if session.status == SessionStatus.NEEDS_HUMAN_REVIEW:
                 risk_categories[friendly_category]["awaiting_review"] += 1
             if session.status == SessionStatus.FAILED:
                 risk_categories[friendly_category]["blocked"] += 1
