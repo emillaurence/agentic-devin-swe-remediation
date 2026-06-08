@@ -23,41 +23,13 @@ Traditional automation tells teams what is broken. Devin helps complete the engi
 The system is built as a Python FastAPI application with the following components:
 
 ```mermaid
-graph TB
-    subgraph "GitHub"
-        GI[GitHub Issues]
-        GPR[GitHub Pull Requests]
-    end
-
-    subgraph "FastAPI Application"
-        WH[Webhook Endpoints]
-        DC[Devin Client]
-        GC[GitHub Client]
-        SS[Session Store]
-        DM[Data Models]
-        DASH[Dashboard]
-    end
-
-    subgraph "Devin"
-        DA[Devin API]
-        DS[Devin Sessions]
-    end
-
-    GI -->|webhook| WH
-    GPR -->|webhook| WH
-    WH --> DC
-    WH --> GC
-    DC -->|create session| DA
-    DA --> DS
-    GC -->|comments/labels| GI
-    GC -->|status updates| GPR
-    DC --> SS
-    GC --> SS
-    SS --> DASH
-    DM --> WH
-    DM --> DC
-    DM --> GC
-    DM --> SS
+graph LR
+    GitHub[GitHub Issues/PRs] -->|Webhooks| FastAPI[FastAPI App]
+    FastAPI -->|Orchestrates| Devin[Devin API]
+    Devin -->|Autonomous Work| Sessions[Devin Sessions]
+    FastAPI -->|Comments/Labels| GitHub
+    FastAPI -->|Track Sessions| Store[Session Store]
+    Store -->|Visibility| Dashboard[Dashboard]
 ```
 
 ### Components
