@@ -32,7 +32,7 @@ graph TB
         FastAPI[⚙️ FastAPI Orchestrator]
     end
 
-    subgraph "AI Engineering Layer"
+    subgraph "Agentic Software Engineering"
         Devin[🤖 Devin API]
         Sessions[✨ Devin Sessions]
     end
@@ -49,8 +49,8 @@ graph TB
     FastAPI -->|Tracks| Store
     Store -->|Powers| Dashboard
 
-    style Devin fill:#7c3aed,stroke:#5b21b6,stroke-width:3px
-    style Sessions fill:#8b5cf6,stroke:#6d28d9,stroke-width:2px
+    style Devin fill:#0F131C,stroke:#FFF,stroke-width:3px,color:#FFF
+    style Sessions fill:#1a1f2e,stroke:#FFF,stroke-width:2px,color:#FFF
     style FastAPI fill:#3b82f6,stroke:#1d4ed8,stroke-width:2px
     style GitHub fill:#10b981,stroke:#059669,stroke-width:2px
     style Dashboard fill:#f59e0b,stroke:#d97706,stroke-width:2px
