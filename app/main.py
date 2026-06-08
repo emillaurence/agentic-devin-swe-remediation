@@ -58,7 +58,8 @@ remediation_service = SoftwareRemediationService(
     status_running_label=config["STATUS_RUNNING_LABEL"],
     status_failed_label=config["STATUS_FAILED_LABEL"],
     status_completed_label=config["STATUS_COMPLETED_LABEL"],
-    status_needs_review_label=config["STATUS_NEEDS_REVIEW_LABEL"]
+    status_needs_review_label=config["STATUS_NEEDS_REVIEW_LABEL"],
+    config=config
 ) if github_client else None
 
 # Initialize Jinja2 templates
@@ -563,8 +564,8 @@ async def dashboard(request: Request):
     kpis = calculate_kpis(sessions, config)
     
     # Prepare data for tabs using formatter utilities
-    queue_rows = prepare_queue_rows(sessions)
-    detail_rows = prepare_detail_rows(sessions)
+    queue_rows = prepare_queue_rows(sessions, config)
+    detail_rows = prepare_detail_rows(sessions, config)
     risk_categories = prepare_risk_categories(sessions, config)
     
     # Calculate time to PR for detail rows

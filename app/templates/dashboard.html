@@ -627,6 +627,7 @@
                             <th>Issue Title</th>
                             <th>Repository</th>
                             <th>Risk Category</th>
+                            <th>Playbook</th>
                             <th>Devin Status</th>
                             <th>PR Link</th>
                             <th>Last Updated</th>
@@ -640,6 +641,7 @@
                                     <td>{{ row.issue_title[:60] }}...</td>
                                     <td>{{ row.repository }}</td>
                                     <td>{{ row.risk_category }}</td>
+                                    <td>{% if row.playbook_link %}<a href="{{ row.playbook_link }}" class="link" target="_blank">{{ row.playbook_type_display or row.playbook_type }}</a>{% else %}{{ row.playbook_type_display or row.playbook_type or 'None' }}{% endif %}</td>
                                     <td>
                                         {% if row.status == 'Running' %}
                                             <span class="status-running">{{ row.status }}</span>
@@ -658,7 +660,7 @@
                                 </tr>
                             {% endfor %}
                         {% else %}
-                            <tr><td colspan="7" class="empty-row">No remediation sessions yet. Trigger a GitHub issue with the devin-remediate label or use the simulator to create the first session.</td></tr>
+                            <tr><td colspan="8" class="empty-row">No remediation sessions yet. Trigger a GitHub issue with the devin-remediate label or use the simulator to create the first session.</td></tr>
                         {% endif %}
                     </tbody>
                 </table>
@@ -675,6 +677,7 @@
                             <th>Repository</th>
                             <th>All Labels</th>
                             <th>Risk Category</th>
+                            <th>Playbook</th>
                             <th>Devin Status</th>
                             <th>Devin Session</th>
                             <th>PR Link</th>
@@ -693,6 +696,7 @@
                                     <td>{{ row.repository }}</td>
                                     <td>{{ row.all_labels|join(', ') if row.all_labels else 'None' }}</td>
                                     <td>{{ row.risk_category }}</td>
+                                    <td>{% if row.playbook_link %}<a href="{{ row.playbook_link }}" class="link" target="_blank">{{ row.playbook_type_display or row.playbook_type }}</a>{% else %}{{ row.playbook_type_display or row.playbook_type or 'None' }}{% endif %}</td>
                                     <td>
                                         {% if row.status == 'Running' %}
                                             <span class="status-running">{{ row.status }}</span>
@@ -715,7 +719,7 @@
                                 </tr>
                             {% endfor %}
                         {% else %}
-                            <tr><td colspan="12" class="empty-row">No remediation sessions yet. Trigger a GitHub issue with the devin-remediate label or use the simulator to create the first session.</td></tr>
+                            <tr><td colspan="13" class="empty-row">No remediation sessions yet. Trigger a GitHub issue with the devin-remediate label or use the simulator to create the first session.</td></tr>
                         {% endif %}
                     </tbody>
                 </table>

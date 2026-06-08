@@ -45,6 +45,51 @@ The system is generic and label-driven. It uses GitHub labels to control behavio
 - `status:devin-completed` - Added when remediation is reviewed and approved
 - `status:devin-failed` - Added when remediation fails
 
+## Organization Playbook Support
+
+The app supports optional organization playbooks for Devin sessions based on GitHub risk labels. When configured, the app will automatically select and pass the appropriate playbook ID to the Devin API when creating a session.
+
+### Playbook Configuration
+
+Configure the following environment variables in `.env`:
+
+- `DEVIN_SECURITY_PLAYBOOK_ID` - Used for issues labeled with `risk:security`
+- `DEVIN_QUALITY_PLAYBOOK_ID` - Used for issues labeled with `risk:quality`
+- `DEVIN_DEFAULT_PLAYBOOK_ID` - Used when no risk-specific playbook is configured
+
+### Playbook Selection Logic
+
+The app selects playbooks in the following order:
+
+1. If issue labels include `risk:security` and `DEVIN_SECURITY_PLAYBOOK_ID` is configured, use the security playbook
+2. Else if issue labels include `risk:quality` and `DEVIN_QUALITY_PLAYBOOK_ID` is configured, use the quality playbook
+3. Else if `DEVIN_DEFAULT_PLAYBOOK_ID` is configured, use the default playbook
+4. Else omit `playbook_id` and use the generated prompt only
+
+If both `risk:security` and `risk:quality` are present, the app prefers `risk:security`.
+
+### Prompt Updates
+
+When a playbook is selected, the generated prompt includes a plain-language instruction mentioning the playbook type:
+
+- For `risk:security`: "Apply the organization security remediation playbook and follow the issue-specific acceptance criteria below."
+- For `risk:quality`: "Apply the organization quality remediation playbook and follow the issue-specific acceptance criteria below."
+- For default playbook: "Apply the organization default remediation playbook and follow the issue-specific acceptance criteria below."
+- If no playbook is configured: "No organization playbook was configured for this issue. Follow the issue-specific remediation instructions below."
+
+### Session Metadata
+
+The app stores the selected playbook information in the local session record:
+
+- `playbook_id` - The playbook ID passed to Devin (if configured)
+- `playbook_type` - One of `security`, `quality`, `default`, or `none`
+
+The `/sessions` endpoint returns these fields for traceability. The dashboard's "Devin Session Details" tab also displays the playbook type for each session.
+
+### Fallback Behavior
+
+If no playbook ID is configured for a given risk category or no default playbook is configured, the app falls back to using the generated prompt guidance without a playbook. This ensures the app continues to work even without playbook configuration.
+
 ## Quick Start
 
 ### Prerequisites
@@ -64,9 +109,19 @@ cp .env.example .env
 ```bash
 DEVIN_API_KEY=your_devin_api_key
 DEVIN_ORG_ID=your_devin_org_id
+DEVIN_ORG_SLUG=your_devin_org_slug
 GITHUB_TOKEN=your_github_token
+DEFAULT_GITHUB_OWNER=your_github_username
+DEFAULT_GITHUB_REPO=your_target_repository
 NGROK_AUTHTOKEN=your_ngrok_authtoken
 ```
+
+**Getting your credentials:**
+
+- **Devin API Key & Org ID**: Log in to https://app.devin.ai and get these from your account settings
+- **Devin Org Slug**: Found in your Devin organization URL (e.g., `https://app.devin.ai/org/your-org-slug/settings`) or in organization settings
+- **GitHub Token**: Create a personal access token at https://github.com/settings/tokens with `repo` permissions
+- **Ngrok Auth Token**: Sign up at https://ngrok.com and get your authtoken from the dashboard
 
 3. Run with Docker Compose (recommended):
 ```bash

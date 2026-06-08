@@ -28,6 +28,7 @@ def load_environment_variables():
     """Load and validate environment variables."""
     DEVIN_API_KEY = os.getenv("DEVIN_API_KEY")
     DEVIN_ORG_ID = os.getenv("DEVIN_ORG_ID")
+    DEVIN_ORG_SLUG = os.getenv("DEVIN_ORG_SLUG")
     GITHUB_TOKEN = os.getenv("GITHUB_TOKEN")
     DEFAULT_GITHUB_OWNER = os.getenv("DEFAULT_GITHUB_OWNER", "emillaurence")
     DEFAULT_GITHUB_REPO = os.getenv("DEFAULT_GITHUB_REPO", "superset")
@@ -47,6 +48,11 @@ def load_environment_variables():
     BLENDED_ENGINEERING_HOURLY_COST = float(os.getenv("BLENDED_ENGINEERING_HOURLY_COST", "150"))
     ROI_CURRENCY = os.getenv("ROI_CURRENCY", "A$")
     
+    # Organization playbook configuration
+    DEVIN_DEFAULT_PLAYBOOK_ID = os.getenv("DEVIN_DEFAULT_PLAYBOOK_ID")
+    DEVIN_QUALITY_PLAYBOOK_ID = os.getenv("DEVIN_QUALITY_PLAYBOOK_ID")
+    DEVIN_SECURITY_PLAYBOOK_ID = os.getenv("DEVIN_SECURITY_PLAYBOOK_ID")
+    
     # Validate required environment variables
     if not DEVIN_API_KEY:
         logger.warning("DEVIN_API_KEY not set - Devin integration will not work. Set this environment variable to enable Devin session creation.")
@@ -58,6 +64,7 @@ def load_environment_variables():
     return {
         "DEVIN_API_KEY": DEVIN_API_KEY,
         "DEVIN_ORG_ID": DEVIN_ORG_ID,
+        "DEVIN_ORG_SLUG": DEVIN_ORG_SLUG,
         "GITHUB_TOKEN": GITHUB_TOKEN,
         "DEFAULT_GITHUB_OWNER": DEFAULT_GITHUB_OWNER,
         "DEFAULT_GITHUB_REPO": DEFAULT_GITHUB_REPO,
@@ -71,7 +78,10 @@ def load_environment_variables():
         "HUMAN_BASELINE_SECURITY_HOURS": HUMAN_BASELINE_SECURITY_HOURS,
         "HUMAN_BASELINE_OTHER_HOURS": HUMAN_BASELINE_OTHER_HOURS,
         "BLENDED_ENGINEERING_HOURLY_COST": BLENDED_ENGINEERING_HOURLY_COST,
-        "ROI_CURRENCY": ROI_CURRENCY
+        "ROI_CURRENCY": ROI_CURRENCY,
+        "DEVIN_DEFAULT_PLAYBOOK_ID": DEVIN_DEFAULT_PLAYBOOK_ID,
+        "DEVIN_QUALITY_PLAYBOOK_ID": DEVIN_QUALITY_PLAYBOOK_ID,
+        "DEVIN_SECURITY_PLAYBOOK_ID": DEVIN_SECURITY_PLAYBOOK_ID
     }
 
 

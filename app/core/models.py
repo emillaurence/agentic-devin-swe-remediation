@@ -40,6 +40,8 @@ class DevinSession(BaseModel):
     error_message: Optional[str] = None
     pull_request_url: Optional[str] = None
     devin_session_url: Optional[str] = None
+    playbook_id: Optional[str] = None
+    playbook_type: Optional[str] = None
 
 
 class WebhookPayload(BaseModel):

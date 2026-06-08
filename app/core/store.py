@@ -52,7 +52,9 @@ class SessionStore:
             "devin_response": session.devin_response,
             "error_message": session.error_message,
             "pull_request_url": session.pull_request_url,
-            "devin_session_url": session.devin_session_url
+            "devin_session_url": session.devin_session_url,
+            "playbook_id": session.playbook_id,
+            "playbook_type": session.playbook_type
         }
 
     def _dict_to_session(self, data: Dict[str, Any]) -> DevinSession:
@@ -78,7 +80,9 @@ class SessionStore:
             devin_response=data.get("devin_response"),
             error_message=data.get("error_message"),
             pull_request_url=data.get("pull_request_url"),
-            devin_session_url=data.get("devin_session_url")
+            devin_session_url=data.get("devin_session_url"),
+            playbook_id=data.get("playbook_id"),
+            playbook_type=data.get("playbook_type")
         )
 
     def add_session(self, session: DevinSession) -> DevinSession:
