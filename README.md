@@ -49,11 +49,11 @@ graph TB
     FastAPI -->|Tracks| Store
     Store -->|Powers| Dashboard
 
-    style Devin fill:#ff6b6b,stroke:#c92a2a,stroke-width:3px
-    style Sessions fill:#ff6b6b,stroke:#c92a2a,stroke-width:2px
-    style FastAPI fill:#4dabf7,stroke:#1864ab,stroke-width:2px
-    style GitHub fill:#51cf66,stroke:#2b8a3e,stroke-width:2px
-    style Dashboard fill:#fcc419,stroke:#f08c00,stroke-width:2px
+    style Devin fill:#7c3aed,stroke:#5b21b6,stroke-width:3px
+    style Sessions fill:#8b5cf6,stroke:#6d28d9,stroke-width:2px
+    style FastAPI fill:#3b82f6,stroke:#1d4ed8,stroke-width:2px
+    style GitHub fill:#10b981,stroke:#059669,stroke-width:2px
+    style Dashboard fill:#f59e0b,stroke:#d97706,stroke-width:2px
 ```
 
 ### Components
