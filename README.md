@@ -15,8 +15,8 @@ Traditional automation tells teams what is broken. Devin helps complete the engi
 - Target repository: https://github.com/emillaurence/superset
 - Solution repository: https://github.com/emillaurence/agentic-devin-swe-remediation
 - Dashboard: http://localhost:8000/dashboard (or https://your-ngrok-url.ngrok.io/dashboard)
-- Example issue: Add link after creating the demo issue
-- Example pull request: Add link after Devin creates the demo PR
+- Example issue: https://github.com/emillaurence/superset/issues/26
+- Example pull request: https://github.com/emillaurence/superset/pull/27
 
 ## Architecture
 

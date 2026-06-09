@@ -22,9 +22,9 @@
     "risk_labels": [
       "risk:quality"
     ],
-    "status": "needs_human_review",
+    "status": "completed",
     "created_at": "2026-06-08T01:09:16.382294",
-    "completed_at": null,
+    "completed_at": "2026-06-08T04:09:55.534458",
     "needs_review_at": "2026-06-08 01:12:25.469649",
     "pr_detected_at": "2026-06-08 01:12:25.469651",
     "prompt": "# Role and Objective\nYou are an autonomous software engineering agent tasked with remediating a GitHub issue. Your objective is to produce a small, isolated, independently reviewable remediation that addresses the issue.\n\n# Selected Playbook Context\nUse the selected organization quality remediation playbook as the general procedure.\nThe playbook provides the general workflow. The GitHub Issue below is the source of truth for this specific remediation.\n\n# Target Repository\n- Owner: emillaurence\n- Repository: superset\n- GitHub URL: https://github.com/emillaurence/superset\n\n# GitHub Issue Details\n- Issue Number: 1\n- Title: Chore: restore Superset README context and remove remediation app copy\n- Description:\n## Problem\n\nThe repository README currently appears to describe the agentic remediation application rather than the Superset fork.\n\nThis is confusing for contributors because the README should help them understand the target repository, local setup expectations, and how this fork relates to Apache Superset.\n\n## Why it matters\n\nA correct README improves contributor experience, reduces confusion during review, and keeps the forked Superset repository clearly separated from the remediation automation repository.\n\n## Scope\n\nReview the current README and make a focused documentation correction so the repository is clearly presented as the Superset fork used for remediation issues.\n\nKeep the change small. Do not rewrite unrelated documentation or modify application code.\n\n## Acceptance criteria\n\n- Update the README title and opening section so it clearly refers to the Superset fork.\n- Remove or replace references that describe the agentic remediation app as if it is the main project.\n- Add a short note that this fork is used as the target repository for remediation workflow testing, if appropriate.\n- Do not change Superset application code.\n- Open a pull request with a clear summary of the documentation correction.\n- Comment on this issue with the PR link and validation result.\n\n## Validation\n\nThis is documentation-only. Automated validation is not required, but the PR should state that the README was reviewed for clarity.\n- Issue URL: https://github.com/emillaurence/superset/issues/1\n\n# Labels and Risk Labels\n- All Labels: devin-remediate, risk:quality\n- Risk Labels: risk:quality\n\n# Task Classification\n- Work Type: Quality remediation\n- Guidance: Focus on code quality, maintainability, tests, linting, static analysis, or small cleanup. Preserve existing behavior and avoid broad refactors.\n\n# Scope Boundaries\n- Make the smallest safe change that addresses the issue.\n- Treat this as one isolated remediation slice.\n- Do not perform broad refactors.\n- Do not fix unrelated issues.\n- Do not update unrelated dependencies.\n- Do not change public behavior unless required by the issue.\n- Prefer a focused one-file or small multi-file change.\n- Follow existing repository style, conventions, and patterns.\n- Avoid speculative improvements.\n\n# Execution Plan\n1. Read the GitHub Issue carefully.\n2. Inspect only the relevant parts of the repository.\n3. Identify the smallest safe remediation.\n4. Implement the change on a branch.\n5. Run the smallest relevant validation where practical.\n6. Open a pull request against the target repository.\n7. Comment on the GitHub Issue with the PR URL, remediation summary, and validation result.\n8. Stop after opening the PR and commenting on the issue.\n\n# Validation Guidance\n- If Python code changes, run the most targeted available test, lint, or type check where practical.\n- If frontend code changes, run the most targeted test, lint, type check, or build check where practical.\n- If dependency or security files change, run package manager, lockfile, dependency, test, or build validation where practical.\n- If documentation-only changes are made, state that automated validation is not applicable.\n- If validation cannot be run due to environment or time constraints, explain why in the PR and issue comment.\n\n# Pull Request Requirements\nThe PR description must include:\n- Linked GitHub Issue\n- Summary of the change\n- Files changed\n- Validation performed\n- Risks, residual risk, or follow-up required\n\n# GitHub Issue Comment Requirements\nAfter opening the PR, comment on the original GitHub Issue with:\n- PR URL\n- Summary of remediation\n- Validation result\n- Final status: ready for human review\n\n# Blocker Handling\nIf you cannot safely create a PR, you must comment on the GitHub Issue with:\n- Blocker encountered\n- Steps attempted\n- Information, access, or decision needed\n- Recommended next action\n\n# Stop Condition\n- Stop after opening the pull request and commenting on the GitHub Issue.\n- Do not merge the pull request.\n- Human review remains the merge gate.\n\nBegin your work now.\n",
@@ -60,5 +60,811 @@
     "devin_session_url": "https://app.devin.ai/sessions/144e9d9a22e84f79896fa1d21453c5c2",
     "playbook_id": "playbook-b0b350bb71da4957b416c8360bbb5baa",
     "playbook_type": "quality"
+  },
+  {
+    "session_id": "86e24b9457f14a0690189e0498d48a5f",
+    "issue": {
+      "owner": "emillaurence",
+      "repo": "superset",
+      "number": 3,
+      "title": "Chore: add note clarifying this fork is used for remediation workflow demos",
+      "body": "## Problem\n\nThis Superset fork is being used as the target repository for the agentic remediation workflow, but the repository does not clearly explain that context for reviewers or contributors.\n\n## Why it matters\n\nA short clarification helps reviewers understand why issues and pull requests are being created in this fork, without confusing this repository with the separate remediation automation app.\n\n## Scope\n\nAdd a small note to the README explaining that this fork is used as the target repository for Devin remediation workflow testing.\n\nKeep the change focused and documentation-only.\n\n## Acceptance criteria\n\n- Add a concise note explaining that this is the target Superset fork for remediation workflow demos.\n- Mention that remediation automation is managed from the separate `agentic-devin-swe-remediation` repository.\n- Do not modify Superset application code.\n- Do not rewrite unrelated README sections.\n- Open a pull request with a clear summary.\n- Comment on this issue with the PR link and validation result.\n\n## Validation\n\nThis is documentation-only. Automated validation is not required, but the PR should state that the README was reviewed for clarity.",
+      "url": "https://github.com/emillaurence/superset/issues/3",
+      "labels": [
+        {
+          "name": "devin-remediate",
+          "color": "5319E7"
+        },
+        {
+          "name": "risk:quality",
+          "color": "FBCA04"
+        }
+      ]
+    },
+    "risk_labels": [
+      "risk:quality"
+    ],
+    "status": "completed",
+    "created_at": "2026-06-08T04:10:39.910463",
+    "completed_at": "2026-06-08T04:17:26.708906",
+    "needs_review_at": "2026-06-08 04:12:25.513346",
+    "pr_detected_at": "2026-06-08 04:12:25.513351",
+    "prompt": "# Role and Objective\nYou are an autonomous software engineering agent tasked with remediating a GitHub issue. Your objective is to produce a small, isolated, independently reviewable remediation that addresses the issue.\n\n# Selected Playbook Context\nUse the selected organization quality remediation playbook as the general procedure.\nThe playbook provides the general workflow. The GitHub Issue below is the source of truth for this specific remediation.\n\n# Target Repository\n- Owner: emillaurence\n- Repository: superset\n- GitHub URL: https://github.com/emillaurence/superset\n\n# GitHub Issue Details\n- Issue Number: 3\n- Title: Chore: add note clarifying this fork is used for remediation workflow demos\n- Description:\n## Problem\n\nThis Superset fork is being used as the target repository for the agentic remediation workflow, but the repository does not clearly explain that context for reviewers or contributors.\n\n## Why it matters\n\nA short clarification helps reviewers understand why issues and pull requests are being created in this fork, without confusing this repository with the separate remediation automation app.\n\n## Scope\n\nAdd a small note to the README explaining that this fork is used as the target repository for Devin remediation workflow testing.\n\nKeep the change focused and documentation-only.\n\n## Acceptance criteria\n\n- Add a concise note explaining that this is the target Superset fork for remediation workflow demos.\n- Mention that remediation automation is managed from the separate `agentic-devin-swe-remediation` repository.\n- Do not modify Superset application code.\n- Do not rewrite unrelated README sections.\n- Open a pull request with a clear summary.\n- Comment on this issue with the PR link and validation result.\n\n## Validation\n\nThis is documentation-only. Automated validation is not required, but the PR should state that the README was reviewed for clarity.\n- Issue URL: https://github.com/emillaurence/superset/issues/3\n\n# Labels and Risk Labels\n- All Labels: devin-remediate, risk:quality\n- Risk Labels: risk:quality\n\n# Task Classification\n- Work Type: Quality remediation\n- Guidance: Focus on code quality, maintainability, tests, linting, static analysis, or small cleanup. Preserve existing behavior and avoid broad refactors.\n\n# Scope Boundaries\n- Make the smallest safe change that addresses the issue.\n- Treat this as one isolated remediation slice.\n- Do not perform broad refactors.\n- Do not fix unrelated issues.\n- Do not update unrelated dependencies.\n- Do not change public behavior unless required by the issue.\n- Prefer a focused one-file or small multi-file change.\n- Follow existing repository style, conventions, and patterns.\n- Avoid speculative improvements.\n\n# Execution Plan\n1. Read the GitHub Issue carefully.\n2. Inspect only the relevant parts of the repository.\n3. Identify the smallest safe remediation.\n4. Implement the change on a branch.\n5. Run the smallest relevant validation where practical.\n6. Open a pull request against the target repository.\n7. Comment on the GitHub Issue with the PR URL, remediation summary, and validation result.\n8. Stop after opening the PR and commenting on the issue.\n\n# Validation Guidance\n- If Python code changes, run the most targeted available test, lint, or type check where practical.\n- If frontend code changes, run the most targeted test, lint, type check, or build check where practical.\n- If dependency or security files change, run package manager, lockfile, dependency, test, or build validation where practical.\n- If documentation-only changes are made, state that automated validation is not applicable.\n- If validation cannot be run due to environment or time constraints, explain why in the PR and issue comment.\n\n# Pull Request Requirements\nThe PR description must include:\n- Linked GitHub Issue\n- Summary of the change\n- Files changed\n- Validation performed\n- Risks, residual risk, or follow-up required\n\n# GitHub Issue Comment Requirements\nAfter opening the PR, comment on the original GitHub Issue with:\n- PR URL\n- Summary of remediation\n- Validation result\n- Final status: ready for human review\n\n# Blocker Handling\nIf you cannot safely create a PR, you must comment on the GitHub Issue with:\n- Blocker encountered\n- Steps attempted\n- Information, access, or decision needed\n- Recommended next action\n\n# Stop Condition\n- Stop after opening the pull request and commenting on the GitHub Issue.\n- Do not merge the pull request.\n- Human review remains the merge gate.\n\nBegin your work now.\n",
+    "devin_response": {
+      "session_id": "86e24b9457f14a0690189e0498d48a5f",
+      "url": "https://app.devin.ai/sessions/86e24b9457f14a0690189e0498d48a5f",
+      "status": "new",
+      "title": "Remediate superset issue #3",
+      "tags": [
+        "devin-remediate",
+        "risk:quality",
+        "agent:devin-rs"
+      ],
+      "playbook_id": "playbook-b0b350bb71da4957b416c8360bbb5baa",
+      "user_id": "bot_apk",
+      "org_id": "org-bdcb6702eb2143c5a65d85c939b52b4a",
+      "created_at": 1780891840,
+      "updated_at": 1780891840,
+      "is_archived": false,
+      "acus_consumed": 0.0,
+      "pull_requests": [],
+      "parent_session_id": null,
+      "child_session_ids": null,
+      "service_user_id": "service-user-630e5ca4d5d5414cbd6a3ecace9c83e7",
+      "category": null,
+      "subcategory": null,
+      "origin": "api",
+      "structured_output": null,
+      "status_detail": null
+    },
+    "error_message": null,
+    "pull_request_url": "https://github.com/emillaurence/superset/pull/4",
+    "devin_session_url": "https://app.devin.ai/sessions/86e24b9457f14a0690189e0498d48a5f",
+    "playbook_id": "playbook-b0b350bb71da4957b416c8360bbb5baa",
+    "playbook_type": "quality"
+  },
+  {
+    "session_id": "c99ac71995ad404a9866c3e9fcab897f",
+    "issue": {
+      "owner": "emillaurence",
+      "repo": "superset",
+      "number": 5,
+      "title": "Chore: fix minor typo in README wording",
+      "body": "## Problem\n\nThe README contains wording that could be made clearer for contributors reviewing this Superset fork.\n\n## Why it matters\n\nSmall documentation improvements reduce confusion and make the repository easier to understand during review.\n\n## Scope\n\nReview the README and fix one small typo, awkward phrase, or unclear sentence.\n\nKeep the change documentation-only and focused.\n\n## Acceptance criteria\n\n- Identify one small typo, awkward phrase, or unclear sentence in the README.\n- Make a concise wording improvement.\n- Do not rewrite large sections of the README.\n- Do not modify application code.\n- Open a pull request with a clear summary.\n- Comment on this issue with the PR link and validation result.\n\n## Validation\n\nThis is documentation-only. Automated validation is not required, but the PR should state that the README was reviewed for clarity.",
+      "url": "https://github.com/emillaurence/superset/issues/5",
+      "labels": [
+        {
+          "name": "devin-remediate",
+          "color": "5319E7"
+        },
+        {
+          "name": "risk:quality",
+          "color": "FBCA04"
+        }
+      ]
+    },
+    "risk_labels": [
+      "risk:quality"
+    ],
+    "status": "completed",
+    "created_at": "2026-06-08T07:26:04.848867",
+    "completed_at": "2026-06-08T07:31:25.272536",
+    "needs_review_at": "2026-06-08 07:28:11.785807",
+    "pr_detected_at": "2026-06-08 07:28:11.785812",
+    "prompt": "# Role and Objective\nYou are an autonomous software engineering agent tasked with remediating a GitHub issue. Your objective is to produce a small, isolated, independently reviewable remediation that addresses the issue.\n\n# Selected Playbook Context\nUse the selected organization quality remediation playbook as the general procedure.\nThe playbook provides the general workflow. The GitHub Issue below is the source of truth for this specific remediation.\n\n# Target Repository\n- Owner: emillaurence\n- Repository: superset\n- GitHub URL: https://github.com/emillaurence/superset\n\n# GitHub Issue Details\n- Issue Number: 5\n- Title: Chore: fix minor typo in README wording\n- Description:\n## Problem\n\nThe README contains wording that could be made clearer for contributors reviewing this Superset fork.\n\n## Why it matters\n\nSmall documentation improvements reduce confusion and make the repository easier to understand during review.\n\n## Scope\n\nReview the README and fix one small typo, awkward phrase, or unclear sentence.\n\nKeep the change documentation-only and focused.\n\n## Acceptance criteria\n\n- Identify one small typo, awkward phrase, or unclear sentence in the README.\n- Make a concise wording improvement.\n- Do not rewrite large sections of the README.\n- Do not modify application code.\n- Open a pull request with a clear summary.\n- Comment on this issue with the PR link and validation result.\n\n## Validation\n\nThis is documentation-only. Automated validation is not required, but the PR should state that the README was reviewed for clarity.\n- Issue URL: https://github.com/emillaurence/superset/issues/5\n\n# Labels and Risk Labels\n- All Labels: devin-remediate, risk:quality\n- Risk Labels: risk:quality\n\n# Task Classification\n- Work Type: Quality remediation\n- Guidance: Focus on code quality, maintainability, tests, linting, static analysis, or small cleanup. Preserve existing behavior and avoid broad refactors.\n\n# Scope Boundaries\n- Make the smallest safe change that addresses the issue.\n- Treat this as one isolated remediation slice.\n- Do not perform broad refactors.\n- Do not fix unrelated issues.\n- Do not update unrelated dependencies.\n- Do not change public behavior unless required by the issue.\n- Prefer a focused one-file or small multi-file change.\n- Follow existing repository style, conventions, and patterns.\n- Avoid speculative improvements.\n\n# Execution Plan\n1. Read the GitHub Issue carefully.\n2. Inspect only the relevant parts of the repository.\n3. Identify the smallest safe remediation.\n4. Implement the change on a branch.\n5. Run the smallest relevant validation where practical.\n6. Open a pull request against the target repository.\n7. Comment on the GitHub Issue with the PR URL, remediation summary, and validation result.\n8. Stop after opening the PR and commenting on the issue.\n\n# Validation Guidance\n- If Python code changes, run the most targeted available test, lint, or type check where practical.\n- If frontend code changes, run the most targeted test, lint, type check, or build check where practical.\n- If dependency or security files change, run package manager, lockfile, dependency, test, or build validation where practical.\n- If documentation-only changes are made, state that automated validation is not applicable.\n- If validation cannot be run due to environment or time constraints, explain why in the PR and issue comment.\n\n# Pull Request Requirements\nThe PR description must include:\n- Linked GitHub Issue\n- Summary of the change\n- Files changed\n- Validation performed\n- Risks, residual risk, or follow-up required\n\n# GitHub Issue Comment Requirements\nAfter opening the PR, comment on the original GitHub Issue with:\n- PR URL\n- Summary of remediation\n- Validation result\n- Final status: ready for human review\n\n# Blocker Handling\nIf you cannot safely create a PR, you must comment on the GitHub Issue with:\n- Blocker encountered\n- Steps attempted\n- Information, access, or decision needed\n- Recommended next action\n\n# Stop Condition\n- Stop after opening the pull request and commenting on the GitHub Issue.\n- Do not merge the pull request.\n- Human review remains the merge gate.\n\nBegin your work now.\n",
+    "devin_response": {
+      "session_id": "c99ac71995ad404a9866c3e9fcab897f",
+      "url": "https://app.devin.ai/sessions/c99ac71995ad404a9866c3e9fcab897f",
+      "status": "new",
+      "title": "Remediate superset issue #5",
+      "tags": [
+        "devin-remediate",
+        "risk:quality",
+        "agent:devin-rs"
+      ],
+      "playbook_id": "playbook-b0b350bb71da4957b416c8360bbb5baa",
+      "user_id": "bot_apk",
+      "org_id": "org-bdcb6702eb2143c5a65d85c939b52b4a",
+      "created_at": 1780903564,
+      "updated_at": 1780903564,
+      "is_archived": false,
+      "acus_consumed": 0.0,
+      "pull_requests": [],
+      "parent_session_id": null,
+      "child_session_ids": null,
+      "service_user_id": "service-user-630e5ca4d5d5414cbd6a3ecace9c83e7",
+      "category": null,
+      "subcategory": null,
+      "origin": "api",
+      "structured_output": null,
+      "status_detail": null
+    },
+    "error_message": null,
+    "pull_request_url": "https://github.com/emillaurence/superset/pull/6",
+    "devin_session_url": "https://app.devin.ai/sessions/c99ac71995ad404a9866c3e9fcab897f",
+    "playbook_id": "playbook-b0b350bb71da4957b416c8360bbb5baa",
+    "playbook_type": "quality"
+  },
+  {
+    "session_id": "2ddc55a93b414285b20c9b841e4bd3d5",
+    "issue": {
+      "owner": "emillaurence",
+      "repo": "superset",
+      "number": 8,
+      "title": "Add baseline security headers to the Docker NGINX reverse proxy",
+      "body": "# Add baseline security headers to the Docker NGINX reverse proxy\n\n## Type\nSecurity / Hardening\n\n## Priority\nMedium\n\n## Summary\nThe Docker NGINX reverse proxy configuration does not define common defensive HTTP response headers. Adding baseline headers would improve the default security posture for local demos, development, and proof of concept environments.\n\n## Context\nThe Docker NGINX configuration proxies Superset traffic, but does not appear to set common security headers such as:\n\n- `X-Content-Type-Options`\n- `Referrer-Policy`\n- `X-Frame-Options`\n- `Permissions-Policy`\n\n## Why this matters\nAlthough this configuration is primarily used for local development, Docker based setups are often reused for demos, testing, and customer proof of concepts.\n\nAdding conservative security headers reduces accidental exposure and improves security hygiene without materially changing application behavior.\n\n## Suggested remediation\nAdd baseline security headers to the NGINX server configuration.\n\nExample:\n\n```nginx\nadd_header X-Content-Type-Options \"nosniff\" always;\nadd_header Referrer-Policy \"strict-origin-when-cross-origin\" always;\nadd_header X-Frame-Options \"SAMEORIGIN\" always;\nadd_header Permissions-Policy \"geolocation=(), microphone=(), camera=()\" always;\n```\n\nDo not introduce a strict Content Security Policy unless it is fully tested against the Superset frontend.\n\n## Acceptance criteria\n- [ ] NGINX responses include `X-Content-Type-Options: nosniff`\n- [ ] NGINX responses include a conservative `Referrer-Policy`\n- [ ] NGINX responses include `X-Frame-Options: SAMEORIGIN`\n- [ ] NGINX responses include a conservative `Permissions-Policy`\n- [ ] Superset UI still loads correctly through the Docker NGINX proxy\n- [ ] No restrictive CSP is added unless separately tested\n\n## Suggested validation\nRun Superset through Docker and check response headers:\n\n```bash\ncurl -I http://localhost\n```\n\nExpected result: the configured security headers are present in the response.",
+      "url": "https://github.com/emillaurence/superset/issues/8",
+      "labels": [
+        {
+          "name": "devin-remediate",
+          "color": "5319E7"
+        },
+        {
+          "name": "risk:security",
+          "color": "D73A4A"
+        }
+      ]
+    },
+    "risk_labels": [
+      "risk:security"
+    ],
+    "status": "completed",
+    "created_at": "2026-06-09T00:36:39.893979",
+    "completed_at": "2026-06-09T00:59:21.895569",
+    "needs_review_at": "2026-06-09 00:39:11.476366",
+    "pr_detected_at": "2026-06-09 00:39:11.476371",
+    "prompt": "# Role and Objective\nYou are an autonomous software engineering agent tasked with remediating a GitHub issue. Your objective is to produce a small, isolated, independently reviewable remediation that addresses the issue.\n\n# Selected Playbook Context\nUse the selected organization security remediation playbook as the general procedure.\nThe playbook provides the general workflow. The GitHub Issue below is the source of truth for this specific remediation.\n\n# Target Repository\n- Owner: emillaurence\n- Repository: superset\n- GitHub URL: https://github.com/emillaurence/superset\n\n# GitHub Issue Details\n- Issue Number: 8\n- Title: Add baseline security headers to the Docker NGINX reverse proxy\n- Description:\n# Add baseline security headers to the Docker NGINX reverse proxy\n\n## Type\nSecurity / Hardening\n\n## Priority\nMedium\n\n## Summary\nThe Docker NGINX reverse proxy configuration does not define common defensive HTTP response headers. Adding baseline headers would improve the default security posture for local demos, development, and proof of concept environments.\n\n## Context\nThe Docker NGINX configuration proxies Superset traffic, but does not appear to set common security headers such as:\n\n- `X-Content-Type-Options`\n- `Referrer-Policy`\n- `X-Frame-Options`\n- `Permissions-Policy`\n\n## Why this matters\nAlthough this configuration is primarily used for local development, Docker based setups are often reused for demos, testing, and customer proof of concepts.\n\nAdding conservative security headers reduces accidental exposure and improves security hygiene without materially changing application behavior.\n\n## Suggested remediation\nAdd baseline security headers to the NGINX server configuration.\n\nExample:\n\n```nginx\nadd_header X-Content-Type-Options \"nosniff\" always;\nadd_header Referrer-Policy \"strict-origin-when-cross-origin\" always;\nadd_header X-Frame-Options \"SAMEORIGIN\" always;\nadd_header Permissions-Policy \"geolocation=(), microphone=(), camera=()\" always;\n```\n\nDo not introduce a strict Content Security Policy unless it is fully tested against the Superset frontend.\n\n## Acceptance criteria\n- [ ] NGINX responses include `X-Content-Type-Options: nosniff`\n- [ ] NGINX responses include a conservative `Referrer-Policy`\n- [ ] NGINX responses include `X-Frame-Options: SAMEORIGIN`\n- [ ] NGINX responses include a conservative `Permissions-Policy`\n- [ ] Superset UI still loads correctly through the Docker NGINX proxy\n- [ ] No restrictive CSP is added unless separately tested\n\n## Suggested validation\nRun Superset through Docker and check response headers:\n\n```bash\ncurl -I http://localhost\n```\n\nExpected result: the configured security headers are present in the response.\n- Issue URL: https://github.com/emillaurence/superset/issues/8\n\n# Labels and Risk Labels\n- All Labels: devin-remediate, risk:security\n- Risk Labels: risk:security\n\n# Task Classification\n- Work Type: Security remediation\n- Guidance: Focus on the security concern described in the issue. Prefer the smallest safe remediation, avoid broad dependency upgrades, and clearly document security impact and residual risk.\n\n# Scope Boundaries\n- Make the smallest safe change that addresses the issue.\n- Treat this as one isolated remediation slice.\n- Do not perform broad refactors.\n- Do not fix unrelated issues.\n- Do not update unrelated dependencies.\n- Do not change public behavior unless required by the issue.\n- Prefer a focused one-file or small multi-file change.\n- Follow existing repository style, conventions, and patterns.\n- Avoid speculative improvements.\n\n# Execution Plan\n1. Read the GitHub Issue carefully.\n2. Inspect only the relevant parts of the repository.\n3. Identify the smallest safe remediation.\n4. Implement the change on a branch.\n5. Run the smallest relevant validation where practical.\n6. Open a pull request against the target repository.\n7. Comment on the GitHub Issue with the PR URL, remediation summary, and validation result.\n8. Stop after opening the PR and commenting on the issue.\n\n# Validation Guidance\n- If Python code changes, run the most targeted available test, lint, or type check where practical.\n- If frontend code changes, run the most targeted test, lint, type check, or build check where practical.\n- If dependency or security files change, run package manager, lockfile, dependency, test, or build validation where practical.\n- If documentation-only changes are made, state that automated validation is not applicable.\n- If validation cannot be run due to environment or time constraints, explain why in the PR and issue comment.\n\n# Pull Request Requirements\nThe PR description must include:\n- Linked GitHub Issue\n- Summary of the change\n- Files changed\n- Validation performed\n- Risks, residual risk, or follow-up required\n\n# GitHub Issue Comment Requirements\nAfter opening the PR, comment on the original GitHub Issue with:\n- PR URL\n- Summary of remediation\n- Validation result\n- Final status: ready for human review\n\n# Blocker Handling\nIf you cannot safely create a PR, you must comment on the GitHub Issue with:\n- Blocker encountered\n- Steps attempted\n- Information, access, or decision needed\n- Recommended next action\n\n# Stop Condition\n- Stop after opening the pull request and commenting on the GitHub Issue.\n- Do not merge the pull request.\n- Human review remains the merge gate.\n\nBegin your work now.\n",
+    "devin_response": {
+      "session_id": "2ddc55a93b414285b20c9b841e4bd3d5",
+      "url": "https://app.devin.ai/sessions/2ddc55a93b414285b20c9b841e4bd3d5",
+      "status": "new",
+      "title": "Remediate superset issue #8",
+      "tags": [
+        "devin-remediate",
+        "risk:security",
+        "agent:devin-rs"
+      ],
+      "playbook_id": "playbook-f3d5e50a33b14d1a94558e61ee86956d",
+      "user_id": "bot_apk",
+      "org_id": "org-bdcb6702eb2143c5a65d85c939b52b4a",
+      "created_at": 1780965399,
+      "updated_at": 1780965399,
+      "is_archived": false,
+      "acus_consumed": 0.0,
+      "pull_requests": [],
+      "parent_session_id": null,
+      "child_session_ids": null,
+      "service_user_id": "service-user-630e5ca4d5d5414cbd6a3ecace9c83e7",
+      "category": null,
+      "subcategory": null,
+      "origin": "api",
+      "structured_output": null,
+      "status_detail": null
+    },
+    "error_message": null,
+    "pull_request_url": "https://github.com/emillaurence/superset/pull/9",
+    "devin_session_url": "https://app.devin.ai/sessions/2ddc55a93b414285b20c9b841e4bd3d5",
+    "playbook_id": "playbook-f3d5e50a33b14d1a94558e61ee86956d",
+    "playbook_type": "security"
+  },
+  {
+    "session_id": "1b46df5f11334016bd9a7e71de8fca20",
+    "issue": {
+      "owner": "emillaurence",
+      "repo": "superset",
+      "number": 10,
+      "title": "Make streaming CSV export chunk size configurable",
+      "body": "# Make streaming CSV export chunk size configurable\n\n## Type\nQuality / Maintainability\n\n## Priority\nMedium\n\n## Verified in repo\nThe streaming CSV export chunk size is hardcoded to `1024` in:\n\n- `superset/charts/data/api.py`\n- `superset/sqllab/api.py`\n\nBoth locations create streaming CSV export commands using a fixed chunk size.\n\n## Summary\nStreaming CSV exports currently use a hardcoded chunk size. This should be configurable so operators can tune export behavior for different deployment sizes and workloads.\n\n## Why this matters\nA fixed chunk size may not be suitable for all deployments. Smaller environments may prefer smaller chunks to reduce memory pressure, while larger environments may prefer larger chunks to improve throughput.\n\nMaking this configurable improves operational flexibility while preserving the existing default behavior.\n\n## Suggested remediation\nAdd a Superset config value such as:\n\n```python\nCSV_EXPORT_CHUNK_SIZE = 1024\n```\n\nThen replace hardcoded usage like:\n\n```python\nchunk_size = 1024\n```\n\nwith config-driven logic, for example:\n\n```python\nchunk_size = app.config.get(\"CSV_EXPORT_CHUNK_SIZE\", 1024)\n```\n\nThe implementation should safely fall back to `1024` if the configured value is missing, invalid, or non-positive.\n\n## Acceptance criteria\n- [ ] `superset/charts/data/api.py` uses a config-driven CSV export chunk size\n- [ ] `superset/sqllab/api.py` uses a config-driven CSV export chunk size\n- [ ] Default behavior remains `1024`\n- [ ] Invalid or non-positive config values fall back safely to `1024`\n- [ ] Tests cover default, custom, and invalid chunk size behavior\n\n## Suggested validation\nRun the relevant backend tests for chart export and SQL Lab export.\n\nSuggested test areas:\n\n```bash\npytest tests/unit_tests/commands/chart/streaming_export_command_test.py\npytest tests/unit_tests/commands/sql_lab/streaming_export_command_test.py\npytest tests/unit_tests/sqllab/api_test.py\n```",
+      "url": "https://github.com/emillaurence/superset/issues/10",
+      "labels": [
+        {
+          "name": "devin-remediate",
+          "color": "5319E7"
+        },
+        {
+          "name": "risk:quality",
+          "color": "FBCA04"
+        }
+      ]
+    },
+    "risk_labels": [
+      "risk:quality"
+    ],
+    "status": "needs_human_review",
+    "created_at": "2026-06-09T00:44:59.507783",
+    "completed_at": null,
+    "needs_review_at": "2026-06-09 00:52:44.259496",
+    "pr_detected_at": "2026-06-09 00:52:44.259500",
+    "prompt": "# Role and Objective\nYou are an autonomous software engineering agent tasked with remediating a GitHub issue. Your objective is to produce a small, isolated, independently reviewable remediation that addresses the issue.\n\n# Selected Playbook Context\nUse the selected organization quality remediation playbook as the general procedure.\nThe playbook provides the general workflow. The GitHub Issue below is the source of truth for this specific remediation.\n\n# Target Repository\n- Owner: emillaurence\n- Repository: superset\n- GitHub URL: https://github.com/emillaurence/superset\n\n# GitHub Issue Details\n- Issue Number: 10\n- Title: Make streaming CSV export chunk size configurable\n- Description:\n# Make streaming CSV export chunk size configurable\n\n## Type\nQuality / Maintainability\n\n## Priority\nMedium\n\n## Verified in repo\nThe streaming CSV export chunk size is hardcoded to `1024` in:\n\n- `superset/charts/data/api.py`\n- `superset/sqllab/api.py`\n\nBoth locations create streaming CSV export commands using a fixed chunk size.\n\n## Summary\nStreaming CSV exports currently use a hardcoded chunk size. This should be configurable so operators can tune export behavior for different deployment sizes and workloads.\n\n## Why this matters\nA fixed chunk size may not be suitable for all deployments. Smaller environments may prefer smaller chunks to reduce memory pressure, while larger environments may prefer larger chunks to improve throughput.\n\nMaking this configurable improves operational flexibility while preserving the existing default behavior.\n\n## Suggested remediation\nAdd a Superset config value such as:\n\n```python\nCSV_EXPORT_CHUNK_SIZE = 1024\n```\n\nThen replace hardcoded usage like:\n\n```python\nchunk_size = 1024\n```\n\nwith config-driven logic, for example:\n\n```python\nchunk_size = app.config.get(\"CSV_EXPORT_CHUNK_SIZE\", 1024)\n```\n\nThe implementation should safely fall back to `1024` if the configured value is missing, invalid, or non-positive.\n\n## Acceptance criteria\n- [ ] `superset/charts/data/api.py` uses a config-driven CSV export chunk size\n- [ ] `superset/sqllab/api.py` uses a config-driven CSV export chunk size\n- [ ] Default behavior remains `1024`\n- [ ] Invalid or non-positive config values fall back safely to `1024`\n- [ ] Tests cover default, custom, and invalid chunk size behavior\n\n## Suggested validation\nRun the relevant backend tests for chart export and SQL Lab export.\n\nSuggested test areas:\n\n```bash\npytest tests/unit_tests/commands/chart/streaming_export_command_test.py\npytest tests/unit_tests/commands/sql_lab/streaming_export_command_test.py\npytest tests/unit_tests/sqllab/api_test.py\n```\n- Issue URL: https://github.com/emillaurence/superset/issues/10\n\n# Labels and Risk Labels\n- All Labels: devin-remediate, risk:quality\n- Risk Labels: risk:quality\n\n# Task Classification\n- Work Type: Quality remediation\n- Guidance: Focus on code quality, maintainability, tests, linting, static analysis, or small cleanup. Preserve existing behavior and avoid broad refactors.\n\n# Scope Boundaries\n- Make the smallest safe change that addresses the issue.\n- Treat this as one isolated remediation slice.\n- Do not perform broad refactors.\n- Do not fix unrelated issues.\n- Do not update unrelated dependencies.\n- Do not change public behavior unless required by the issue.\n- Prefer a focused one-file or small multi-file change.\n- Follow existing repository style, conventions, and patterns.\n- Avoid speculative improvements.\n\n# Execution Plan\n1. Read the GitHub Issue carefully.\n2. Inspect only the relevant parts of the repository.\n3. Identify the smallest safe remediation.\n4. Implement the change on a branch.\n5. Run the smallest relevant validation where practical.\n6. Open a pull request against the target repository.\n7. Comment on the GitHub Issue with the PR URL, remediation summary, and validation result.\n8. Stop after opening the PR and commenting on the issue.\n\n# Validation Guidance\n- If Python code changes, run the most targeted available test, lint, or type check where practical.\n- If frontend code changes, run the most targeted test, lint, type check, or build check where practical.\n- If dependency or security files change, run package manager, lockfile, dependency, test, or build validation where practical.\n- If documentation-only changes are made, state that automated validation is not applicable.\n- If validation cannot be run due to environment or time constraints, explain why in the PR and issue comment.\n\n# Pull Request Requirements\nThe PR description must include:\n- Linked GitHub Issue\n- Summary of the change\n- Files changed\n- Validation performed\n- Risks, residual risk, or follow-up required\n\n# GitHub Issue Comment Requirements\nAfter opening the PR, comment on the original GitHub Issue with:\n- PR URL\n- Summary of remediation\n- Validation result\n- Final status: ready for human review\n\n# Blocker Handling\nIf you cannot safely create a PR, you must comment on the GitHub Issue with:\n- Blocker encountered\n- Steps attempted\n- Information, access, or decision needed\n- Recommended next action\n\n# Stop Condition\n- Stop after opening the pull request and commenting on the GitHub Issue.\n- Do not merge the pull request.\n- Human review remains the merge gate.\n\nBegin your work now.\n",
+    "devin_response": {
+      "session_id": "1b46df5f11334016bd9a7e71de8fca20",
+      "url": "https://app.devin.ai/sessions/1b46df5f11334016bd9a7e71de8fca20",
+      "status": "new",
+      "title": "Remediate superset issue #10",
+      "tags": [
+        "devin-remediate",
+        "risk:quality",
+        "agent:devin-rs"
+      ],
+      "playbook_id": "playbook-b0b350bb71da4957b416c8360bbb5baa",
+      "user_id": "bot_apk",
+      "org_id": "org-bdcb6702eb2143c5a65d85c939b52b4a",
+      "created_at": 1780965899,
+      "updated_at": 1780965899,
+      "is_archived": false,
+      "acus_consumed": 0.0,
+      "pull_requests": [],
+      "parent_session_id": null,
+      "child_session_ids": null,
+      "service_user_id": "service-user-630e5ca4d5d5414cbd6a3ecace9c83e7",
+      "category": null,
+      "subcategory": null,
+      "origin": "api",
+      "structured_output": null,
+      "status_detail": null
+    },
+    "error_message": null,
+    "pull_request_url": "https://github.com/emillaurence/superset/pull/13",
+    "devin_session_url": "https://app.devin.ai/sessions/1b46df5f11334016bd9a7e71de8fca20",
+    "playbook_id": "playbook-b0b350bb71da4957b416c8360bbb5baa",
+    "playbook_type": "quality"
+  },
+  {
+    "session_id": "dfd95fc47e954aea8c4f6ad06f671d72",
+    "issue": {
+      "owner": "emillaurence",
+      "repo": "superset",
+      "number": 11,
+      "title": "Bind Docker-exposed Superset services to localhost by default",
+      "body": "# Bind Docker-exposed Superset services to localhost by default\n\n## Type\nSecurity / Network Exposure\n\n## Priority\nMedium\n\n## Verified in repo\nIn `docker-compose.yml`, some services are already bound to localhost:\n\n```yaml\n127.0.0.1:${REDIS_PORT:-6379}:6379\n127.0.0.1:${DATABASE_PORT:-5432}:5432\n```\n\nHowever, these services expose ports without an explicit localhost binding:\n\n```yaml\n${NGINX_PORT:-80}:80\n${SUPERSET_PORT:-8088}:8088\n${CYPRESS_PORT:-8081}:8081\n${WEBSOCKET_PORT:-8080}:8080\n```\n\n## Summary\nDocker Compose should bind local development ports to `127.0.0.1` by default to reduce accidental network exposure.\n\n## Why this matters\nThe Docker setup is intended for development, demos, and local testing. Services should default to the least exposed network posture.\n\nWithout an explicit localhost binding, Docker may expose these services on all network interfaces depending on host configuration. This can make Superset reachable from other machines on the same network.\n\n## Suggested remediation\nUpdate default port bindings to use `127.0.0.1`.\n\nExample:\n\n```yaml\nports:\n  - \"127.0.0.1:${NGINX_PORT:-80}:80\"\n```\n\nApply the same pattern to Superset app, Cypress, and websocket ports where appropriate.\n\nIf external access is needed for demos or remote testing, document how to override the binding intentionally.\n\n## Acceptance criteria\n- [ ] NGINX port binds to `127.0.0.1` by default\n- [ ] Superset app port binds to `127.0.0.1` by default\n- [ ] Cypress port binds to `127.0.0.1` by default\n- [ ] Websocket port binds to `127.0.0.1` by default\n- [ ] Redis and Postgres behavior remains unchanged\n- [ ] Docker Compose config validates successfully\n- [ ] Documentation or comments explain how to intentionally expose services externally\n\n## Suggested validation\nRun:\n\n```bash\ndocker compose config\n```\n\nExpected result: rendered port bindings show `127.0.0.1` for local development services.",
+      "url": "https://github.com/emillaurence/superset/issues/11",
+      "labels": [
+        {
+          "name": "devin-remediate",
+          "color": "5319E7"
+        },
+        {
+          "name": "risk:security",
+          "color": "D73A4A"
+        }
+      ]
+    },
+    "risk_labels": [
+      "risk:security"
+    ],
+    "status": "completed",
+    "created_at": "2026-06-09T00:45:32.129695",
+    "completed_at": "2026-06-09T00:59:36.214592",
+    "needs_review_at": "2026-06-09 00:48:14.624274",
+    "pr_detected_at": "2026-06-09 00:48:14.624277",
+    "prompt": "# Role and Objective\nYou are an autonomous software engineering agent tasked with remediating a GitHub issue. Your objective is to produce a small, isolated, independently reviewable remediation that addresses the issue.\n\n# Selected Playbook Context\nUse the selected organization security remediation playbook as the general procedure.\nThe playbook provides the general workflow. The GitHub Issue below is the source of truth for this specific remediation.\n\n# Target Repository\n- Owner: emillaurence\n- Repository: superset\n- GitHub URL: https://github.com/emillaurence/superset\n\n# GitHub Issue Details\n- Issue Number: 11\n- Title: Bind Docker-exposed Superset services to localhost by default\n- Description:\n# Bind Docker-exposed Superset services to localhost by default\n\n## Type\nSecurity / Network Exposure\n\n## Priority\nMedium\n\n## Verified in repo\nIn `docker-compose.yml`, some services are already bound to localhost:\n\n```yaml\n127.0.0.1:${REDIS_PORT:-6379}:6379\n127.0.0.1:${DATABASE_PORT:-5432}:5432\n```\n\nHowever, these services expose ports without an explicit localhost binding:\n\n```yaml\n${NGINX_PORT:-80}:80\n${SUPERSET_PORT:-8088}:8088\n${CYPRESS_PORT:-8081}:8081\n${WEBSOCKET_PORT:-8080}:8080\n```\n\n## Summary\nDocker Compose should bind local development ports to `127.0.0.1` by default to reduce accidental network exposure.\n\n## Why this matters\nThe Docker setup is intended for development, demos, and local testing. Services should default to the least exposed network posture.\n\nWithout an explicit localhost binding, Docker may expose these services on all network interfaces depending on host configuration. This can make Superset reachable from other machines on the same network.\n\n## Suggested remediation\nUpdate default port bindings to use `127.0.0.1`.\n\nExample:\n\n```yaml\nports:\n  - \"127.0.0.1:${NGINX_PORT:-80}:80\"\n```\n\nApply the same pattern to Superset app, Cypress, and websocket ports where appropriate.\n\nIf external access is needed for demos or remote testing, document how to override the binding intentionally.\n\n## Acceptance criteria\n- [ ] NGINX port binds to `127.0.0.1` by default\n- [ ] Superset app port binds to `127.0.0.1` by default\n- [ ] Cypress port binds to `127.0.0.1` by default\n- [ ] Websocket port binds to `127.0.0.1` by default\n- [ ] Redis and Postgres behavior remains unchanged\n- [ ] Docker Compose config validates successfully\n- [ ] Documentation or comments explain how to intentionally expose services externally\n\n## Suggested validation\nRun:\n\n```bash\ndocker compose config\n```\n\nExpected result: rendered port bindings show `127.0.0.1` for local development services.\n- Issue URL: https://github.com/emillaurence/superset/issues/11\n\n# Labels and Risk Labels\n- All Labels: devin-remediate, risk:security\n- Risk Labels: risk:security\n\n# Task Classification\n- Work Type: Security remediation\n- Guidance: Focus on the security concern described in the issue. Prefer the smallest safe remediation, avoid broad dependency upgrades, and clearly document security impact and residual risk.\n\n# Scope Boundaries\n- Make the smallest safe change that addresses the issue.\n- Treat this as one isolated remediation slice.\n- Do not perform broad refactors.\n- Do not fix unrelated issues.\n- Do not update unrelated dependencies.\n- Do not change public behavior unless required by the issue.\n- Prefer a focused one-file or small multi-file change.\n- Follow existing repository style, conventions, and patterns.\n- Avoid speculative improvements.\n\n# Execution Plan\n1. Read the GitHub Issue carefully.\n2. Inspect only the relevant parts of the repository.\n3. Identify the smallest safe remediation.\n4. Implement the change on a branch.\n5. Run the smallest relevant validation where practical.\n6. Open a pull request against the target repository.\n7. Comment on the GitHub Issue with the PR URL, remediation summary, and validation result.\n8. Stop after opening the PR and commenting on the issue.\n\n# Validation Guidance\n- If Python code changes, run the most targeted available test, lint, or type check where practical.\n- If frontend code changes, run the most targeted test, lint, type check, or build check where practical.\n- If dependency or security files change, run package manager, lockfile, dependency, test, or build validation where practical.\n- If documentation-only changes are made, state that automated validation is not applicable.\n- If validation cannot be run due to environment or time constraints, explain why in the PR and issue comment.\n\n# Pull Request Requirements\nThe PR description must include:\n- Linked GitHub Issue\n- Summary of the change\n- Files changed\n- Validation performed\n- Risks, residual risk, or follow-up required\n\n# GitHub Issue Comment Requirements\nAfter opening the PR, comment on the original GitHub Issue with:\n- PR URL\n- Summary of remediation\n- Validation result\n- Final status: ready for human review\n\n# Blocker Handling\nIf you cannot safely create a PR, you must comment on the GitHub Issue with:\n- Blocker encountered\n- Steps attempted\n- Information, access, or decision needed\n- Recommended next action\n\n# Stop Condition\n- Stop after opening the pull request and commenting on the GitHub Issue.\n- Do not merge the pull request.\n- Human review remains the merge gate.\n\nBegin your work now.\n",
+    "devin_response": {
+      "session_id": "dfd95fc47e954aea8c4f6ad06f671d72",
+      "url": "https://app.devin.ai/sessions/dfd95fc47e954aea8c4f6ad06f671d72",
+      "status": "new",
+      "title": "Remediate superset issue #11",
+      "tags": [
+        "devin-remediate",
+        "risk:security",
+        "agent:devin-rs"
+      ],
+      "playbook_id": "playbook-f3d5e50a33b14d1a94558e61ee86956d",
+      "user_id": "bot_apk",
+      "org_id": "org-bdcb6702eb2143c5a65d85c939b52b4a",
+      "created_at": 1780965932,
+      "updated_at": 1780965932,
+      "is_archived": false,
+      "acus_consumed": 0.0,
+      "pull_requests": [],
+      "parent_session_id": null,
+      "child_session_ids": null,
+      "service_user_id": "service-user-630e5ca4d5d5414cbd6a3ecace9c83e7",
+      "category": null,
+      "subcategory": null,
+      "origin": "api",
+      "structured_output": null,
+      "status_detail": null
+    },
+    "error_message": null,
+    "pull_request_url": "https://github.com/emillaurence/superset/pull/12",
+    "devin_session_url": "https://app.devin.ai/sessions/dfd95fc47e954aea8c4f6ad06f671d72",
+    "playbook_id": "playbook-f3d5e50a33b14d1a94558e61ee86956d",
+    "playbook_type": "security"
+  },
+  {
+    "session_id": "8fd40bae0d6d47aca66e72d39ecabafe",
+    "issue": {
+      "owner": "emillaurence",
+      "repo": "superset",
+      "number": 14,
+      "title": "Remove unused POC-only dashboard ExampleComponent",
+      "body": "# Remove unused POC-only dashboard ExampleComponent\n\n## Type\nQuality / Code Cleanup\n\n## Priority\nLow\n\n## Verified in repo\nThe repo contains a POC-only dashboard component under:\n\n- `superset-frontend/src/visualizations/dashboardComponents/ExampleComponent/ExampleComponent.tsx`\n- `superset-frontend/src/visualizations/dashboardComponents/ExampleComponent/index.ts`\n\nBoth files include comments saying the component is POC-only and can be removed after PR approval.\n\nThe component is not registered in:\n\n- `superset-frontend/src/visualizations/presets/dashboardComponents.ts`\n\nIt is only referenced in commented example code in:\n\n- `superset-frontend/src/setup/setupDashboardComponents.ts`\n\n## Summary\nA POC-only dashboard component remains in the frontend codebase even though it is not registered or used. It should be removed to reduce dead code and avoid confusion for contributors.\n\n## Why this matters\nLeaving unused POC code in the main codebase creates noise and makes it harder for contributors to understand which dashboard component patterns are production-ready.\n\nThis is a small cleanup that improves maintainability without changing runtime behavior.\n\n## Suggested remediation\nRemove the unused `ExampleComponent` files and update the setup comments so they do not point to a deleted example component.\n\nPossible changes:\n- Delete `superset-frontend/src/visualizations/dashboardComponents/ExampleComponent/ExampleComponent.tsx`\n- Delete `superset-frontend/src/visualizations/dashboardComponents/ExampleComponent/index.ts`\n- Update or simplify the commented example in `superset-frontend/src/setup/setupDashboardComponents.ts`\n\n## Acceptance criteria\n- [ ] POC-only `ExampleComponent` files are removed\n- [ ] No active imports reference `ExampleComponent`\n- [ ] Setup comments no longer point to deleted files\n- [ ] Frontend typecheck or lint passes\n\n## Suggested validation\nRun:\n\n```bash\ncd superset-frontend\nnpm run type\nnpm run lint\n```",
+      "url": "https://github.com/emillaurence/superset/issues/14",
+      "labels": [
+        {
+          "name": "devin-remediate",
+          "color": "5319E7"
+        },
+        {
+          "name": "risk:quality",
+          "color": "FBCA04"
+        }
+      ]
+    },
+    "risk_labels": [
+      "risk:quality"
+    ],
+    "status": "completed",
+    "created_at": "2026-06-09T00:54:42.166070",
+    "completed_at": "2026-06-09T01:02:09.550203",
+    "needs_review_at": "2026-06-09 00:58:14.117381",
+    "pr_detected_at": "2026-06-09 00:58:14.117385",
+    "prompt": "# Role and Objective\nYou are an autonomous software engineering agent tasked with remediating a GitHub issue. Your objective is to produce a small, isolated, independently reviewable remediation that addresses the issue.\n\n# Selected Playbook Context\nUse the selected organization quality remediation playbook as the general procedure.\nThe playbook provides the general workflow. The GitHub Issue below is the source of truth for this specific remediation.\n\n# Target Repository\n- Owner: emillaurence\n- Repository: superset\n- GitHub URL: https://github.com/emillaurence/superset\n\n# GitHub Issue Details\n- Issue Number: 14\n- Title: Remove unused POC-only dashboard ExampleComponent\n- Description:\n# Remove unused POC-only dashboard ExampleComponent\n\n## Type\nQuality / Code Cleanup\n\n## Priority\nLow\n\n## Verified in repo\nThe repo contains a POC-only dashboard component under:\n\n- `superset-frontend/src/visualizations/dashboardComponents/ExampleComponent/ExampleComponent.tsx`\n- `superset-frontend/src/visualizations/dashboardComponents/ExampleComponent/index.ts`\n\nBoth files include comments saying the component is POC-only and can be removed after PR approval.\n\nThe component is not registered in:\n\n- `superset-frontend/src/visualizations/presets/dashboardComponents.ts`\n\nIt is only referenced in commented example code in:\n\n- `superset-frontend/src/setup/setupDashboardComponents.ts`\n\n## Summary\nA POC-only dashboard component remains in the frontend codebase even though it is not registered or used. It should be removed to reduce dead code and avoid confusion for contributors.\n\n## Why this matters\nLeaving unused POC code in the main codebase creates noise and makes it harder for contributors to understand which dashboard component patterns are production-ready.\n\nThis is a small cleanup that improves maintainability without changing runtime behavior.\n\n## Suggested remediation\nRemove the unused `ExampleComponent` files and update the setup comments so they do not point to a deleted example component.\n\nPossible changes:\n- Delete `superset-frontend/src/visualizations/dashboardComponents/ExampleComponent/ExampleComponent.tsx`\n- Delete `superset-frontend/src/visualizations/dashboardComponents/ExampleComponent/index.ts`\n- Update or simplify the commented example in `superset-frontend/src/setup/setupDashboardComponents.ts`\n\n## Acceptance criteria\n- [ ] POC-only `ExampleComponent` files are removed\n- [ ] No active imports reference `ExampleComponent`\n- [ ] Setup comments no longer point to deleted files\n- [ ] Frontend typecheck or lint passes\n\n## Suggested validation\nRun:\n\n```bash\ncd superset-frontend\nnpm run type\nnpm run lint\n```\n- Issue URL: https://github.com/emillaurence/superset/issues/14\n\n# Labels and Risk Labels\n- All Labels: devin-remediate, risk:quality\n- Risk Labels: risk:quality\n\n# Task Classification\n- Work Type: Quality remediation\n- Guidance: Focus on code quality, maintainability, tests, linting, static analysis, or small cleanup. Preserve existing behavior and avoid broad refactors.\n\n# Scope Boundaries\n- Make the smallest safe change that addresses the issue.\n- Treat this as one isolated remediation slice.\n- Do not perform broad refactors.\n- Do not fix unrelated issues.\n- Do not update unrelated dependencies.\n- Do not change public behavior unless required by the issue.\n- Prefer a focused one-file or small multi-file change.\n- Follow existing repository style, conventions, and patterns.\n- Avoid speculative improvements.\n\n# Execution Plan\n1. Read the GitHub Issue carefully.\n2. Inspect only the relevant parts of the repository.\n3. Identify the smallest safe remediation.\n4. Implement the change on a branch.\n5. Run the smallest relevant validation where practical.\n6. Open a pull request against the target repository.\n7. Comment on the GitHub Issue with the PR URL, remediation summary, and validation result.\n8. Stop after opening the PR and commenting on the issue.\n\n# Validation Guidance\n- If Python code changes, run the most targeted available test, lint, or type check where practical.\n- If frontend code changes, run the most targeted test, lint, type check, or build check where practical.\n- If dependency or security files change, run package manager, lockfile, dependency, test, or build validation where practical.\n- If documentation-only changes are made, state that automated validation is not applicable.\n- If validation cannot be run due to environment or time constraints, explain why in the PR and issue comment.\n\n# Pull Request Requirements\nThe PR description must include:\n- Linked GitHub Issue\n- Summary of the change\n- Files changed\n- Validation performed\n- Risks, residual risk, or follow-up required\n\n# GitHub Issue Comment Requirements\nAfter opening the PR, comment on the original GitHub Issue with:\n- PR URL\n- Summary of remediation\n- Validation result\n- Final status: ready for human review\n\n# Blocker Handling\nIf you cannot safely create a PR, you must comment on the GitHub Issue with:\n- Blocker encountered\n- Steps attempted\n- Information, access, or decision needed\n- Recommended next action\n\n# Stop Condition\n- Stop after opening the pull request and commenting on the GitHub Issue.\n- Do not merge the pull request.\n- Human review remains the merge gate.\n\nBegin your work now.\n",
+    "devin_response": {
+      "session_id": "8fd40bae0d6d47aca66e72d39ecabafe",
+      "url": "https://app.devin.ai/sessions/8fd40bae0d6d47aca66e72d39ecabafe",
+      "status": "new",
+      "title": "Remediate superset issue #14",
+      "tags": [
+        "devin-remediate",
+        "risk:quality",
+        "agent:devin-rs"
+      ],
+      "playbook_id": "playbook-b0b350bb71da4957b416c8360bbb5baa",
+      "user_id": "bot_apk",
+      "org_id": "org-bdcb6702eb2143c5a65d85c939b52b4a",
+      "created_at": 1780966482,
+      "updated_at": 1780966482,
+      "is_archived": false,
+      "acus_consumed": 0.0,
+      "pull_requests": [],
+      "parent_session_id": null,
+      "child_session_ids": null,
+      "service_user_id": "service-user-630e5ca4d5d5414cbd6a3ecace9c83e7",
+      "category": null,
+      "subcategory": null,
+      "origin": "api",
+      "structured_output": null,
+      "status_detail": null
+    },
+    "error_message": null,
+    "pull_request_url": "https://github.com/emillaurence/superset/pull/17",
+    "devin_session_url": "https://app.devin.ai/sessions/8fd40bae0d6d47aca66e72d39ecabafe",
+    "playbook_id": "playbook-b0b350bb71da4957b416c8360bbb5baa",
+    "playbook_type": "quality"
+  },
+  {
+    "session_id": "0c0b8dff11394a1d84af85e527950621",
+    "issue": {
+      "owner": "emillaurence",
+      "repo": "superset",
+      "number": 15,
+      "title": "Treat Docker default SUPERSET_SECRET_KEY as an insecure default",
+      "body": "# Treat Docker default SUPERSET_SECRET_KEY as an insecure default\n\n## Type\nSecurity / Configuration Hardening\n\n## Priority\nHigh\n\n## Verified in repo\n`docker/.env` contains:\n\n```env\nSUPERSET_SECRET_KEY=TEST_NON_DEV_SECRET\n```\n\nSuperset startup validation currently checks for the built-in default secret key constant, but this Docker-specific value is different. That means the Docker default can bypass the existing insecure default secret check.\n\nRelevant files:\n- `docker/.env`\n- `superset/config.py`\n- `superset/constants.py`\n- `superset/initialization/__init__.py`\n\n## Summary\nThe Docker default `SUPERSET_SECRET_KEY` should be treated as an insecure default and should fail fast or warn loudly outside debug and test contexts.\n\n## Why this matters\nSuperset uses `SECRET_KEY` for security-sensitive application behavior. A predictable default secret weakens any environment that accidentally reuses the Docker `.env` value beyond local development.\n\nThe current value is clearly named as non-production, but relying on a comment is not enough. The application should actively detect it.\n\n## Suggested remediation\nAdd a constant for the Docker default secret, for example:\n\n```python\nTEST_NON_DEV_SECRET_KEY = \"TEST_NON_DEV_SECRET\"\n```\n\nThen update `check_secret_key()` in `superset/initialization/__init__.py` so it treats both values as insecure defaults:\n\n```python\nCHANGE_ME_TO_A_COMPLEX_RANDOM_SECRET\nTEST_NON_DEV_SECRET\n```\n\nBehavior should remain permissive for debug and testing, but production-like startup should fail or emit a clear warning.\n\n## Acceptance criteria\n- [ ] `TEST_NON_DEV_SECRET` is treated as an insecure default secret\n- [ ] Debug and test startup behavior remains developer-friendly\n- [ ] Non-debug, non-test startup refuses to start or clearly fails when this secret is used\n- [ ] Warning message explains how to generate a secure secret\n- [ ] Unit tests cover the Docker default secret path\n\n## Suggested validation\nAdd or update tests under:\n\n```bash\ntests/unit_tests/initialization/\n```\n\nSuggested test command:\n\n```bash\npytest tests/unit_tests/initialization/\n```",
+      "url": "https://github.com/emillaurence/superset/issues/15",
+      "labels": [
+        {
+          "name": "devin-remediate",
+          "color": "5319E7"
+        },
+        {
+          "name": "risk:security",
+          "color": "D73A4A"
+        }
+      ]
+    },
+    "risk_labels": [
+      "risk:security"
+    ],
+    "status": "needs_human_review",
+    "created_at": "2026-06-09T00:55:14.437650",
+    "completed_at": null,
+    "needs_review_at": "2026-06-09 00:59:25.860213",
+    "pr_detected_at": "2026-06-09 00:59:25.860216",
+    "prompt": "# Role and Objective\nYou are an autonomous software engineering agent tasked with remediating a GitHub issue. Your objective is to produce a small, isolated, independently reviewable remediation that addresses the issue.\n\n# Selected Playbook Context\nUse the selected organization security remediation playbook as the general procedure.\nThe playbook provides the general workflow. The GitHub Issue below is the source of truth for this specific remediation.\n\n# Target Repository\n- Owner: emillaurence\n- Repository: superset\n- GitHub URL: https://github.com/emillaurence/superset\n\n# GitHub Issue Details\n- Issue Number: 15\n- Title: Treat Docker default SUPERSET_SECRET_KEY as an insecure default\n- Description:\n# Treat Docker default SUPERSET_SECRET_KEY as an insecure default\n\n## Type\nSecurity / Configuration Hardening\n\n## Priority\nHigh\n\n## Verified in repo\n`docker/.env` contains:\n\n```env\nSUPERSET_SECRET_KEY=TEST_NON_DEV_SECRET\n```\n\nSuperset startup validation currently checks for the built-in default secret key constant, but this Docker-specific value is different. That means the Docker default can bypass the existing insecure default secret check.\n\nRelevant files:\n- `docker/.env`\n- `superset/config.py`\n- `superset/constants.py`\n- `superset/initialization/__init__.py`\n\n## Summary\nThe Docker default `SUPERSET_SECRET_KEY` should be treated as an insecure default and should fail fast or warn loudly outside debug and test contexts.\n\n## Why this matters\nSuperset uses `SECRET_KEY` for security-sensitive application behavior. A predictable default secret weakens any environment that accidentally reuses the Docker `.env` value beyond local development.\n\nThe current value is clearly named as non-production, but relying on a comment is not enough. The application should actively detect it.\n\n## Suggested remediation\nAdd a constant for the Docker default secret, for example:\n\n```python\nTEST_NON_DEV_SECRET_KEY = \"TEST_NON_DEV_SECRET\"\n```\n\nThen update `check_secret_key()` in `superset/initialization/__init__.py` so it treats both values as insecure defaults:\n\n```python\nCHANGE_ME_TO_A_COMPLEX_RANDOM_SECRET\nTEST_NON_DEV_SECRET\n```\n\nBehavior should remain permissive for debug and testing, but production-like startup should fail or emit a clear warning.\n\n## Acceptance criteria\n- [ ] `TEST_NON_DEV_SECRET` is treated as an insecure default secret\n- [ ] Debug and test startup behavior remains developer-friendly\n- [ ] Non-debug, non-test startup refuses to start or clearly fails when this secret is used\n- [ ] Warning message explains how to generate a secure secret\n- [ ] Unit tests cover the Docker default secret path\n\n## Suggested validation\nAdd or update tests under:\n\n```bash\ntests/unit_tests/initialization/\n```\n\nSuggested test command:\n\n```bash\npytest tests/unit_tests/initialization/\n```\n- Issue URL: https://github.com/emillaurence/superset/issues/15\n\n# Labels and Risk Labels\n- All Labels: devin-remediate, risk:security\n- Risk Labels: risk:security\n\n# Task Classification\n- Work Type: Security remediation\n- Guidance: Focus on the security concern described in the issue. Prefer the smallest safe remediation, avoid broad dependency upgrades, and clearly document security impact and residual risk.\n\n# Scope Boundaries\n- Make the smallest safe change that addresses the issue.\n- Treat this as one isolated remediation slice.\n- Do not perform broad refactors.\n- Do not fix unrelated issues.\n- Do not update unrelated dependencies.\n- Do not change public behavior unless required by the issue.\n- Prefer a focused one-file or small multi-file change.\n- Follow existing repository style, conventions, and patterns.\n- Avoid speculative improvements.\n\n# Execution Plan\n1. Read the GitHub Issue carefully.\n2. Inspect only the relevant parts of the repository.\n3. Identify the smallest safe remediation.\n4. Implement the change on a branch.\n5. Run the smallest relevant validation where practical.\n6. Open a pull request against the target repository.\n7. Comment on the GitHub Issue with the PR URL, remediation summary, and validation result.\n8. Stop after opening the PR and commenting on the issue.\n\n# Validation Guidance\n- If Python code changes, run the most targeted available test, lint, or type check where practical.\n- If frontend code changes, run the most targeted test, lint, type check, or build check where practical.\n- If dependency or security files change, run package manager, lockfile, dependency, test, or build validation where practical.\n- If documentation-only changes are made, state that automated validation is not applicable.\n- If validation cannot be run due to environment or time constraints, explain why in the PR and issue comment.\n\n# Pull Request Requirements\nThe PR description must include:\n- Linked GitHub Issue\n- Summary of the change\n- Files changed\n- Validation performed\n- Risks, residual risk, or follow-up required\n\n# GitHub Issue Comment Requirements\nAfter opening the PR, comment on the original GitHub Issue with:\n- PR URL\n- Summary of remediation\n- Validation result\n- Final status: ready for human review\n\n# Blocker Handling\nIf you cannot safely create a PR, you must comment on the GitHub Issue with:\n- Blocker encountered\n- Steps attempted\n- Information, access, or decision needed\n- Recommended next action\n\n# Stop Condition\n- Stop after opening the pull request and commenting on the GitHub Issue.\n- Do not merge the pull request.\n- Human review remains the merge gate.\n\nBegin your work now.\n",
+    "devin_response": {
+      "session_id": "0c0b8dff11394a1d84af85e527950621",
+      "url": "https://app.devin.ai/sessions/0c0b8dff11394a1d84af85e527950621",
+      "status": "new",
+      "title": "Remediate superset issue #15",
+      "tags": [
+        "devin-remediate",
+        "risk:security",
+        "agent:devin-rs"
+      ],
+      "playbook_id": "playbook-f3d5e50a33b14d1a94558e61ee86956d",
+      "user_id": "bot_apk",
+      "org_id": "org-bdcb6702eb2143c5a65d85c939b52b4a",
+      "created_at": 1780966514,
+      "updated_at": 1780966514,
+      "is_archived": false,
+      "acus_consumed": 0.0,
+      "pull_requests": [],
+      "parent_session_id": null,
+      "child_session_ids": null,
+      "service_user_id": "service-user-630e5ca4d5d5414cbd6a3ecace9c83e7",
+      "category": null,
+      "subcategory": null,
+      "origin": "api",
+      "structured_output": null,
+      "status_detail": null
+    },
+    "error_message": null,
+    "pull_request_url": "https://github.com/emillaurence/superset/pull/18",
+    "devin_session_url": "https://app.devin.ai/sessions/0c0b8dff11394a1d84af85e527950621",
+    "playbook_id": "playbook-f3d5e50a33b14d1a94558e61ee86956d",
+    "playbook_type": "security"
+  },
+  {
+    "session_id": "08738e58de674b6cb282183962904d9c",
+    "issue": {
+      "owner": "emillaurence",
+      "repo": "superset",
+      "number": 16,
+      "title": "Move semantic layer connection sorting and pagination closer to the query layer",
+      "body": "# Move semantic layer connection sorting and pagination closer to the query layer\n\n## Type\nQuality / Performance\n\n## Priority\nMedium\n\n## Verified in repo\n`superset/semantic_layers/api.py` contains a TODO:\n\n```python\n# TODO: move sort + pagination to SQL before GA.\n```\n\nThe current implementation fetches database and semantic layer connection records into Python lists, combines them, and then relies on Python-side sorting and pagination.\n\n## Summary\nSemantic layer connection listing should avoid loading more records than necessary into memory. Sorting and pagination should be pushed closer to the SQL query layer where practical.\n\n## Why this matters\nPython-side sorting and pagination can become inefficient as the number of databases and semantic layer objects grows. For larger deployments, metadata APIs should remain predictable and avoid unnecessary memory usage.\n\nThis is especially relevant because the existing TODO explicitly calls out that this should be addressed before GA.\n\n## Suggested remediation\nRefactor the semantic layer connection listing flow so that filtering, sorting, and pagination are applied at the query level where possible.\n\nThe implementation should preserve:\n- Existing authorization behavior\n- Existing filtering behavior\n- Existing response shape\n- Existing sort order\n- Existing pagination semantics\n\nIf a full SQL-level refactor is too large, implement a narrower first PR that:\n- Adds targeted tests around the current sorting and pagination behavior\n- Documents the limitation clearly\n- Reduces unnecessary loading where safe\n\n## Acceptance criteria\n- [ ] Existing API response shape is unchanged\n- [ ] Authorization filtering is preserved\n- [ ] Sorting behavior is covered by tests\n- [ ] Pagination behavior is covered by tests\n- [ ] The TODO is either resolved or replaced with a more precise follow-up\n- [ ] No regression for mixed database and semantic layer connection results\n\n## Suggested validation\nAdd or update tests covering:\n- Sorting by name\n- Sorting by changed date\n- Pagination with limit and offset\n- Restricted user visibility\n- Mixed database and semantic layer connection results",
+      "url": "https://github.com/emillaurence/superset/issues/16",
+      "labels": [
+        {
+          "name": "devin-remediate",
+          "color": "5319E7"
+        },
+        {
+          "name": "risk:quality",
+          "color": "FBCA04"
+        }
+      ]
+    },
+    "risk_labels": [
+      "risk:quality"
+    ],
+    "status": "needs_human_review",
+    "created_at": "2026-06-09T00:56:05.070269",
+    "completed_at": null,
+    "needs_review_at": "2026-06-09 01:04:42.175970",
+    "pr_detected_at": "2026-06-09 01:04:42.175973",
+    "prompt": "# Role and Objective\nYou are an autonomous software engineering agent tasked with remediating a GitHub issue. Your objective is to produce a small, isolated, independently reviewable remediation that addresses the issue.\n\n# Selected Playbook Context\nUse the selected organization quality remediation playbook as the general procedure.\nThe playbook provides the general workflow. The GitHub Issue below is the source of truth for this specific remediation.\n\n# Target Repository\n- Owner: emillaurence\n- Repository: superset\n- GitHub URL: https://github.com/emillaurence/superset\n\n# GitHub Issue Details\n- Issue Number: 16\n- Title: Move semantic layer connection sorting and pagination closer to the query layer\n- Description:\n# Move semantic layer connection sorting and pagination closer to the query layer\n\n## Type\nQuality / Performance\n\n## Priority\nMedium\n\n## Verified in repo\n`superset/semantic_layers/api.py` contains a TODO:\n\n```python\n# TODO: move sort + pagination to SQL before GA.\n```\n\nThe current implementation fetches database and semantic layer connection records into Python lists, combines them, and then relies on Python-side sorting and pagination.\n\n## Summary\nSemantic layer connection listing should avoid loading more records than necessary into memory. Sorting and pagination should be pushed closer to the SQL query layer where practical.\n\n## Why this matters\nPython-side sorting and pagination can become inefficient as the number of databases and semantic layer objects grows. For larger deployments, metadata APIs should remain predictable and avoid unnecessary memory usage.\n\nThis is especially relevant because the existing TODO explicitly calls out that this should be addressed before GA.\n\n## Suggested remediation\nRefactor the semantic layer connection listing flow so that filtering, sorting, and pagination are applied at the query level where possible.\n\nThe implementation should preserve:\n- Existing authorization behavior\n- Existing filtering behavior\n- Existing response shape\n- Existing sort order\n- Existing pagination semantics\n\nIf a full SQL-level refactor is too large, implement a narrower first PR that:\n- Adds targeted tests around the current sorting and pagination behavior\n- Documents the limitation clearly\n- Reduces unnecessary loading where safe\n\n## Acceptance criteria\n- [ ] Existing API response shape is unchanged\n- [ ] Authorization filtering is preserved\n- [ ] Sorting behavior is covered by tests\n- [ ] Pagination behavior is covered by tests\n- [ ] The TODO is either resolved or replaced with a more precise follow-up\n- [ ] No regression for mixed database and semantic layer connection results\n\n## Suggested validation\nAdd or update tests covering:\n- Sorting by name\n- Sorting by changed date\n- Pagination with limit and offset\n- Restricted user visibility\n- Mixed database and semantic layer connection results\n- Issue URL: https://github.com/emillaurence/superset/issues/16\n\n# Labels and Risk Labels\n- All Labels: devin-remediate, risk:quality\n- Risk Labels: risk:quality\n\n# Task Classification\n- Work Type: Quality remediation\n- Guidance: Focus on code quality, maintainability, tests, linting, static analysis, or small cleanup. Preserve existing behavior and avoid broad refactors.\n\n# Scope Boundaries\n- Make the smallest safe change that addresses the issue.\n- Treat this as one isolated remediation slice.\n- Do not perform broad refactors.\n- Do not fix unrelated issues.\n- Do not update unrelated dependencies.\n- Do not change public behavior unless required by the issue.\n- Prefer a focused one-file or small multi-file change.\n- Follow existing repository style, conventions, and patterns.\n- Avoid speculative improvements.\n\n# Execution Plan\n1. Read the GitHub Issue carefully.\n2. Inspect only the relevant parts of the repository.\n3. Identify the smallest safe remediation.\n4. Implement the change on a branch.\n5. Run the smallest relevant validation where practical.\n6. Open a pull request against the target repository.\n7. Comment on the GitHub Issue with the PR URL, remediation summary, and validation result.\n8. Stop after opening the PR and commenting on the issue.\n\n# Validation Guidance\n- If Python code changes, run the most targeted available test, lint, or type check where practical.\n- If frontend code changes, run the most targeted test, lint, type check, or build check where practical.\n- If dependency or security files change, run package manager, lockfile, dependency, test, or build validation where practical.\n- If documentation-only changes are made, state that automated validation is not applicable.\n- If validation cannot be run due to environment or time constraints, explain why in the PR and issue comment.\n\n# Pull Request Requirements\nThe PR description must include:\n- Linked GitHub Issue\n- Summary of the change\n- Files changed\n- Validation performed\n- Risks, residual risk, or follow-up required\n\n# GitHub Issue Comment Requirements\nAfter opening the PR, comment on the original GitHub Issue with:\n- PR URL\n- Summary of remediation\n- Validation result\n- Final status: ready for human review\n\n# Blocker Handling\nIf you cannot safely create a PR, you must comment on the GitHub Issue with:\n- Blocker encountered\n- Steps attempted\n- Information, access, or decision needed\n- Recommended next action\n\n# Stop Condition\n- Stop after opening the pull request and commenting on the GitHub Issue.\n- Do not merge the pull request.\n- Human review remains the merge gate.\n\nBegin your work now.\n",
+    "devin_response": {
+      "session_id": "08738e58de674b6cb282183962904d9c",
+      "url": "https://app.devin.ai/sessions/08738e58de674b6cb282183962904d9c",
+      "status": "new",
+      "title": "Remediate superset issue #16",
+      "tags": [
+        "devin-remediate",
+        "risk:quality",
+        "agent:devin-rs"
+      ],
+      "playbook_id": "playbook-b0b350bb71da4957b416c8360bbb5baa",
+      "user_id": "bot_apk",
+      "org_id": "org-bdcb6702eb2143c5a65d85c939b52b4a",
+      "created_at": 1780966565,
+      "updated_at": 1780966565,
+      "is_archived": false,
+      "acus_consumed": 0.0,
+      "pull_requests": [],
+      "parent_session_id": null,
+      "child_session_ids": null,
+      "service_user_id": "service-user-630e5ca4d5d5414cbd6a3ecace9c83e7",
+      "category": null,
+      "subcategory": null,
+      "origin": "api",
+      "structured_output": null,
+      "status_detail": null
+    },
+    "error_message": null,
+    "pull_request_url": "https://github.com/emillaurence/superset/pull/22",
+    "devin_session_url": "https://app.devin.ai/sessions/08738e58de674b6cb282183962904d9c",
+    "playbook_id": "playbook-b0b350bb71da4957b416c8360bbb5baa",
+    "playbook_type": "quality"
+  },
+  {
+    "session_id": "eab8698114544dd6a1892e63ad401962",
+    "issue": {
+      "owner": "emillaurence",
+      "repo": "superset",
+      "number": 19,
+      "title": "Migrate TimeTable frontend tests away from global Jest APIs",
+      "body": "# Migrate TimeTable frontend tests away from global Jest APIs\n\n## Type\nQuality / Test Maintainability\n\n## Priority\nLow\n\n## Verified in repo\nSeveral TimeTable test files contain repeated eslint suppressions for global Jest APIs.\n\nExamples include:\n\n- `superset-frontend/src/visualizations/TimeTable/utils/valueCalculations/valueCalculations.test.ts`\n- `superset-frontend/src/visualizations/TimeTable/utils/sparklineHelpers/sparklineHelpers.test.ts`\n- `superset-frontend/src/visualizations/TimeTable/utils/sparklineDataUtils/sparklineDataUtils.test.ts`\n- `superset-frontend/src/visualizations/TimeTable/utils/sortUtils/sortUtils.test.ts`\n- `superset-frontend/src/visualizations/TimeTable/utils/colorUtils/colorUtils.test.ts`\n\nThe files include comments such as:\n\n```ts\n// eslint-disable-next-line no-restricted-globals -- TODO: Migrate from describe blocks\n```\n\n## Summary\nThe TimeTable tests should import Jest test helpers explicitly instead of relying on restricted globals and repeated eslint suppression comments.\n\n## Why this matters\nRepeated lint suppressions make the test suite noisier and reduce confidence in lint rules. Migrating these tests to explicit imports improves consistency and removes technical debt without changing product behavior.\n\n## Suggested remediation\nUpdate the affected test files to explicitly import Jest helpers.\n\nExample:\n\n```ts\nimport { describe, expect, it } from '@jest/globals';\n```\n\nThen remove the related `no-restricted-globals` eslint suppression comments.\n\n## Acceptance criteria\n- [ ] TimeTable tests no longer rely on restricted global `describe`, `it`, or `expect`\n- [ ] Repeated `no-restricted-globals` suppressions are removed from the migrated files\n- [ ] Test behavior remains unchanged\n- [ ] A focused frontend test run passes\n\n## Suggested validation\nRun:\n\n```bash\ncd superset-frontend\nnpm run test -- TimeTable\nnpm run lint\n```",
+      "url": "https://github.com/emillaurence/superset/issues/19",
+      "labels": [
+        {
+          "name": "devin-remediate",
+          "color": "5319E7"
+        },
+        {
+          "name": "risk:quality",
+          "color": "FBCA04"
+        }
+      ]
+    },
+    "risk_labels": [
+      "risk:quality"
+    ],
+    "status": "needs_human_review",
+    "created_at": "2026-06-09T01:01:06.015969",
+    "completed_at": null,
+    "needs_review_at": "2026-06-09 01:05:01.872753",
+    "pr_detected_at": "2026-06-09 01:05:01.872758",
+    "prompt": "# Role and Objective\nYou are an autonomous software engineering agent tasked with remediating a GitHub issue. Your objective is to produce a small, isolated, independently reviewable remediation that addresses the issue.\n\n# Selected Playbook Context\nUse the selected organization quality remediation playbook as the general procedure.\nThe playbook provides the general workflow. The GitHub Issue below is the source of truth for this specific remediation.\n\n# Target Repository\n- Owner: emillaurence\n- Repository: superset\n- GitHub URL: https://github.com/emillaurence/superset\n\n# GitHub Issue Details\n- Issue Number: 19\n- Title: Migrate TimeTable frontend tests away from global Jest APIs\n- Description:\n# Migrate TimeTable frontend tests away from global Jest APIs\n\n## Type\nQuality / Test Maintainability\n\n## Priority\nLow\n\n## Verified in repo\nSeveral TimeTable test files contain repeated eslint suppressions for global Jest APIs.\n\nExamples include:\n\n- `superset-frontend/src/visualizations/TimeTable/utils/valueCalculations/valueCalculations.test.ts`\n- `superset-frontend/src/visualizations/TimeTable/utils/sparklineHelpers/sparklineHelpers.test.ts`\n- `superset-frontend/src/visualizations/TimeTable/utils/sparklineDataUtils/sparklineDataUtils.test.ts`\n- `superset-frontend/src/visualizations/TimeTable/utils/sortUtils/sortUtils.test.ts`\n- `superset-frontend/src/visualizations/TimeTable/utils/colorUtils/colorUtils.test.ts`\n\nThe files include comments such as:\n\n```ts\n// eslint-disable-next-line no-restricted-globals -- TODO: Migrate from describe blocks\n```\n\n## Summary\nThe TimeTable tests should import Jest test helpers explicitly instead of relying on restricted globals and repeated eslint suppression comments.\n\n## Why this matters\nRepeated lint suppressions make the test suite noisier and reduce confidence in lint rules. Migrating these tests to explicit imports improves consistency and removes technical debt without changing product behavior.\n\n## Suggested remediation\nUpdate the affected test files to explicitly import Jest helpers.\n\nExample:\n\n```ts\nimport { describe, expect, it } from '@jest/globals';\n```\n\nThen remove the related `no-restricted-globals` eslint suppression comments.\n\n## Acceptance criteria\n- [ ] TimeTable tests no longer rely on restricted global `describe`, `it`, or `expect`\n- [ ] Repeated `no-restricted-globals` suppressions are removed from the migrated files\n- [ ] Test behavior remains unchanged\n- [ ] A focused frontend test run passes\n\n## Suggested validation\nRun:\n\n```bash\ncd superset-frontend\nnpm run test -- TimeTable\nnpm run lint\n```\n- Issue URL: https://github.com/emillaurence/superset/issues/19\n\n# Labels and Risk Labels\n- All Labels: devin-remediate, risk:quality\n- Risk Labels: risk:quality\n\n# Task Classification\n- Work Type: Quality remediation\n- Guidance: Focus on code quality, maintainability, tests, linting, static analysis, or small cleanup. Preserve existing behavior and avoid broad refactors.\n\n# Scope Boundaries\n- Make the smallest safe change that addresses the issue.\n- Treat this as one isolated remediation slice.\n- Do not perform broad refactors.\n- Do not fix unrelated issues.\n- Do not update unrelated dependencies.\n- Do not change public behavior unless required by the issue.\n- Prefer a focused one-file or small multi-file change.\n- Follow existing repository style, conventions, and patterns.\n- Avoid speculative improvements.\n\n# Execution Plan\n1. Read the GitHub Issue carefully.\n2. Inspect only the relevant parts of the repository.\n3. Identify the smallest safe remediation.\n4. Implement the change on a branch.\n5. Run the smallest relevant validation where practical.\n6. Open a pull request against the target repository.\n7. Comment on the GitHub Issue with the PR URL, remediation summary, and validation result.\n8. Stop after opening the PR and commenting on the issue.\n\n# Validation Guidance\n- If Python code changes, run the most targeted available test, lint, or type check where practical.\n- If frontend code changes, run the most targeted test, lint, type check, or build check where practical.\n- If dependency or security files change, run package manager, lockfile, dependency, test, or build validation where practical.\n- If documentation-only changes are made, state that automated validation is not applicable.\n- If validation cannot be run due to environment or time constraints, explain why in the PR and issue comment.\n\n# Pull Request Requirements\nThe PR description must include:\n- Linked GitHub Issue\n- Summary of the change\n- Files changed\n- Validation performed\n- Risks, residual risk, or follow-up required\n\n# GitHub Issue Comment Requirements\nAfter opening the PR, comment on the original GitHub Issue with:\n- PR URL\n- Summary of remediation\n- Validation result\n- Final status: ready for human review\n\n# Blocker Handling\nIf you cannot safely create a PR, you must comment on the GitHub Issue with:\n- Blocker encountered\n- Steps attempted\n- Information, access, or decision needed\n- Recommended next action\n\n# Stop Condition\n- Stop after opening the pull request and commenting on the GitHub Issue.\n- Do not merge the pull request.\n- Human review remains the merge gate.\n\nBegin your work now.\n",
+    "devin_response": {
+      "session_id": "eab8698114544dd6a1892e63ad401962",
+      "url": "https://app.devin.ai/sessions/eab8698114544dd6a1892e63ad401962",
+      "status": "new",
+      "title": "Remediate superset issue #19",
+      "tags": [
+        "devin-remediate",
+        "risk:quality",
+        "agent:devin-rs"
+      ],
+      "playbook_id": "playbook-b0b350bb71da4957b416c8360bbb5baa",
+      "user_id": "bot_apk",
+      "org_id": "org-bdcb6702eb2143c5a65d85c939b52b4a",
+      "created_at": 1780966866,
+      "updated_at": 1780966866,
+      "is_archived": false,
+      "acus_consumed": 0.0,
+      "pull_requests": [],
+      "parent_session_id": null,
+      "child_session_ids": null,
+      "service_user_id": "service-user-630e5ca4d5d5414cbd6a3ecace9c83e7",
+      "category": null,
+      "subcategory": null,
+      "origin": "api",
+      "structured_output": null,
+      "status_detail": null
+    },
+    "error_message": null,
+    "pull_request_url": "https://github.com/emillaurence/superset/pull/23",
+    "devin_session_url": "https://app.devin.ai/sessions/eab8698114544dd6a1892e63ad401962",
+    "playbook_id": "playbook-b0b350bb71da4957b416c8360bbb5baa",
+    "playbook_type": "quality"
+  },
+  {
+    "session_id": "c1f3f430d1e941e1975814250cd77803",
+    "issue": {
+      "owner": "emillaurence",
+      "repo": "superset",
+      "number": 20,
+      "title": "Fail websocket startup when JWT secret uses placeholder value",
+      "body": "# Fail websocket startup when JWT secret uses placeholder value\n\n## Type\nSecurity / Authentication Hardening\n\n## Priority\nHigh\n\n## Verified in repo\nThe websocket example config contains a placeholder JWT secret:\n\n```json\n\"jwtSecret\": \"CHANGE-ME-IN-PRODUCTION-GOTTA-BE-LONG-AND-SECRET\"\n```\n\n`superset-websocket/src/index.ts` checks for short secrets and warns when the secret starts with `CHANGE-ME`, but it does not fail startup for the placeholder value.\n\nRelevant files:\n- `superset-websocket/config.example.json`\n- `superset-websocket/src/index.ts`\n- `superset-websocket/spec/config.test.ts`\n- `superset-websocket/spec/index.test.ts`\n\n## Summary\nThe websocket service should fail startup when a placeholder JWT secret is used in a production-like environment.\n\n## Why this matters\nThe websocket JWT secret protects async event channels. A predictable placeholder secret weakens authentication if copied into a real deployment.\n\nA warning is easy to miss. Production-like startup should fail fast.\n\n## Suggested remediation\nUpdate startup validation so that when the server is started and `NODE_ENV` is not `development` or `test`, placeholder secrets are rejected.\n\nExample policy:\n- Fail if `jwtSecret` starts with `CHANGE-ME`\n- Fail if `jwtSecret` is shorter than 32 characters\n- Keep tests and local development behavior explicit\n\n## Acceptance criteria\n- [ ] Placeholder websocket JWT secrets fail startup in production-like mode\n- [ ] Short secrets continue to fail startup\n- [ ] Test and local development behavior remains manageable\n- [ ] Unit tests cover placeholder, short, and valid secrets\n- [ ] Error message explains how to set a secure secret\n\n## Suggested validation\nRun websocket tests:\n\n```bash\ncd superset-websocket\nnpm test\n```",
+      "url": "https://github.com/emillaurence/superset/issues/20",
+      "labels": [
+        {
+          "name": "devin-remediate",
+          "color": "5319E7"
+        },
+        {
+          "name": "risk:security",
+          "color": "D73A4A"
+        }
+      ]
+    },
+    "risk_labels": [
+      "risk:security"
+    ],
+    "status": "needs_human_review",
+    "created_at": "2026-06-09T01:01:40.953722",
+    "completed_at": null,
+    "needs_review_at": "2026-06-09 01:04:35.720548",
+    "pr_detected_at": "2026-06-09 01:04:35.720553",
+    "prompt": "# Role and Objective\nYou are an autonomous software engineering agent tasked with remediating a GitHub issue. Your objective is to produce a small, isolated, independently reviewable remediation that addresses the issue.\n\n# Selected Playbook Context\nUse the selected organization security remediation playbook as the general procedure.\nThe playbook provides the general workflow. The GitHub Issue below is the source of truth for this specific remediation.\n\n# Target Repository\n- Owner: emillaurence\n- Repository: superset\n- GitHub URL: https://github.com/emillaurence/superset\n\n# GitHub Issue Details\n- Issue Number: 20\n- Title: Fail websocket startup when JWT secret uses placeholder value\n- Description:\n# Fail websocket startup when JWT secret uses placeholder value\n\n## Type\nSecurity / Authentication Hardening\n\n## Priority\nHigh\n\n## Verified in repo\nThe websocket example config contains a placeholder JWT secret:\n\n```json\n\"jwtSecret\": \"CHANGE-ME-IN-PRODUCTION-GOTTA-BE-LONG-AND-SECRET\"\n```\n\n`superset-websocket/src/index.ts` checks for short secrets and warns when the secret starts with `CHANGE-ME`, but it does not fail startup for the placeholder value.\n\nRelevant files:\n- `superset-websocket/config.example.json`\n- `superset-websocket/src/index.ts`\n- `superset-websocket/spec/config.test.ts`\n- `superset-websocket/spec/index.test.ts`\n\n## Summary\nThe websocket service should fail startup when a placeholder JWT secret is used in a production-like environment.\n\n## Why this matters\nThe websocket JWT secret protects async event channels. A predictable placeholder secret weakens authentication if copied into a real deployment.\n\nA warning is easy to miss. Production-like startup should fail fast.\n\n## Suggested remediation\nUpdate startup validation so that when the server is started and `NODE_ENV` is not `development` or `test`, placeholder secrets are rejected.\n\nExample policy:\n- Fail if `jwtSecret` starts with `CHANGE-ME`\n- Fail if `jwtSecret` is shorter than 32 characters\n- Keep tests and local development behavior explicit\n\n## Acceptance criteria\n- [ ] Placeholder websocket JWT secrets fail startup in production-like mode\n- [ ] Short secrets continue to fail startup\n- [ ] Test and local development behavior remains manageable\n- [ ] Unit tests cover placeholder, short, and valid secrets\n- [ ] Error message explains how to set a secure secret\n\n## Suggested validation\nRun websocket tests:\n\n```bash\ncd superset-websocket\nnpm test\n```\n- Issue URL: https://github.com/emillaurence/superset/issues/20\n\n# Labels and Risk Labels\n- All Labels: devin-remediate, risk:security\n- Risk Labels: risk:security\n\n# Task Classification\n- Work Type: Security remediation\n- Guidance: Focus on the security concern described in the issue. Prefer the smallest safe remediation, avoid broad dependency upgrades, and clearly document security impact and residual risk.\n\n# Scope Boundaries\n- Make the smallest safe change that addresses the issue.\n- Treat this as one isolated remediation slice.\n- Do not perform broad refactors.\n- Do not fix unrelated issues.\n- Do not update unrelated dependencies.\n- Do not change public behavior unless required by the issue.\n- Prefer a focused one-file or small multi-file change.\n- Follow existing repository style, conventions, and patterns.\n- Avoid speculative improvements.\n\n# Execution Plan\n1. Read the GitHub Issue carefully.\n2. Inspect only the relevant parts of the repository.\n3. Identify the smallest safe remediation.\n4. Implement the change on a branch.\n5. Run the smallest relevant validation where practical.\n6. Open a pull request against the target repository.\n7. Comment on the GitHub Issue with the PR URL, remediation summary, and validation result.\n8. Stop after opening the PR and commenting on the issue.\n\n# Validation Guidance\n- If Python code changes, run the most targeted available test, lint, or type check where practical.\n- If frontend code changes, run the most targeted test, lint, type check, or build check where practical.\n- If dependency or security files change, run package manager, lockfile, dependency, test, or build validation where practical.\n- If documentation-only changes are made, state that automated validation is not applicable.\n- If validation cannot be run due to environment or time constraints, explain why in the PR and issue comment.\n\n# Pull Request Requirements\nThe PR description must include:\n- Linked GitHub Issue\n- Summary of the change\n- Files changed\n- Validation performed\n- Risks, residual risk, or follow-up required\n\n# GitHub Issue Comment Requirements\nAfter opening the PR, comment on the original GitHub Issue with:\n- PR URL\n- Summary of remediation\n- Validation result\n- Final status: ready for human review\n\n# Blocker Handling\nIf you cannot safely create a PR, you must comment on the GitHub Issue with:\n- Blocker encountered\n- Steps attempted\n- Information, access, or decision needed\n- Recommended next action\n\n# Stop Condition\n- Stop after opening the pull request and commenting on the GitHub Issue.\n- Do not merge the pull request.\n- Human review remains the merge gate.\n\nBegin your work now.\n",
+    "devin_response": {
+      "session_id": "c1f3f430d1e941e1975814250cd77803",
+      "url": "https://app.devin.ai/sessions/c1f3f430d1e941e1975814250cd77803",
+      "status": "new",
+      "title": "Remediate superset issue #20",
+      "tags": [
+        "devin-remediate",
+        "risk:security",
+        "agent:devin-rs"
+      ],
+      "playbook_id": "playbook-f3d5e50a33b14d1a94558e61ee86956d",
+      "user_id": "bot_apk",
+      "org_id": "org-bdcb6702eb2143c5a65d85c939b52b4a",
+      "created_at": 1780966900,
+      "updated_at": 1780966900,
+      "is_archived": false,
+      "acus_consumed": 0.0,
+      "pull_requests": [],
+      "parent_session_id": null,
+      "child_session_ids": null,
+      "service_user_id": "service-user-630e5ca4d5d5414cbd6a3ecace9c83e7",
+      "category": null,
+      "subcategory": null,
+      "origin": "api",
+      "structured_output": null,
+      "status_detail": null
+    },
+    "error_message": null,
+    "pull_request_url": "https://github.com/emillaurence/superset/pull/21",
+    "devin_session_url": "https://app.devin.ai/sessions/c1f3f430d1e941e1975814250cd77803",
+    "playbook_id": "playbook-f3d5e50a33b14d1a94558e61ee86956d",
+    "playbook_type": "security"
+  },
+  {
+    "session_id": "2e4b238fd49f466f9822936c4e9cbe67",
+    "issue": {
+      "owner": "emillaurence",
+      "repo": "superset",
+      "number": 24,
+      "title": "Replace unsafe yaml.load usage in example config loading",
+      "body": "# Replace unsafe yaml.load usage in example config loading\n\n## Type\nSecurity / Safe Parsing\n\n## Priority\nMedium\n\n## Verified in repo\n`superset/examples/utils.py` uses `yaml.load()` with `yaml.Loader`:\n\n```python\nmetadata = yaml.load(contents.get(METADATA_FILE_NAME, \"{}\"), Loader=yaml.Loader)\n```\n\nThe line is currently suppressed with:\n\n```python\n# noqa: S506\n```\n\n## Summary\nExample config loading should use `yaml.safe_load()` instead of `yaml.load()` where arbitrary Python object construction is not required.\n\n## Why this matters\n`yaml.load()` can be unsafe when parsing untrusted YAML. Even if example loading is expected to operate on local project files, using `safe_load()` is the safer default and removes the need for a security lint suppression.\n\n## Suggested remediation\nReplace:\n\n```python\nyaml.load(..., Loader=yaml.Loader)\n```\n\nwith:\n\n```python\nyaml.safe_load(...) or {}\n```\n\nEnsure the behavior remains correct when metadata is missing or empty.\n\n## Acceptance criteria\n- [ ] `superset/examples/utils.py` no longer uses `yaml.load()` for metadata loading\n- [ ] `# noqa: S506` is removed\n- [ ] Missing metadata still defaults to an empty dictionary\n- [ ] Example import behavior remains unchanged\n- [ ] Tests cover metadata with and without a `type` field\n\n## Suggested validation\nRun:\n\n```bash\npytest tests/unit_tests/examples/\npytest tests/integration_tests/importexport/\n```",
+      "url": "https://github.com/emillaurence/superset/issues/24",
+      "labels": [
+        {
+          "name": "devin-remediate",
+          "color": "5319E7"
+        },
+        {
+          "name": "risk:security",
+          "color": "D73A4A"
+        }
+      ]
+    },
+    "risk_labels": [
+      "risk:security"
+    ],
+    "status": "needs_human_review",
+    "created_at": "2026-06-09T01:24:36.924754",
+    "completed_at": null,
+    "needs_review_at": "2026-06-09 01:30:10.868785",
+    "pr_detected_at": "2026-06-09 01:30:10.868787",
+    "prompt": "# Role and Objective\nYou are an autonomous software engineering agent tasked with remediating a GitHub issue. Your objective is to produce a small, isolated, independently reviewable remediation that addresses the issue.\n\n# Selected Playbook Context\nUse the selected organization security remediation playbook as the general procedure.\nThe playbook provides the general workflow. The GitHub Issue below is the source of truth for this specific remediation.\n\n# Target Repository\n- Owner: emillaurence\n- Repository: superset\n- GitHub URL: https://github.com/emillaurence/superset\n\n# GitHub Issue Details\n- Issue Number: 24\n- Title: Replace unsafe yaml.load usage in example config loading\n- Description:\n# Replace unsafe yaml.load usage in example config loading\n\n## Type\nSecurity / Safe Parsing\n\n## Priority\nMedium\n\n## Verified in repo\n`superset/examples/utils.py` uses `yaml.load()` with `yaml.Loader`:\n\n```python\nmetadata = yaml.load(contents.get(METADATA_FILE_NAME, \"{}\"), Loader=yaml.Loader)\n```\n\nThe line is currently suppressed with:\n\n```python\n# noqa: S506\n```\n\n## Summary\nExample config loading should use `yaml.safe_load()` instead of `yaml.load()` where arbitrary Python object construction is not required.\n\n## Why this matters\n`yaml.load()` can be unsafe when parsing untrusted YAML. Even if example loading is expected to operate on local project files, using `safe_load()` is the safer default and removes the need for a security lint suppression.\n\n## Suggested remediation\nReplace:\n\n```python\nyaml.load(..., Loader=yaml.Loader)\n```\n\nwith:\n\n```python\nyaml.safe_load(...) or {}\n```\n\nEnsure the behavior remains correct when metadata is missing or empty.\n\n## Acceptance criteria\n- [ ] `superset/examples/utils.py` no longer uses `yaml.load()` for metadata loading\n- [ ] `# noqa: S506` is removed\n- [ ] Missing metadata still defaults to an empty dictionary\n- [ ] Example import behavior remains unchanged\n- [ ] Tests cover metadata with and without a `type` field\n\n## Suggested validation\nRun:\n\n```bash\npytest tests/unit_tests/examples/\npytest tests/integration_tests/importexport/\n```\n- Issue URL: https://github.com/emillaurence/superset/issues/24\n\n# Labels and Risk Labels\n- All Labels: devin-remediate, risk:security\n- Risk Labels: risk:security\n\n# Task Classification\n- Work Type: Security remediation\n- Guidance: Focus on the security concern described in the issue. Prefer the smallest safe remediation, avoid broad dependency upgrades, and clearly document security impact and residual risk.\n\n# Scope Boundaries\n- Make the smallest safe change that addresses the issue.\n- Treat this as one isolated remediation slice.\n- Do not perform broad refactors.\n- Do not fix unrelated issues.\n- Do not update unrelated dependencies.\n- Do not change public behavior unless required by the issue.\n- Prefer a focused one-file or small multi-file change.\n- Follow existing repository style, conventions, and patterns.\n- Avoid speculative improvements.\n\n# Execution Plan\n1. Read the GitHub Issue carefully.\n2. Inspect only the relevant parts of the repository.\n3. Identify the smallest safe remediation.\n4. Implement the change on a branch.\n5. Run the smallest relevant validation where practical.\n6. Open a pull request against the target repository.\n7. Comment on the GitHub Issue with the PR URL, remediation summary, and validation result.\n8. Stop after opening the PR and commenting on the issue.\n\n# Validation Guidance\n- If Python code changes, run the most targeted available test, lint, or type check where practical.\n- If frontend code changes, run the most targeted test, lint, type check, or build check where practical.\n- If dependency or security files change, run package manager, lockfile, dependency, test, or build validation where practical.\n- If documentation-only changes are made, state that automated validation is not applicable.\n- If validation cannot be run due to environment or time constraints, explain why in the PR and issue comment.\n\n# Pull Request Requirements\nThe PR description must include:\n- Linked GitHub Issue\n- Summary of the change\n- Files changed\n- Validation performed\n- Risks, residual risk, or follow-up required\n\n# GitHub Issue Comment Requirements\nAfter opening the PR, comment on the original GitHub Issue with:\n- PR URL\n- Summary of remediation\n- Validation result\n- Final status: ready for human review\n\n# Blocker Handling\nIf you cannot safely create a PR, you must comment on the GitHub Issue with:\n- Blocker encountered\n- Steps attempted\n- Information, access, or decision needed\n- Recommended next action\n\n# Stop Condition\n- Stop after opening the pull request and commenting on the GitHub Issue.\n- Do not merge the pull request.\n- Human review remains the merge gate.\n\nBegin your work now.\n",
+    "devin_response": {
+      "session_id": "2e4b238fd49f466f9822936c4e9cbe67",
+      "url": "https://app.devin.ai/sessions/2e4b238fd49f466f9822936c4e9cbe67",
+      "status": "new",
+      "title": "Remediate superset issue #24",
+      "tags": [
+        "devin-remediate",
+        "risk:security",
+        "agent:devin-rs"
+      ],
+      "playbook_id": "playbook-f3d5e50a33b14d1a94558e61ee86956d",
+      "user_id": "bot_apk",
+      "org_id": "org-bdcb6702eb2143c5a65d85c939b52b4a",
+      "created_at": 1780968276,
+      "updated_at": 1780968276,
+      "is_archived": false,
+      "acus_consumed": 0.0,
+      "pull_requests": [],
+      "parent_session_id": null,
+      "child_session_ids": null,
+      "service_user_id": "service-user-630e5ca4d5d5414cbd6a3ecace9c83e7",
+      "category": null,
+      "subcategory": null,
+      "origin": "api",
+      "structured_output": null,
+      "status_detail": null
+    },
+    "error_message": null,
+    "pull_request_url": "https://github.com/emillaurence/superset/pull/25",
+    "devin_session_url": "https://app.devin.ai/sessions/2e4b238fd49f466f9822936c4e9cbe67",
+    "playbook_id": "playbook-f3d5e50a33b14d1a94558e61ee86956d",
+    "playbook_type": "security"
+  },
+  {
+    "session_id": "fdebf8acccfd41218023d1dbf0e463f6",
+    "issue": {
+      "owner": "emillaurence",
+      "repo": "superset",
+      "number": 26,
+      "title": "Stop printing the Docker admin password during initialisation",
+      "body": "# Stop printing the Docker admin password during initialisation\n\n## Type\nSecurity / Sensitive Information Exposure\n\n## Priority\nMedium\n\n## Verified in repo\n`docker/docker-init.sh` logs the admin username and password during initialisation:\n\n```bash\necho_step \"2\" \"Starting\" \"Setting up admin user ( admin / $ADMIN_PASSWORD )\"\n```\n\n## Summary\nThe Docker initialisation script should not print the admin password to stdout.\n\n## Why this matters\nDocker logs are often shared during troubleshooting, demos, CI runs, and customer proof of concepts. Printing credentials into logs increases the chance that a password is accidentally exposed.\n\n## Suggested remediation\nUpdate the log message so it does not include the password.\n\nExample:\n\n```bash\necho_step \"2\" \"Starting\" \"Setting up admin user ( admin / [hidden] )\"\n```\n\nor:\n\n```bash\necho_step \"2\" \"Starting\" \"Setting up admin user\"\n```\n\n## Acceptance criteria\n- [ ] `docker/docker-init.sh` no longer prints `ADMIN_PASSWORD`\n- [ ] Admin user creation behavior remains unchanged\n- [ ] Cypress-specific behavior remains unchanged\n- [ ] The init logs still clearly show progress\n\n## Suggested validation\nRun the Docker init flow and confirm logs do not include the admin password.\n\n```bash\ndocker compose up superset-init\n```",
+      "url": "https://github.com/emillaurence/superset/issues/26",
+      "labels": [
+        {
+          "name": "devin-remediate",
+          "color": "5319E7"
+        },
+        {
+          "name": "risk:security",
+          "color": "D73A4A"
+        }
+      ]
+    },
+    "risk_labels": [
+      "risk:security"
+    ],
+    "status": "needs_human_review",
+    "created_at": "2026-06-09T01:44:38.668889",
+    "completed_at": null,
+    "needs_review_at": "2026-06-09 01:46:45.011671",
+    "pr_detected_at": "2026-06-09 01:46:45.011675",
+    "prompt": "# Role and Objective\nYou are an autonomous software engineering agent tasked with remediating a GitHub issue. Your objective is to produce a small, isolated, independently reviewable remediation that addresses the issue.\n\n# Selected Playbook Context\nUse the selected organization security remediation playbook as the general procedure.\nThe playbook provides the general workflow. The GitHub Issue below is the source of truth for this specific remediation.\n\n# Target Repository\n- Owner: emillaurence\n- Repository: superset\n- GitHub URL: https://github.com/emillaurence/superset\n\n# GitHub Issue Details\n- Issue Number: 26\n- Title: Stop printing the Docker admin password during initialisation\n- Description:\n# Stop printing the Docker admin password during initialisation\n\n## Type\nSecurity / Sensitive Information Exposure\n\n## Priority\nMedium\n\n## Verified in repo\n`docker/docker-init.sh` logs the admin username and password during initialisation:\n\n```bash\necho_step \"2\" \"Starting\" \"Setting up admin user ( admin / $ADMIN_PASSWORD )\"\n```\n\n## Summary\nThe Docker initialisation script should not print the admin password to stdout.\n\n## Why this matters\nDocker logs are often shared during troubleshooting, demos, CI runs, and customer proof of concepts. Printing credentials into logs increases the chance that a password is accidentally exposed.\n\n## Suggested remediation\nUpdate the log message so it does not include the password.\n\nExample:\n\n```bash\necho_step \"2\" \"Starting\" \"Setting up admin user ( admin / [hidden] )\"\n```\n\nor:\n\n```bash\necho_step \"2\" \"Starting\" \"Setting up admin user\"\n```\n\n## Acceptance criteria\n- [ ] `docker/docker-init.sh` no longer prints `ADMIN_PASSWORD`\n- [ ] Admin user creation behavior remains unchanged\n- [ ] Cypress-specific behavior remains unchanged\n- [ ] The init logs still clearly show progress\n\n## Suggested validation\nRun the Docker init flow and confirm logs do not include the admin password.\n\n```bash\ndocker compose up superset-init\n```\n- Issue URL: https://github.com/emillaurence/superset/issues/26\n\n# Labels and Risk Labels\n- All Labels: devin-remediate, risk:security\n- Risk Labels: risk:security\n\n# Task Classification\n- Work Type: Security remediation\n- Guidance: Focus on the security concern described in the issue. Prefer the smallest safe remediation, avoid broad dependency upgrades, and clearly document security impact and residual risk.\n\n# Scope Boundaries\n- Make the smallest safe change that addresses the issue.\n- Treat this as one isolated remediation slice.\n- Do not perform broad refactors.\n- Do not fix unrelated issues.\n- Do not update unrelated dependencies.\n- Do not change public behavior unless required by the issue.\n- Prefer a focused one-file or small multi-file change.\n- Follow existing repository style, conventions, and patterns.\n- Avoid speculative improvements.\n\n# Execution Plan\n1. Read the GitHub Issue carefully.\n2. Inspect only the relevant parts of the repository.\n3. Identify the smallest safe remediation.\n4. Implement the change on a branch.\n5. Run the smallest relevant validation where practical.\n6. Open a pull request against the target repository.\n7. Comment on the GitHub Issue with the PR URL, remediation summary, and validation result.\n8. Stop after opening the PR and commenting on the issue.\n\n# Validation Guidance\n- If Python code changes, run the most targeted available test, lint, or type check where practical.\n- If frontend code changes, run the most targeted test, lint, type check, or build check where practical.\n- If dependency or security files change, run package manager, lockfile, dependency, test, or build validation where practical.\n- If documentation-only changes are made, state that automated validation is not applicable.\n- If validation cannot be run due to environment or time constraints, explain why in the PR and issue comment.\n\n# Pull Request Requirements\nThe PR description must include:\n- Linked GitHub Issue\n- Summary of the change\n- Files changed\n- Validation performed\n- Risks, residual risk, or follow-up required\n\n# GitHub Issue Comment Requirements\nAfter opening the PR, comment on the original GitHub Issue with:\n- PR URL\n- Summary of remediation\n- Validation result\n- Final status: ready for human review\n\n# Blocker Handling\nIf you cannot safely create a PR, you must comment on the GitHub Issue with:\n- Blocker encountered\n- Steps attempted\n- Information, access, or decision needed\n- Recommended next action\n\n# Stop Condition\n- Stop after opening the pull request and commenting on the GitHub Issue.\n- Do not merge the pull request.\n- Human review remains the merge gate.\n\nBegin your work now.\n",
+    "devin_response": {
+      "session_id": "fdebf8acccfd41218023d1dbf0e463f6",
+      "url": "https://app.devin.ai/sessions/fdebf8acccfd41218023d1dbf0e463f6",
+      "status": "new",
+      "title": "Remediate superset issue #26",
+      "tags": [
+        "devin-remediate",
+        "risk:security",
+        "agent:devin-rs"
+      ],
+      "playbook_id": "playbook-f3d5e50a33b14d1a94558e61ee86956d",
+      "user_id": "bot_apk",
+      "org_id": "org-bdcb6702eb2143c5a65d85c939b52b4a",
+      "created_at": 1780969478,
+      "updated_at": 1780969478,
+      "is_archived": false,
+      "acus_consumed": 0.0,
+      "pull_requests": [],
+      "parent_session_id": null,
+      "child_session_ids": null,
+      "service_user_id": "service-user-630e5ca4d5d5414cbd6a3ecace9c83e7",
+      "category": null,
+      "subcategory": null,
+      "origin": "api",
+      "structured_output": null,
+      "status_detail": null
+    },
+    "error_message": null,
+    "pull_request_url": "https://github.com/emillaurence/superset/pull/27",
+    "devin_session_url": "https://app.devin.ai/sessions/fdebf8acccfd41218023d1dbf0e463f6",
+    "playbook_id": "playbook-f3d5e50a33b14d1a94558e61ee86956d",
+    "playbook_type": "security"
+  },
+  {
+    "session_id": "c41c02233115466f8e858567f1571213",
+    "issue": {
+      "owner": "emillaurence",
+      "repo": "superset",
+      "number": 28,
+      "title": "Fail websocket startup when JWT secret uses placeholder value",
+      "body": "# Fail websocket startup when JWT secret uses placeholder value\n\n## Type\nSecurity / Authentication Hardening\n\n## Priority\nHigh\n\n## Verified in repo\nThe websocket example config contains a placeholder JWT secret:\n\n```json\n\"jwtSecret\": \"CHANGE-ME-IN-PRODUCTION-GOTTA-BE-LONG-AND-SECRET\"\n```\n\n`superset-websocket/src/index.ts` checks for short secrets and warns when the secret starts with `CHANGE-ME`, but it does not fail startup for the placeholder value.\n\nRelevant files:\n- `superset-websocket/config.example.json`\n- `superset-websocket/src/index.ts`\n- `superset-websocket/spec/config.test.ts`\n- `superset-websocket/spec/index.test.ts`\n\n## Summary\nThe websocket service should fail startup when a placeholder JWT secret is used in a production-like environment.\n\n## Why this matters\nThe websocket JWT secret protects async event channels. A predictable placeholder secret weakens authentication if copied into a real deployment.\n\nA warning is easy to miss. Production-like startup should fail fast.\n\n## Suggested remediation\nUpdate startup validation so that when the server is started and `NODE_ENV` is not `development` or `test`, placeholder secrets are rejected.\n\nExample policy:\n- Fail if `jwtSecret` starts with `CHANGE-ME`\n- Fail if `jwtSecret` is shorter than 32 characters\n- Keep tests and local development behavior explicit\n\n## Acceptance criteria\n- [ ] Placeholder websocket JWT secrets fail startup in production-like mode\n- [ ] Short secrets continue to fail startup\n- [ ] Test and local development behavior remains manageable\n- [ ] Unit tests cover placeholder, short, and valid secrets\n- [ ] Error message explains how to set a secure secret\n\n## Suggested validation\nRun websocket tests:\n\n```bash\ncd superset-websocket\nnpm test\n```",
+      "url": "https://github.com/emillaurence/superset/issues/28",
+      "labels": [
+        {
+          "name": "devin-remediate",
+          "color": "5319E7"
+        },
+        {
+          "name": "risk:security",
+          "color": "D73A4A"
+        }
+      ]
+    },
+    "risk_labels": [
+      "risk:security"
+    ],
+    "status": "needs_human_review",
+    "created_at": "2026-06-09T01:54:21.046531",
+    "completed_at": null,
+    "needs_review_at": "2026-06-09 01:59:43.274610",
+    "pr_detected_at": "2026-06-09 01:59:43.274612",
+    "prompt": "# Role and Objective\nYou are an autonomous software engineering agent tasked with remediating a GitHub issue. Your objective is to produce a small, isolated, independently reviewable remediation that addresses the issue.\n\n# Selected Playbook Context\nUse the selected organization security remediation playbook as the general procedure.\nThe playbook provides the general workflow. The GitHub Issue below is the source of truth for this specific remediation.\n\n# Target Repository\n- Owner: emillaurence\n- Repository: superset\n- GitHub URL: https://github.com/emillaurence/superset\n\n# GitHub Issue Details\n- Issue Number: 28\n- Title: Fail websocket startup when JWT secret uses placeholder value\n- Description:\n# Fail websocket startup when JWT secret uses placeholder value\n\n## Type\nSecurity / Authentication Hardening\n\n## Priority\nHigh\n\n## Verified in repo\nThe websocket example config contains a placeholder JWT secret:\n\n```json\n\"jwtSecret\": \"CHANGE-ME-IN-PRODUCTION-GOTTA-BE-LONG-AND-SECRET\"\n```\n\n`superset-websocket/src/index.ts` checks for short secrets and warns when the secret starts with `CHANGE-ME`, but it does not fail startup for the placeholder value.\n\nRelevant files:\n- `superset-websocket/config.example.json`\n- `superset-websocket/src/index.ts`\n- `superset-websocket/spec/config.test.ts`\n- `superset-websocket/spec/index.test.ts`\n\n## Summary\nThe websocket service should fail startup when a placeholder JWT secret is used in a production-like environment.\n\n## Why this matters\nThe websocket JWT secret protects async event channels. A predictable placeholder secret weakens authentication if copied into a real deployment.\n\nA warning is easy to miss. Production-like startup should fail fast.\n\n## Suggested remediation\nUpdate startup validation so that when the server is started and `NODE_ENV` is not `development` or `test`, placeholder secrets are rejected.\n\nExample policy:\n- Fail if `jwtSecret` starts with `CHANGE-ME`\n- Fail if `jwtSecret` is shorter than 32 characters\n- Keep tests and local development behavior explicit\n\n## Acceptance criteria\n- [ ] Placeholder websocket JWT secrets fail startup in production-like mode\n- [ ] Short secrets continue to fail startup\n- [ ] Test and local development behavior remains manageable\n- [ ] Unit tests cover placeholder, short, and valid secrets\n- [ ] Error message explains how to set a secure secret\n\n## Suggested validation\nRun websocket tests:\n\n```bash\ncd superset-websocket\nnpm test\n```\n- Issue URL: https://github.com/emillaurence/superset/issues/28\n\n# Labels and Risk Labels\n- All Labels: devin-remediate, risk:security\n- Risk Labels: risk:security\n\n# Task Classification\n- Work Type: Security remediation\n- Guidance: Focus on the security concern described in the issue. Prefer the smallest safe remediation, avoid broad dependency upgrades, and clearly document security impact and residual risk.\n\n# Scope Boundaries\n- Make the smallest safe change that addresses the issue.\n- Treat this as one isolated remediation slice.\n- Do not perform broad refactors.\n- Do not fix unrelated issues.\n- Do not update unrelated dependencies.\n- Do not change public behavior unless required by the issue.\n- Prefer a focused one-file or small multi-file change.\n- Follow existing repository style, conventions, and patterns.\n- Avoid speculative improvements.\n\n# Execution Plan\n1. Read the GitHub Issue carefully.\n2. Inspect only the relevant parts of the repository.\n3. Identify the smallest safe remediation.\n4. Implement the change on a branch.\n5. Run the smallest relevant validation where practical.\n6. Open a pull request against the target repository.\n7. Comment on the GitHub Issue with the PR URL, remediation summary, and validation result.\n8. Stop after opening the PR and commenting on the issue.\n\n# Validation Guidance\n- If Python code changes, run the most targeted available test, lint, or type check where practical.\n- If frontend code changes, run the most targeted test, lint, type check, or build check where practical.\n- If dependency or security files change, run package manager, lockfile, dependency, test, or build validation where practical.\n- If documentation-only changes are made, state that automated validation is not applicable.\n- If validation cannot be run due to environment or time constraints, explain why in the PR and issue comment.\n\n# Pull Request Requirements\nThe PR description must include:\n- Linked GitHub Issue\n- Summary of the change\n- Files changed\n- Validation performed\n- Risks, residual risk, or follow-up required\n\n# GitHub Issue Comment Requirements\nAfter opening the PR, comment on the original GitHub Issue with:\n- PR URL\n- Summary of remediation\n- Validation result\n- Final status: ready for human review\n\n# Blocker Handling\nIf you cannot safely create a PR, you must comment on the GitHub Issue with:\n- Blocker encountered\n- Steps attempted\n- Information, access, or decision needed\n- Recommended next action\n\n# Stop Condition\n- Stop after opening the pull request and commenting on the GitHub Issue.\n- Do not merge the pull request.\n- Human review remains the merge gate.\n\nBegin your work now.\n",
+    "devin_response": {
+      "session_id": "c41c02233115466f8e858567f1571213",
+      "url": "https://app.devin.ai/sessions/c41c02233115466f8e858567f1571213",
+      "status": "new",
+      "title": "Remediate superset issue #28",
+      "tags": [
+        "devin-remediate",
+        "risk:security",
+        "agent:devin-rs"
+      ],
+      "playbook_id": "playbook-f3d5e50a33b14d1a94558e61ee86956d",
+      "user_id": "bot_apk",
+      "org_id": "org-bdcb6702eb2143c5a65d85c939b52b4a",
+      "created_at": 1780970060,
+      "updated_at": 1780970060,
+      "is_archived": false,
+      "acus_consumed": 0.0,
+      "pull_requests": [],
+      "parent_session_id": null,
+      "child_session_ids": null,
+      "service_user_id": "service-user-630e5ca4d5d5414cbd6a3ecace9c83e7",
+      "category": null,
+      "subcategory": null,
+      "origin": "api",
+      "structured_output": null,
+      "status_detail": null
+    },
+    "error_message": null,
+    "pull_request_url": "https://github.com/emillaurence/superset/pull/29",
+    "devin_session_url": "https://app.devin.ai/sessions/c41c02233115466f8e858567f1571213",
+    "playbook_id": "playbook-f3d5e50a33b14d1a94558e61ee86956d",
+    "playbook_type": "security"
   }
 ]
